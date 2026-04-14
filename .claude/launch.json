@@ -1,0 +1,25 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "Converza API",
+      "runtimeExecutable": "python",
+      "runtimeArgs": ["-m", "uvicorn", "main:app", "--reload", "--port", "8000"],
+      "port": 8000
+    },
+    {
+      "name": "Converza Web",
+      "runtimeExecutable": "npm",
+      "runtimeArgs": ["run", "dev", "--prefix", "web"],
+      "port": 3000,
+      "autoPort": true
+    },
+    {
+      "name": "OpenClaw Engine",
+      "runtimeExecutable": "pnpm",
+      "runtimeArgs": ["gateway:watch"],
+      "port": 18789,
+      "cwd": "backend"
+    }
+  ]
+}
