@@ -248,7 +248,7 @@ function RolePill({
           className={clsx(
             "rounded-full px-3 py-1 text-[12px] font-medium transition-all duration-150",
             role === r
-              ? "bg-bg-primary text-text-primary shadow-[0_1px_2px_rgba(0,0,0,0.06)]"
+              ? "bg-bg-elevated text-text-primary shadow-[0_1px_2px_rgba(0,0,0,0.06)]"
               : "text-text-muted hover:text-text-primary",
           )}
         >
@@ -280,7 +280,7 @@ function ModePill({
         className={clsx(
           "flex items-center gap-1.5 rounded-full px-3 py-1 text-[12px] font-medium transition-all duration-150",
           mode === "chat"
-            ? "bg-bg-primary text-text-primary shadow-[0_1px_2px_rgba(0,0,0,0.06)]"
+            ? "bg-bg-elevated text-text-primary shadow-[0_1px_2px_rgba(0,0,0,0.06)]"
             : "text-text-muted hover:text-text-primary",
         )}
       >
@@ -293,7 +293,7 @@ function ModePill({
         className={clsx(
           "flex items-center gap-1.5 rounded-full px-3 py-1 text-[12px] font-medium transition-all duration-150",
           mode === "pipeline"
-            ? "bg-bg-primary text-text-primary shadow-[0_1px_2px_rgba(0,0,0,0.06)]"
+            ? "bg-bg-elevated text-text-primary shadow-[0_1px_2px_rgba(0,0,0,0.06)]"
             : "text-text-muted hover:text-text-primary",
         )}
       >
@@ -412,7 +412,7 @@ function EmptyState({
           <button
             key={prompt}
             onClick={() => onPrompt(prompt)}
-            className="group rounded-2xl border border-border bg-bg-secondary/60 px-4 py-3.5 text-left text-[13.5px] leading-relaxed text-text-secondary transition-all duration-200 hover:-translate-y-px hover:border-border-hover hover:bg-bg-primary hover:text-text-primary hover:shadow-[0_4px_14px_rgba(0,0,0,0.04)]"
+            className="group rounded-2xl border border-border bg-bg-elevated/70 px-4 py-3.5 text-left text-[13.5px] leading-relaxed text-text-secondary transition-all duration-200 hover:-translate-y-px hover:border-border-hover hover:bg-bg-elevated hover:text-text-primary hover:shadow-[0_4px_14px_rgba(0,0,0,0.04)]"
           >
             <span className="line-clamp-2">{prompt}</span>
           </button>
@@ -921,7 +921,7 @@ export default function CommandCenter() {
       {/* Input bar — Claude-style: textarea on top, tool toolbar below */}
       <div className="sticky bottom-0 shrink-0 bg-gradient-to-b from-transparent via-bg-primary/80 to-bg-primary px-3 pt-6 pb-4 pb-safe md:px-6 md:pt-8 md:pb-6">
         <div className="mx-auto max-w-3xl">
-          <div className="rounded-3xl border border-border bg-bg-primary shadow-[0_2px_8px_rgba(0,0,0,0.04),0_12px_32px_-8px_rgba(0,0,0,0.06)] transition-all duration-200 focus-within:border-border-hover focus-within:shadow-[0_2px_8px_rgba(0,0,0,0.04),0_18px_44px_-12px_rgba(0,0,0,0.08)]">
+          <div className="rounded-3xl border border-border bg-bg-elevated shadow-[0_2px_8px_rgba(0,0,0,0.04),0_12px_32px_-8px_rgba(0,0,0,0.06)] transition-all duration-200 focus-within:border-border-hover focus-within:shadow-[0_2px_8px_rgba(0,0,0,0.04),0_18px_44px_-12px_rgba(0,0,0,0.08)]">
             {/* Textarea */}
             <textarea
               ref={textareaRef}

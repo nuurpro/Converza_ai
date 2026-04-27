@@ -299,7 +299,7 @@ export default function AnalyticsPage() {
                   <div
                     key={i}
                     className={clsx(
-                      "rounded-lg border bg-bg-primary p-3.5",
+                      "rounded-lg border bg-bg-elevated p-3.5",
                       cfg.border
                     )}
                   >

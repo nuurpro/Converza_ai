@@ -6,13 +6,13 @@
   --font-serif: var(--font-serif), "Instrument Serif", Georgia, "Times New Roman", serif;
   --font-mono:  var(--font-mono), "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
 
-  /* ── Background ── (light, Claude-inspired warm cream + neutral white) */
-  --color-bg-primary:    #FFFFFF;        /* canvas */
-  --color-bg-secondary:  #FAFAF7;        /* warm surface (sidebar, message bubble bg) */
-  --color-bg-tertiary:   #F4F4F1;        /* sunken (chat input chrome, code blocks) */
-  --color-bg-elevated:   #FFFFFF;        /* lifted card */
-  --color-bg-hover:      rgba(0,0,0,0.04);
-  --color-bg-active:     rgba(0,0,0,0.06);
+  /* ── Background ── (Claude-style: warm cream canvas, true-white lifted surfaces) */
+  --color-bg-primary:    #FAFAF7;        /* warm cream canvas — the "page" */
+  --color-bg-secondary:  #F5F4EF;        /* slightly deeper cream for sidebar / sunken bands */
+  --color-bg-tertiary:   #EDECE6;        /* warmest sunken — chat input shell, code, dividers */
+  --color-bg-elevated:   #FFFFFF;        /* lifted card / message — true white pops off cream */
+  --color-bg-hover:      rgba(0,0,0,0.035);
+  --color-bg-active:     rgba(0,0,0,0.055);
 
   /* ── Accent ── (single brand blue from landing) */
   --color-accent:        #0070F3;

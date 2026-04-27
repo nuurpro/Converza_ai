@@ -253,7 +253,7 @@ function ContentCard({
   status: PostStatus;
 }) {
   return (
-    <div className="group rounded-lg border border-border bg-bg-primary p-3 transition-all hover:border-border-hover hover:bg-bg-tertiary">
+    <div className="group rounded-lg border border-border bg-bg-elevated p-3 transition-all hover:border-border-hover hover:bg-bg-tertiary">
       {/* Thumbnail */}
       <div
         className="mb-2.5 flex h-20 items-center justify-center rounded-md"
