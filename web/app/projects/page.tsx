@@ -130,20 +130,20 @@ const statusConfig: Record<
   running: {
     label: "Running",
     icon: Loader2,
-    bg: "bg-blue-500/10",
-    text: "text-blue-400",
+    bg: "bg-accent-dim",
+    text: "text-accent",
   },
   completed: {
     label: "Completed",
     icon: CheckCircle2,
-    bg: "bg-emerald-500/10",
-    text: "text-emerald-400",
+    bg: "bg-success/10",
+    text: "text-success",
   },
   paused: {
     label: "Paused",
     icon: PauseCircle,
-    bg: "bg-amber-500/10",
-    text: "text-amber-400",
+    bg: "bg-warning/10",
+    text: "text-warning",
   },
 };
 
@@ -161,19 +161,21 @@ export default function ProjectsPage() {
   return (
     <div className="flex h-full flex-col">
       {/* Header */}
-      <header className="flex h-14 shrink-0 items-center justify-between border-b border-[#262626] px-4 pl-14 md:pl-6 md:px-6">
-        <div className="flex items-center gap-2.5">
-          <FolderKanban size={18} strokeWidth={1.8} className="text-[#facc15]" />
-          <h1 className="text-[15px] font-semibold text-white">Projects</h1>
+      <header className="flex h-16 shrink-0 items-center justify-between border-b border-border bg-bg-primary px-4 pl-14 md:pl-8 md:px-8">
+        <div className="flex items-baseline gap-3">
+          <h1 className="text-[18px] font-medium tracking-[-0.01em] text-text-primary">Projects</h1>
+          <span className="hidden font-display text-[18px] text-text-muted sm:block">
+            campaigns
+          </span>
         </div>
-        <button className="flex items-center gap-2 rounded-lg bg-[#facc15] px-3 py-2 text-[12px] font-bold text-black transition-colors hover:bg-[#eab308]">
-          <Zap size={13} strokeWidth={2.5} />
-          <span className="hidden sm:inline">New Campaign</span>
+        <button className="flex items-center gap-2 rounded-full bg-text-primary px-4 py-2 text-[12.5px] font-medium text-bg-primary transition-transform duration-150 hover:scale-[1.02]">
+          <Zap size={13} strokeWidth={2.4} />
+          <span className="hidden sm:inline">New campaign</span>
           <span className="sm:hidden">New</span>
         </button>
       </header>
 
-      <div className="flex-1 overflow-y-auto bg-[#0A0A0A] p-4 md:p-6">
+      <div className="flex-1 overflow-y-auto bg-bg-primary p-4 md:p-6">
         {/* KPI Summary */}
         <div className="mb-6 grid grid-cols-1 gap-3 sm:grid-cols-3 sm:gap-4">
           {[
@@ -181,30 +183,30 @@ export default function ProjectsPage() {
               label: "Active Campaigns",
               value: activeCampaigns.toString(),
               icon: Loader2,
-              color: "text-blue-400",
-              bg: "bg-blue-500/8",
+              color: "text-accent",
+              bg: "bg-accent-dim",
             },
             {
               label: "Total Generated Assets",
               value: totalAssets.toString(),
               icon: Film,
-              color: "text-[#facc15]",
-              bg: "bg-[#facc15]/8",
+              color: "text-accent",
+              bg: "bg-accent/8",
             },
             {
               label: "Completed Campaigns",
               value: completedCampaigns.toString(),
               icon: TrendingUp,
-              color: "text-emerald-400",
-              bg: "bg-emerald-500/8",
+              color: "text-success",
+              bg: "bg-success/8",
             },
           ].map((kpi) => (
             <div
               key={kpi.label}
-              className="rounded-xl border border-[#262626] bg-[#141414] p-5"
+              className="rounded-xl border border-border bg-bg-secondary p-5"
             >
               <div className="flex items-center justify-between">
-                <span className="text-[12px] font-medium tracking-wide text-gray-400">
+                <span className="text-[12px] font-medium tracking-wide text-text-muted">
                   {kpi.label}
                 </span>
                 <div
@@ -216,7 +218,7 @@ export default function ProjectsPage() {
                   <kpi.icon size={16} className={kpi.color} />
                 </div>
               </div>
-              <p className="mt-2 text-3xl font-bold tracking-tight text-white">
+              <p className="mt-2 text-3xl font-bold tracking-tight text-text-primary">
                 {kpi.value}
               </p>
             </div>
@@ -224,9 +226,9 @@ export default function ProjectsPage() {
         </div>
 
         {/* Campaign Table — desktop: grid table, mobile: card list */}
-        <div className="overflow-hidden rounded-xl border border-[#262626] bg-[#141414]">
+        <div className="overflow-hidden rounded-xl border border-border bg-bg-secondary">
           {/* Table header — desktop only */}
-          <div className="hidden border-b border-[#262626] px-5 py-3 lg:grid lg:grid-cols-[2fr_1.2fr_1fr_0.8fr_0.7fr_0.7fr_0.5fr] lg:gap-4">
+          <div className="hidden border-b border-border px-5 py-3 lg:grid lg:grid-cols-[2fr_1.2fr_1fr_0.8fr_0.7fr_0.7fr_0.5fr] lg:gap-4">
             {[
               "Campaign",
               "Strategy",
@@ -238,7 +240,7 @@ export default function ProjectsPage() {
             ].map((h) => (
               <span
                 key={h}
-                className="text-[11px] font-semibold uppercase tracking-wider text-gray-500"
+                className="text-[11px] font-semibold uppercase tracking-wider text-text-muted"
               >
                 {h}
               </span>
@@ -254,20 +256,20 @@ export default function ProjectsPage() {
               <div
                 key={c.id}
                 className={clsx(
-                  "p-4 transition-colors hover:bg-[#1a1a1a] lg:grid lg:grid-cols-[2fr_1.2fr_1fr_0.8fr_0.7fr_0.7fr_0.5fr] lg:items-center lg:gap-4 lg:px-5 lg:py-3.5",
+                  "p-4 transition-colors hover:bg-bg-tertiary lg:grid lg:grid-cols-[2fr_1.2fr_1fr_0.8fr_0.7fr_0.7fr_0.5fr] lg:items-center lg:gap-4 lg:px-5 lg:py-3.5",
                   i < campaigns.length - 1 && "border-b border-[#1e1e1e]"
                 )}
               >
                 {/* Campaign name + platforms */}
                 <div>
-                  <p className="text-[13px] font-medium text-white">
+                  <p className="text-[13px] font-medium text-text-primary">
                     {c.name}
                   </p>
                   <div className="mt-1 flex flex-wrap items-center gap-1.5">
                     {c.platforms.map((p) => (
                       <span
                         key={p}
-                        className="rounded bg-[#1e1e1e] px-1.5 py-0.5 text-[9px] font-semibold uppercase tracking-wider text-gray-500"
+                        className="rounded bg-[#1e1e1e] px-1.5 py-0.5 text-[9px] font-semibold uppercase tracking-wider text-text-muted"
                       >
                         {p}
                       </span>
@@ -280,13 +282,13 @@ export default function ProjectsPage() {
                 </div>
 
                 {/* Strategy — hidden on mobile (shown in mobile via row below) */}
-                <span className="hidden text-[12px] text-gray-400 lg:block">{c.strategy}</span>
+                <span className="hidden text-[12px] text-text-muted lg:block">{c.strategy}</span>
 
                 {/* Mobile: strategy + metrics row */}
                 <div className="mt-2 flex flex-wrap items-center gap-2 lg:hidden">
-                  <span className="text-[11px] text-gray-500">{c.strategy}</span>
+                  <span className="text-[11px] text-text-muted">{c.strategy}</span>
                   <span className="text-gray-700">·</span>
-                  <span className="font-mono text-[11px] text-gray-400">{c.spend}</span>
+                  <span className="font-mono text-[11px] text-text-muted">{c.spend}</span>
                   <span className="text-gray-700">·</span>
                   <span
                     className={clsx(
@@ -294,10 +296,10 @@ export default function ProjectsPage() {
                       c.roas === "—"
                         ? "text-gray-600"
                         : parseFloat(c.roas) >= 3
-                          ? "text-emerald-400"
+                          ? "text-success"
                           : parseFloat(c.roas) >= 2
-                            ? "text-[#facc15]"
-                            : "text-red-400"
+                            ? "text-accent"
+                            : "text-error"
                     )}
                   >
                     {c.roas} ROAS
@@ -322,19 +324,19 @@ export default function ProjectsPage() {
                     {sc.label}
                   </span>
                   {c.statusDetail && (
-                    <p className="mt-1 text-[10px] leading-tight text-amber-400/70">
+                    <p className="mt-1 text-[10px] leading-tight text-warning/70">
                       {c.statusDetail}
                     </p>
                   )}
                 </div>
 
                 {/* Assets — desktop only */}
-                <span className="hidden font-mono text-[13px] font-medium text-white lg:block">
+                <span className="hidden font-mono text-[13px] font-medium text-text-primary lg:block">
                   {c.assets}
                 </span>
 
                 {/* Spend — desktop only */}
-                <span className="hidden font-mono text-[12px] text-gray-400 lg:block">
+                <span className="hidden font-mono text-[12px] text-text-muted lg:block">
                   {c.spend}
                 </span>
 
@@ -345,17 +347,17 @@ export default function ProjectsPage() {
                     c.roas === "—"
                       ? "text-gray-600"
                       : parseFloat(c.roas) >= 3
-                        ? "text-emerald-400"
+                        ? "text-success"
                         : parseFloat(c.roas) >= 2
-                          ? "text-[#facc15]"
-                          : "text-red-400"
+                          ? "text-accent"
+                          : "text-error"
                   )}
                 >
                   {c.roas}
                 </span>
 
                 {/* Action — desktop only */}
-                <button className="hidden h-7 w-7 items-center justify-center rounded-md text-gray-600 transition-colors hover:bg-[#262626] hover:text-gray-400 lg:flex">
+                <button className="hidden h-7 w-7 items-center justify-center rounded-md text-gray-600 transition-colors hover:bg-[#262626] hover:text-text-muted lg:flex">
                   <ArrowUpRight size={14} />
                 </button>
               </div>

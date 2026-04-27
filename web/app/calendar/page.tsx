@@ -34,9 +34,9 @@ interface ContentPost {
 
 const columns: { key: PostStatus; label: string; count: number; dotColor: string }[] = [
   { key: "drafting", label: "Drafting", count: 4, dotColor: "bg-gray-400" },
-  { key: "pending_approval", label: "Pending Approval", count: 3, dotColor: "bg-amber-400" },
-  { key: "scheduled", label: "Scheduled", count: 5, dotColor: "bg-blue-400" },
-  { key: "published", label: "Published", count: 6, dotColor: "bg-emerald-400" },
+  { key: "pending_approval", label: "Pending Approval", count: 3, dotColor: "bg-warning" },
+  { key: "scheduled", label: "Scheduled", count: 5, dotColor: "bg-accent" },
+  { key: "published", label: "Published", count: 6, dotColor: "bg-success" },
 ];
 
 const posts: Record<PostStatus, ContentPost[]> = {
@@ -253,7 +253,7 @@ function ContentCard({
   status: PostStatus;
 }) {
   return (
-    <div className="group rounded-lg border border-[#262626] bg-[#0A0A0A] p-3 transition-all hover:border-[#363636] hover:bg-[#111]">
+    <div className="group rounded-lg border border-border bg-bg-primary p-3 transition-all hover:border-border-hover hover:bg-bg-tertiary">
       {/* Thumbnail */}
       <div
         className="mb-2.5 flex h-20 items-center justify-center rounded-md"
@@ -277,7 +277,7 @@ function ContentCard({
       </div>
 
       {/* Title */}
-      <p className="mb-1.5 text-[12px] font-semibold leading-snug text-white">
+      <p className="mb-1.5 text-[12px] font-semibold leading-snug text-text-primary">
         {post.title}
       </p>
 
@@ -292,14 +292,14 @@ function ContentCard({
         >
           {post.platform}
         </span>
-        <span className="rounded bg-[#1e1e1e] px-1.5 py-0.5 text-[9px] font-semibold uppercase tracking-wider text-gray-500">
+        <span className="rounded bg-[#1e1e1e] px-1.5 py-0.5 text-[9px] font-semibold uppercase tracking-wider text-text-muted">
           {post.assetType}
         </span>
       </div>
 
       {/* Campaign tag */}
       {post.campaign && (
-        <p className="mb-2 text-[10px] text-gray-500">
+        <p className="mb-2 text-[10px] text-text-muted">
           <span className="text-gray-600">Campaign:</span> {post.campaign}
         </p>
       )}
@@ -308,7 +308,7 @@ function ContentCard({
       <div className="flex items-center justify-between border-t border-[#1e1e1e] pt-2">
         <div className="flex items-center gap-1">
           <Clock size={10} className="text-gray-600" />
-          <span className="text-[10px] text-gray-500">
+          <span className="text-[10px] text-text-muted">
             {post.postDate}
             {post.time ? ` · ${post.time}` : ""}
           </span>
@@ -316,30 +316,30 @@ function ContentCard({
 
         {/* Status-specific indicator */}
         {status === "published" && post.engagement && (
-          <span className="text-[10px] font-semibold text-emerald-400">
+          <span className="text-[10px] font-semibold text-success">
             {post.engagement}
           </span>
         )}
         {status === "pending_approval" && (
           <div className="flex items-center gap-1">
-            <Eye size={10} className="text-amber-400" />
-            <span className="text-[10px] font-medium text-amber-400">
+            <Eye size={10} className="text-warning" />
+            <span className="text-[10px] font-medium text-warning">
               Review
             </span>
           </div>
         )}
         {status === "scheduled" && (
           <div className="flex items-center gap-1">
-            <Send size={10} className="text-blue-400" />
-            <span className="text-[10px] font-medium text-blue-400">
+            <Send size={10} className="text-accent" />
+            <span className="text-[10px] font-medium text-accent">
               Queued
             </span>
           </div>
         )}
         {status === "drafting" && (
           <div className="flex items-center gap-1">
-            <PenTool size={10} className="text-gray-500" />
-            <span className="text-[10px] font-medium text-gray-500">
+            <PenTool size={10} className="text-text-muted" />
+            <span className="text-[10px] font-medium text-text-muted">
               Draft
             </span>
           </div>
@@ -360,48 +360,40 @@ export default function CalendarPage() {
   return (
     <div className="flex h-full flex-col">
       {/* Header */}
-      <header className="flex h-14 shrink-0 items-center justify-between border-b border-[#262626] px-4 pl-14 md:pl-6 md:px-6">
-        <div className="flex items-center gap-2.5">
-          <CalendarDays
-            size={18}
-            strokeWidth={1.8}
-            className="text-[#facc15]"
-          />
-          <h1 className="text-[15px] font-semibold text-white">
-            <span className="hidden sm:inline">Content Calendar</span>
-            <span className="sm:hidden">Calendar</span>
+      <header className="flex h-16 shrink-0 items-center justify-between border-b border-border bg-bg-primary px-4 pl-14 md:pl-8 md:px-8">
+        <div className="flex items-baseline gap-3">
+          <h1 className="text-[18px] font-medium tracking-[-0.01em] text-text-primary">
+            <span className="hidden sm:inline">Calendar</span>
+            <span className="sm:hidden">Cal</span>
           </h1>
+          <span className="hidden font-display text-[18px] text-text-muted sm:block">
+            content schedule
+          </span>
         </div>
         <div className="flex items-center gap-2 md:gap-3">
-          <div className="hidden items-center gap-4 text-[11px] sm:flex">
-            <span className="text-gray-400">
-              <span className="font-mono font-bold text-blue-400">
-                {totalScheduled}
-              </span>{" "}
-              queued
+          <div className="hidden items-center gap-4 sm:flex">
+            <span className="font-mono text-[10px] uppercase tracking-[0.18em] text-text-muted">
+              <span className="text-accent">{totalScheduled}</span> queued
             </span>
-            <span className="text-gray-400">
-              <span className="font-mono font-bold text-emerald-400">
-                {totalPublished}
-              </span>{" "}
-              published this week
+            <span className="font-mono text-[10px] uppercase tracking-[0.18em] text-text-muted">
+              <span className="text-success">{totalPublished}</span> shipped
             </span>
           </div>
-          <button className="flex items-center gap-2 rounded-lg bg-[#facc15] px-3 py-2 text-[12px] font-bold text-black transition-colors hover:bg-[#eab308]">
-            <Plus size={13} strokeWidth={2.5} />
-            <span className="hidden sm:inline">Schedule Post</span>
+          <button className="flex items-center gap-2 rounded-full bg-text-primary px-4 py-2 text-[12.5px] font-medium text-bg-primary transition-transform duration-150 hover:scale-[1.02]">
+            <Plus size={13} strokeWidth={2.4} />
+            <span className="hidden sm:inline">Schedule post</span>
             <span className="sm:hidden">Add</span>
           </button>
         </div>
       </header>
 
       {/* Kanban board */}
-      <div className="flex-1 overflow-x-auto bg-[#0A0A0A] p-3 md:p-6">
+      <div className="flex-1 overflow-x-auto bg-bg-primary p-3 md:p-6">
         <div className="flex h-full gap-3 md:gap-4">
           {columns.map((col) => (
             <div
               key={col.key}
-              className="flex w-64 shrink-0 flex-col rounded-xl border border-[#262626] bg-[#141414] md:w-72"
+              className="flex w-64 shrink-0 flex-col rounded-xl border border-border bg-bg-secondary md:w-72"
             >
               {/* Column header */}
               <div className="flex items-center justify-between border-b border-[#1e1e1e] px-4 py-3">
@@ -412,11 +404,11 @@ export default function CalendarPage() {
                       col.dotColor
                     )}
                   />
-                  <span className="text-[12px] font-semibold text-white">
+                  <span className="text-[12px] font-semibold text-text-primary">
                     {col.label}
                   </span>
                 </div>
-                <span className="flex h-5 min-w-[20px] items-center justify-center rounded-full bg-[#1e1e1e] px-1.5 text-[10px] font-bold text-gray-400">
+                <span className="flex h-5 min-w-[20px] items-center justify-center rounded-full bg-[#1e1e1e] px-1.5 text-[10px] font-bold text-text-muted">
                   {posts[col.key].length}
                 </span>
               </div>

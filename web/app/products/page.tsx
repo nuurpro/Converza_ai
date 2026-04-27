@@ -161,9 +161,9 @@ const products: Product[] = [
 ];
 
 const stockConfig = {
-  in_stock: { label: "In Stock", color: "text-emerald-400", bg: "bg-emerald-500/10" },
-  low_stock: { label: "Low Stock", color: "text-amber-400", bg: "bg-amber-500/10" },
-  out_of_stock: { label: "Out of Stock", color: "text-red-400", bg: "bg-red-500/10" },
+  in_stock: { label: "In Stock", color: "text-success", bg: "bg-success/10" },
+  low_stock: { label: "Low Stock", color: "text-warning", bg: "bg-warning/10" },
+  out_of_stock: { label: "Out of Stock", color: "text-error", bg: "bg-error/10" },
 };
 
 // ─────────────────────────────────────────────────────────────────────
@@ -180,30 +180,32 @@ export default function ProductsPage() {
   return (
     <div className="flex h-full flex-col">
       {/* Header */}
-      <header className="flex h-14 shrink-0 items-center justify-between border-b border-[#262626] px-4 pl-14 md:pl-6 md:px-6">
-        <div className="flex items-center gap-2.5">
-          <Package size={18} strokeWidth={1.8} className="text-[#facc15]" />
-          <h1 className="text-[15px] font-semibold text-white">Products</h1>
+      <header className="flex h-16 shrink-0 items-center justify-between border-b border-border bg-bg-primary px-4 pl-14 md:pl-8 md:px-8">
+        <div className="flex items-baseline gap-3">
+          <h1 className="text-[18px] font-medium tracking-[-0.01em] text-text-primary">Products</h1>
+          <span className="hidden font-display text-[18px] text-text-muted sm:block">
+            catalog
+          </span>
         </div>
         <div className="flex items-center gap-2 md:gap-3">
-          <div className="hidden items-center gap-2 rounded-lg border border-[#262626] bg-[#141414] px-3 py-1.5 sm:flex">
-            <Search size={14} className="text-gray-500" />
+          <div className="hidden items-center gap-2 rounded-full border border-border bg-bg-secondary px-3.5 py-1.5 sm:flex">
+            <Search size={13} className="text-text-muted" />
             <input
               type="text"
-              placeholder="Search SKUs..."
-              className="w-40 bg-transparent text-[12px] text-white placeholder-gray-500 outline-none"
+              placeholder="Search SKUs…"
+              className="w-40 bg-transparent text-[12.5px] text-text-primary placeholder-text-muted outline-none"
               readOnly
             />
           </div>
-          <button className="flex items-center gap-2 rounded-lg bg-[#facc15] px-3 py-2 text-[12px] font-bold text-black transition-colors hover:bg-[#eab308]">
-            <Plus size={13} strokeWidth={2.5} />
-            <span className="hidden sm:inline">Sync Catalog</span>
+          <button className="flex items-center gap-2 rounded-full bg-text-primary px-4 py-2 text-[12.5px] font-medium text-bg-primary transition-transform duration-150 hover:scale-[1.02]">
+            <Plus size={13} strokeWidth={2.4} />
+            <span className="hidden sm:inline">Sync catalog</span>
             <span className="sm:hidden">Sync</span>
           </button>
         </div>
       </header>
 
-      <div className="flex-1 overflow-y-auto bg-[#0A0A0A] p-4 md:p-6">
+      <div className="flex-1 overflow-y-auto bg-bg-primary p-4 md:p-6">
         {/* Summary stats */}
         <div className="mb-6 grid grid-cols-1 gap-3 sm:grid-cols-3 sm:gap-4">
           {[
@@ -211,32 +213,32 @@ export default function ProductsPage() {
               label: "Total SKUs",
               value: totalSKUs,
               icon: Box,
-              color: "text-[#facc15]",
+              color: "text-accent",
             },
             {
               label: "AI-Active Products",
               value: activeAI,
               icon: Zap,
-              color: "text-blue-400",
+              color: "text-accent",
             },
             {
               label: "Stock Alerts",
               value: lowStock,
               icon: AlertTriangle,
-              color: "text-amber-400",
+              color: "text-warning",
             },
           ].map((s) => (
             <div
               key={s.label}
-              className="rounded-xl border border-[#262626] bg-[#141414] p-5"
+              className="rounded-xl border border-border bg-bg-secondary p-5"
             >
               <div className="flex items-center justify-between">
-                <span className="text-[12px] font-medium text-gray-400">
+                <span className="text-[12px] font-medium text-text-muted">
                   {s.label}
                 </span>
                 <s.icon size={16} className={s.color} />
               </div>
-              <p className="mt-2 text-3xl font-bold tracking-tight text-white">
+              <p className="mt-2 text-3xl font-bold tracking-tight text-text-primary">
                 {s.value}
               </p>
             </div>
@@ -251,7 +253,7 @@ export default function ProductsPage() {
             return (
               <div
                 key={p.id}
-                className="group rounded-xl border border-[#262626] bg-[#141414] p-4 transition-all hover:border-[#363636] hover:bg-[#1a1a1a]"
+                className="group rounded-xl border border-border bg-bg-secondary p-4 transition-all hover:border-border-hover hover:bg-bg-tertiary"
               >
                 {/* Thumbnail placeholder */}
                 <div
@@ -270,17 +272,17 @@ export default function ProductsPage() {
                 <div className="space-y-2">
                   <div className="flex items-start justify-between">
                     <div>
-                      <p className="text-[13px] font-semibold text-white">
+                      <p className="text-[13px] font-semibold text-text-primary">
                         {p.name}
                       </p>
-                      <p className="mt-0.5 font-mono text-[10px] tracking-wider text-gray-500">
+                      <p className="mt-0.5 font-mono text-[10px] tracking-wider text-text-muted">
                         {p.sku}
                       </p>
                     </div>
                   </div>
 
                   <div className="flex items-center gap-2">
-                    <span className="rounded bg-[#1e1e1e] px-1.5 py-0.5 text-[9px] font-semibold uppercase tracking-wider text-gray-500">
+                    <span className="rounded bg-[#1e1e1e] px-1.5 py-0.5 text-[9px] font-semibold uppercase tracking-wider text-text-muted">
                       {p.category}
                     </span>
                     <span
@@ -297,24 +299,24 @@ export default function ProductsPage() {
                   {/* Metrics row */}
                   <div className="flex items-center justify-between border-t border-[#1e1e1e] pt-2">
                     <div>
-                      <p className="text-[10px] text-gray-500">Stock</p>
-                      <p className="font-mono text-[12px] font-medium text-white">
+                      <p className="text-[10px] text-text-muted">Stock</p>
+                      <p className="font-mono text-[12px] font-medium text-text-primary">
                         {p.stock.toLocaleString()}
                       </p>
                     </div>
                     <div>
-                      <p className="text-[10px] text-gray-500">Revenue</p>
-                      <p className="font-mono text-[12px] font-medium text-white">
+                      <p className="text-[10px] text-text-muted">Revenue</p>
+                      <p className="font-mono text-[12px] font-medium text-text-primary">
                         {p.revenue}
                       </p>
                     </div>
                     <div className="text-right">
-                      <p className="text-[10px] text-gray-500">AI Campaigns</p>
+                      <p className="text-[10px] text-text-muted">AI Campaigns</p>
                       <div className="flex items-center justify-end gap-1">
                         {p.activeCampaigns > 0 ? (
                           <>
-                            <Zap size={10} className="text-[#facc15]" />
-                            <span className="font-mono text-[12px] font-bold text-[#facc15]">
+                            <Zap size={10} className="text-accent" />
+                            <span className="font-mono text-[12px] font-bold text-accent">
                               {p.activeCampaigns}
                             </span>
                           </>
