@@ -339,7 +339,7 @@ function MessageBubble({ msg }: { msg: Message }) {
   return (
     <div className="group flex w-full flex-col gap-2">
       <div className="flex items-center gap-2">
-        <span className="flex h-5 w-5 items-center justify-center rounded-md bg-text-primary text-bg-primary">
+        <span className="relative flex h-5 w-5 items-center justify-center rounded-md bg-text-primary text-bg-elevated">
           <svg width="10" height="10" viewBox="0 0 14 14" fill="none">
             <path
               d="M7 1.5v11M1.5 7h11M3 3l8 8M11 3l-8 8"
@@ -348,6 +348,7 @@ function MessageBubble({ msg }: { msg: Message }) {
               strokeLinecap="round"
             />
           </svg>
+          <span className="absolute -right-0.5 -top-0.5 h-1.5 w-1.5 rounded-full bg-accent" />
         </span>
         <span className="text-[12.5px] font-medium tracking-tight text-text-secondary">
           Co-Pilot
@@ -391,7 +392,18 @@ function EmptyState({
   const starters = mode === "pipeline" ? pipelineStarters : chatStarters;
 
   return (
-    <div className="flex h-full flex-col items-center justify-center gap-12 px-4">
+    <div className="relative flex h-full flex-col items-center justify-center gap-12 px-4">
+      {/* Soft radial bloom — warm peach + cool blue, gives the canvas a 'sunrise' presence */}
+      <div
+        aria-hidden
+        className="pointer-events-none absolute inset-0 -z-10"
+        style={{
+          background: `
+            radial-gradient(ellipse 60% 45% at 50% 38%, rgba(255, 200, 150, 0.18), transparent 70%),
+            radial-gradient(ellipse 80% 50% at 50% 60%, rgba(0, 112, 243, 0.06), transparent 70%)
+          `,
+        }}
+      />
       <div className="flex flex-col items-center gap-5 text-center">
         <div className="font-mono text-[10px] uppercase tracking-[0.22em] text-text-muted">
           {mode === "pipeline" ? "Pipeline · Manager Agent" : "Co-Pilot · Strategist"}

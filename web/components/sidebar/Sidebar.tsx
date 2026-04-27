@@ -145,7 +145,7 @@ export default function Sidebar({ open, onClose }: SidebarProps) {
           onClick={onClose}
           className="group flex items-center gap-2.5"
         >
-          <span className="relative flex h-8 w-8 items-center justify-center rounded-lg bg-text-primary text-bg-primary">
+          <span className="relative flex h-8 w-8 items-center justify-center rounded-lg bg-text-primary text-bg-elevated">
             <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
               <path
                 d="M7 1.5v11M1.5 7h11M3 3l8 8M11 3l-8 8"
@@ -154,6 +154,8 @@ export default function Sidebar({ open, onClose }: SidebarProps) {
                 strokeLinecap="round"
               />
             </svg>
+            {/* Brand-coded accent dot — a single beat of color on an otherwise mono mark */}
+            <span className="absolute -right-0.5 -top-0.5 h-2 w-2 rounded-full bg-accent ring-2 ring-bg-secondary" />
           </span>
           <span className="text-[15px] font-semibold tracking-[-0.015em] text-text-primary">
             Converza
