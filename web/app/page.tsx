@@ -312,51 +312,53 @@ function MessageBubble({ msg }: { msg: Message }) {
   const isUser = msg.role === "user";
   const isPipelineStatus = msg.type === "pipeline_status";
 
+  // Pipeline status — quiet inline log line
   if (isPipelineStatus) {
     return (
-      <div className="flex w-full justify-start gap-3">
-        <div className="mt-0.5 flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-blue-500/10 ring-1 ring-blue-500/30">
-          <Rocket size={13} className="text-blue-400" strokeWidth={2} />
-        </div>
-        <div className="max-w-[85%] rounded-2xl rounded-tl-sm bg-bg-elevated px-4 py-3 text-[13px] italic leading-relaxed text-text-secondary ring-1 ring-border">
+      <div className="flex items-center gap-2.5 py-1">
+        <span className="flex h-1.5 w-1.5 shrink-0 rounded-full bg-accent" />
+        <span className="font-mono text-[11px] uppercase tracking-[0.16em] text-text-muted">
+          {msg.content}
+        </span>
+      </div>
+    );
+  }
+
+  // User message — right-aligned warm bubble, no avatar
+  if (isUser) {
+    return (
+      <div className="flex w-full justify-end">
+        <div className="max-w-[85%] rounded-3xl rounded-tr-md bg-bg-secondary px-5 py-3 text-[15px] leading-relaxed text-text-primary md:max-w-[75%]">
           {msg.content}
         </div>
       </div>
     );
   }
 
+  // Assistant message — Claude-style: small label + plain text, no bubble
   return (
-    <div
-      className={clsx(
-        "flex w-full gap-3",
-        isUser ? "justify-end" : "justify-start"
-      )}
-    >
-      {!isUser && (
-        <div className="mt-0.5 flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-accent-dim ring-1 ring-accent-muted">
-          <Bot size={14} className="text-accent" strokeWidth={2} />
-        </div>
-      )}
-
-      <div
-        className={clsx(
-          "max-w-[85%] md:max-w-[75%] rounded-2xl px-4 py-3 text-[14px] leading-relaxed",
-          isUser
-            ? "rounded-tr-sm bg-accent text-text-on-accent"
-            : "rounded-tl-sm bg-bg-elevated text-text-primary ring-1 ring-border"
-        )}
-      >
+    <div className="group flex w-full flex-col gap-2">
+      <div className="flex items-center gap-2">
+        <span className="flex h-5 w-5 items-center justify-center rounded-md bg-text-primary text-bg-primary">
+          <svg width="10" height="10" viewBox="0 0 14 14" fill="none">
+            <path
+              d="M7 1.5v11M1.5 7h11M3 3l8 8M11 3l-8 8"
+              stroke="currentColor"
+              strokeWidth="1.6"
+              strokeLinecap="round"
+            />
+          </svg>
+        </span>
+        <span className="text-[12.5px] font-medium tracking-tight text-text-secondary">
+          Co-Pilot
+        </span>
+      </div>
+      <div className="pl-7 text-[15px] leading-[1.7] text-text-primary">
         {msg.content}
         {msg.streaming && (
-          <span className="ml-0.5 inline-block h-[14px] w-[2px] animate-pulse rounded-full bg-current align-middle opacity-70" />
+          <span className="ml-0.5 inline-block h-[1em] w-[2px] animate-pulse rounded-full bg-text-primary align-middle opacity-70" />
         )}
       </div>
-
-      {isUser && (
-        <div className="mt-0.5 flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-bg-tertiary ring-1 ring-border">
-          <User size={14} className="text-text-muted" strokeWidth={2} />
-        </div>
-      )}
     </div>
   );
 }
@@ -844,7 +846,7 @@ export default function CommandCenter() {
 
   return (
     <div className="flex h-full flex-col">
-      {/* Header — Claude-style: light, serif italic page title, mode pills right */}
+      {/* Header — minimal Claude chrome */}
       <header className="flex h-16 shrink-0 items-center justify-between border-b border-border bg-bg-primary px-4 pl-14 md:pl-8 md:px-8">
         <div className="flex items-baseline gap-3">
           <h1 className="hidden text-[18px] font-medium tracking-[-0.01em] text-text-primary sm:block">
@@ -854,16 +856,11 @@ export default function CommandCenter() {
             workspace
           </span>
         </div>
-        <div className="flex items-center gap-2 md:gap-2.5">
-          <ModePill mode={mode} onChange={setMode} disabled={streaming} />
-          <PermissionPill mode={permissionMode} onChange={setPermissionMode} disabled={streaming} />
-          <RolePill role={role} onChange={setRole} disabled={streaming} />
+        <div className="flex items-center gap-2">
           <span
             className={clsx(
-              "hidden items-center gap-1.5 rounded-full px-3 py-1.5 font-mono text-[10px] uppercase tracking-[0.18em] sm:inline-flex",
-              mode === "pipeline"
-                ? "bg-accent/10 text-accent"
-                : "bg-bg-secondary text-text-secondary",
+              "hidden items-center gap-1.5 rounded-full border border-border bg-bg-secondary px-3 py-1.5 font-mono text-[10px] uppercase tracking-[0.18em] sm:inline-flex",
+              mode === "pipeline" ? "text-accent" : "text-text-secondary",
             )}
           >
             <span
@@ -872,7 +869,7 @@ export default function CommandCenter() {
                 mode === "pipeline" ? "bg-accent" : "bg-success",
               )}
             />
-            {mode === "pipeline" ? "Pipeline" : "Active"}
+            {mode === "pipeline" ? "Pipeline · running" : "Active"}
           </span>
         </div>
       </header>
@@ -921,10 +918,11 @@ export default function CommandCenter() {
         )}
       </div>
 
-      {/* Input bar — sticky bottom with safe area */}
-      <div className="sticky bottom-0 shrink-0 border-t border-border bg-bg-primary px-3 py-3 pb-safe md:px-4 md:py-4">
+      {/* Input bar — Claude-style: textarea on top, tool toolbar below */}
+      <div className="sticky bottom-0 shrink-0 bg-gradient-to-b from-transparent via-bg-primary/80 to-bg-primary px-3 pt-6 pb-4 pb-safe md:px-6 md:pt-8 md:pb-6">
         <div className="mx-auto max-w-3xl">
-          <div className="flex items-end gap-2 rounded-2xl bg-bg-secondary px-3 py-2.5 ring-1 ring-border transition-all focus-within:ring-accent/40 md:gap-3 md:px-4 md:py-3">
+          <div className="rounded-3xl border border-border bg-bg-primary shadow-[0_2px_8px_rgba(0,0,0,0.04),0_12px_32px_-8px_rgba(0,0,0,0.06)] transition-all duration-200 focus-within:border-border-hover focus-within:shadow-[0_2px_8px_rgba(0,0,0,0.04),0_18px_44px_-12px_rgba(0,0,0,0.08)]">
+            {/* Textarea */}
             <textarea
               ref={textareaRef}
               rows={1}
@@ -935,35 +933,50 @@ export default function CommandCenter() {
               placeholder={
                 mode === "pipeline"
                   ? "Describe a campaign to execute…"
-                  : "Ask your Co-Pilot…"
+                  : "Reply to Co-Pilot…"
               }
-              className="min-h-[24px] flex-1 resize-none bg-transparent text-[14px] text-text-primary placeholder-text-muted outline-none disabled:opacity-50"
+              className="block min-h-[28px] w-full resize-none bg-transparent px-5 pt-4 pb-2 text-[15px] leading-relaxed text-text-primary placeholder-text-muted outline-none disabled:opacity-50"
             />
-            <button
-              onClick={() => send()}
-              disabled={!input.trim() || streaming}
-              className={clsx(
-                "flex h-10 w-10 md:h-8 md:w-8 shrink-0 items-center justify-center rounded-xl transition-colors",
-                input.trim() && !streaming
-                  ? "bg-accent text-text-on-accent hover:bg-accent-hover"
-                  : "bg-bg-tertiary text-text-muted"
-              )}
-            >
-              {streaming ? (
-                <Loader2 size={14} strokeWidth={2} className="animate-spin" />
-              ) : mode === "pipeline" ? (
-                <Rocket size={14} strokeWidth={2.5} />
-              ) : (
-                <Send size={14} strokeWidth={2.5} />
-              )}
-            </button>
+
+            {/* Toolbar — pills LEFT, send RIGHT */}
+            <div className="flex items-center justify-between gap-2 px-3 pt-1 pb-2.5 md:px-3.5">
+              <div className="flex flex-wrap items-center gap-1.5">
+                <ModePill mode={mode} onChange={setMode} disabled={streaming} />
+                <PermissionPill
+                  mode={permissionMode}
+                  onChange={setPermissionMode}
+                  disabled={streaming}
+                />
+                <RolePill role={role} onChange={setRole} disabled={streaming} />
+              </div>
+              <button
+                onClick={() => send()}
+                disabled={!input.trim() || streaming}
+                aria-label="Send message"
+                className={clsx(
+                  "flex h-9 w-9 shrink-0 items-center justify-center rounded-full transition-all duration-150",
+                  input.trim() && !streaming
+                    ? "bg-text-primary text-bg-primary hover:scale-[1.03] active:scale-[0.97]"
+                    : "bg-bg-secondary text-text-muted",
+                )}
+              >
+                {streaming ? (
+                  <Loader2 size={14} strokeWidth={2.2} className="animate-spin" />
+                ) : mode === "pipeline" ? (
+                  <Rocket size={14} strokeWidth={2.4} />
+                ) : (
+                  <Send size={14} strokeWidth={2.4} />
+                )}
+              </button>
+            </div>
           </div>
-          <p className="mt-2 hidden text-center text-[11px] text-text-muted md:block">
-            Shift+Enter for new line · Enter to send
+
+          <p className="mt-3 hidden text-center font-mono text-[10px] uppercase tracking-[0.18em] text-text-muted md:block">
+            Shift+Enter new line · Enter send
             {mode === "pipeline" && (
-              <span className="text-blue-400/60">
+              <span className="text-accent">
                 {" "}
-                · Pipeline mode: Manager Agent will assess before executing
+                · Manager Agent assesses before executing
               </span>
             )}
           </p>
