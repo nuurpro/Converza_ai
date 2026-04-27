@@ -221,13 +221,13 @@ export default function Sidebar({ open, onClose }: SidebarProps) {
         </div>
       </nav>
 
-      {/* ── Status ── */}
-      <div className="mx-3 mb-3 flex items-center gap-2.5 rounded-lg border border-border bg-bg-secondary px-3 py-2.5">
+      {/* ── Status — soft success-tinted card ── */}
+      <div className="mx-3 mb-3 flex items-center gap-2.5 rounded-lg border border-success/15 bg-success-dim px-3 py-2.5">
         <span className="relative flex h-2 w-2">
           <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-success/60" />
           <span className="relative inline-flex h-2 w-2 rounded-full bg-success" />
         </span>
-        <span className="flex-1 font-mono text-[10px] uppercase tracking-[0.18em] text-text-secondary">
+        <span className="flex-1 font-mono text-[10px] uppercase tracking-[0.18em] text-success">
           All systems operational
         </span>
       </div>

@@ -30,10 +30,17 @@
   --color-border:        rgba(0,0,0,0.07);
   --color-border-hover:  rgba(0,0,0,0.12);
 
-  /* ── Status ── */
-  --color-success:       #10B981;
-  --color-warning:       #F59E0B;
-  --color-error:         #EF4444;
+  /* ── Status (saturation kept moderate to read on warm cream) ── */
+  --color-success:       #0E9F6E;        /* deep emerald — 'completed', 'shipped' */
+  --color-success-dim:   rgba(14,159,110,0.10);
+  --color-warning:       #C2820D;        /* warm amber — 'pending approval', 'paused' */
+  --color-warning-dim:   rgba(194,130,13,0.10);
+  --color-error:         #D03A3A;        /* desaturated brick red — 'failed', 'over budget' */
+  --color-error-dim:     rgba(208,58,58,0.10);
+
+  /* Semantic info — re-uses the brand accent (blue) for 'running' / 'in progress' */
+  --color-info:          var(--color-accent);
+  --color-info-dim:      var(--color-accent-dim);
 
   /* ── Sidebar ── */
   --sidebar-width:       272px;

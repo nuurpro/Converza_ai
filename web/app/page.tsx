@@ -293,11 +293,15 @@ function ModePill({
         className={clsx(
           "flex items-center gap-1.5 rounded-full px-3 py-1 text-[12px] font-medium transition-all duration-150",
           mode === "pipeline"
-            ? "bg-bg-elevated text-text-primary shadow-[0_1px_2px_rgba(0,0,0,0.06)]"
+            ? "bg-bg-elevated text-accent shadow-[0_1px_2px_rgba(0,0,0,0.06)] ring-1 ring-accent/15"
             : "text-text-muted hover:text-text-primary",
         )}
       >
-        <Rocket size={11} strokeWidth={2.2} />
+        <Rocket
+          size={11}
+          strokeWidth={2.2}
+          className={mode === "pipeline" ? "text-accent" : ""}
+        />
         Pipeline
       </button>
     </div>
@@ -871,16 +875,26 @@ export default function CommandCenter() {
         <div className="flex items-center gap-2">
           <span
             className={clsx(
-              "hidden items-center gap-1.5 rounded-full border border-border bg-bg-secondary px-3 py-1.5 font-mono text-[10px] uppercase tracking-[0.18em] sm:inline-flex",
-              mode === "pipeline" ? "text-accent" : "text-text-secondary",
+              "hidden items-center gap-1.5 rounded-full px-3 py-1.5 font-mono text-[10px] uppercase tracking-[0.18em] transition-colors sm:inline-flex",
+              mode === "pipeline"
+                ? "border border-accent/20 bg-accent-dim text-accent"
+                : "border border-success/15 bg-success-dim text-success",
             )}
           >
-            <span
-              className={clsx(
-                "h-1.5 w-1.5 rounded-full",
-                mode === "pipeline" ? "bg-accent" : "bg-success",
-              )}
-            />
+            <span className="relative flex h-1.5 w-1.5">
+              <span
+                className={clsx(
+                  "absolute inline-flex h-full w-full animate-ping rounded-full opacity-60",
+                  mode === "pipeline" ? "bg-accent" : "bg-success",
+                )}
+              />
+              <span
+                className={clsx(
+                  "relative h-1.5 w-1.5 rounded-full",
+                  mode === "pipeline" ? "bg-accent" : "bg-success",
+                )}
+              />
+            </span>
             {mode === "pipeline" ? "Pipeline · running" : "Active"}
           </span>
         </div>
