@@ -7,10 +7,17 @@ from pathlib import Path
 from dotenv import load_dotenv
 from supabase import create_client, Client
 
-load_dotenv()
-load_dotenv(Path(__file__).resolve().parents[2] / "converza_bot" / ".env")
+from services.config import is_production, load_local_env_override
 
-from services.config import load_local_env_override
+load_dotenv()
+
+# Local monorepo dev only — in Docker/production env comes from /etc/converza/.env
+if not is_production():
+    parts = Path(__file__).resolve().parents
+    if len(parts) > 2:
+        bot_env = parts[2] / "converza_bot" / ".env"
+        if bot_env.is_file():
+            load_dotenv(bot_env)
 
 load_local_env_override()
 
