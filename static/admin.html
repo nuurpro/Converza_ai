@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Converza Admin — Kirish so'rovlari</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: Inter, system-ui, sans-serif;
+      background: #f3f4f6;
+      color: #111827;
+    }
+    .wrap { max-width: 960px; margin: 0 auto; padding: 24px 16px 48px; }
+    h1 { margin: 0 0 8px; font-size: 24px; }
+    .sub { color: #6b7280; margin-bottom: 24px; }
+    .card {
+      background: #fff;
+      border: 1px solid #e5e7eb;
+      border-radius: 10px;
+      padding: 20px;
+      margin-bottom: 16px;
+      box-shadow: 0 8px 24px rgba(17,24,39,0.06);
+    }
+    .auth { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+    .auth-user { color: #059669; font-weight: 600; }
+    button {
+      font: inherit;
+      border-radius: 8px;
+      border: 1px solid #d1d5db;
+      background: #fff;
+      padding: 8px 14px;
+      cursor: pointer;
+    }
+    button.primary { background: #2563eb; color: #fff; border-color: #2563eb; }
+    button.approve { background: #059669; color: #fff; border-color: #059669; }
+    button.reject { background: #dc2626; color: #fff; border-color: #dc2626; }
+    .tabs { display: flex; gap: 8px; margin-bottom: 16px; }
+    .tab.active { background: #111827; color: #fff; border-color: #111827; }
+    .request {
+      border: 1px solid #e5e7eb;
+      border-radius: 8px;
+      padding: 14px;
+      margin-bottom: 12px;
+    }
+    .request h3 { margin: 0 0 4px; font-size: 18px; color: #111827; }
+    .request .owner { color: #6b7280; font-size: 14px; margin-bottom: 12px; }
+    .field-row {
+      display: grid;
+      grid-template-columns: 140px 1fr;
+      gap: 6px 12px;
+      font-size: 14px;
+      margin-bottom: 8px;
+    }
+    .field-row dt { color: #6b7280; font-weight: 500; margin: 0; }
+    .field-row dd { margin: 0; line-height: 1.45; }
+    .description {
+      background: #f9fafb;
+      border: 1px solid #e5e7eb;
+      border-radius: 8px;
+      padding: 12px;
+      font-size: 14px;
+      line-height: 1.55;
+      margin: 12px 0;
+      white-space: pre-wrap;
+    }
+    .meta { color: #6b7280; font-size: 13px; margin-bottom: 8px; }
+    .actions { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
+    .actions input {
+      flex: 1;
+      min-width: 180px;
+      padding: 8px 10px;
+      border-radius: 6px;
+      border: 1px solid #d1d5db;
+    }
+    .empty { color: #6b7280; padding: 24px; text-align: center; }
+    .error { color: #dc2626; font-size: 14px; }
+    #telegram-login { min-height: 40px; }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <h1>Converza Admin</h1>
+    <p class="sub">Foydalanuvchi kirish so'rovlarini tasdiqlang yoki rad eting. Telegram botda ham: /admin, /pending, /approve, /reject.</p>
+
+    <div class="card auth" id="auth-card">
+      <div id="login-area">
+        <span>Admin sifatida Telegram orqali kiring:</span>
+        <div id="telegram-login"></div>
+      </div>
+      <div id="user-area" hidden>
+        <span class="auth-user" id="admin-label"></span>
+        <button type="button" id="logout-btn">Chiqish</button>
+      </div>
+      <p class="error" id="auth-error" hidden></p>
+    </div>
+
+    <div class="card" id="panel" hidden>
+      <div class="tabs">
+        <button class="tab active" data-filter="pending">Kutilmoqda</button>
+        <button class="tab" data-filter="approved">Tasdiqlangan</button>
+        <button class="tab" data-filter="rejected">Rad etilgan</button>
+        <button class="tab" data-filter="">Barchasi</button>
+        <button type="button" id="refresh-btn" style="margin-left:auto;">Yangilash</button>
+      </div>
+      <div id="requests"></div>
+    </div>
+  </div>
+
+  <script>
+    const ADMIN_AUTH_KEY = "converza_admin_auth";
+    let token = null;
+    let filter = "pending";
+
+    function headers() {
+      return token ? { Authorization: `Bearer ${token}`, "Content-Type": "application/json" } : {};
+    }
+
+    function setLoggedIn(user, t) {
+      token = t;
+      localStorage.setItem(ADMIN_AUTH_KEY, JSON.stringify({ user, token }));
+      document.getElementById("login-area").hidden = true;
+      document.getElementById("user-area").hidden = false;
+      document.getElementById("panel").hidden = false;
+      document.getElementById("admin-label").textContent =
+        user.username ? `@${user.username} (admin)` : `${user.first_name} (admin)`;
+      loadRequests();
+    }
+
+    function logout() {
+      token = null;
+      localStorage.removeItem(ADMIN_AUTH_KEY);
+      document.getElementById("login-area").hidden = false;
+      document.getElementById("user-area").hidden = true;
+      document.getElementById("panel").hidden = true;
+      document.getElementById("telegram-login").innerHTML = "";
+      mountWidget();
+    }
+
+    async function mountWidget() {
+      const config = await fetch("/api/auth/config").then(r => r.json());
+      const script = document.createElement("script");
+      script.async = true;
+      script.src = "https://telegram.org/js/telegram-widget.js?22";
+      script.setAttribute("data-telegram-login", config.bot_username);
+      script.setAttribute("data-size", "medium");
+      script.setAttribute("data-radius", "8");
+      script.setAttribute("data-onauth", "onAdminAuth(user)");
+      document.getElementById("telegram-login").appendChild(script);
+    }
+
+    window.onAdminAuth = async function(user) {
+      const err = document.getElementById("auth-error");
+      err.hidden = true;
+      try {
+        const response = await fetch("/api/auth/telegram", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(user)
+        });
+        const result = await response.json();
+        if (!response.ok) throw new Error(result.detail || response.statusText);
+        if (result.role !== "admin") {
+          throw new Error("Bu hisob admin ro'yxatida emas. ADMIN_TELEGRAM_IDS ni tekshiring.");
+        }
+        setLoggedIn({ first_name: result.first_name, username: result.username }, result.token);
+      } catch (e) {
+        err.textContent = e.message;
+        err.hidden = false;
+      }
+    };
+
+    function formatDate(value) {
+      if (!value) return "—";
+      return new Date(value).toLocaleString("uz-UZ");
+    }
+
+    async function loadRequests() {
+      const list = document.getElementById("requests");
+      list.innerHTML = '<div class="empty">Yuklanmoqda...</div>';
+      const url = filter ? `/api/admin/access-requests?status=${filter}` : "/api/admin/access-requests";
+      try {
+        const response = await fetch(url, { headers: headers() });
+        const data = await response.json();
+        if (!response.ok) throw new Error(data.detail || response.statusText);
+        const rows = data.requests || [];
+        if (!rows.length) {
+          list.innerHTML = '<div class="empty">So\'rovlar yo\'q.</div>';
+          return;
+        }
+        list.innerHTML = "";
+        rows.forEach(row => {
+          const el = document.createElement("div");
+          el.className = "request";
+          el.innerHTML = `
+            <h3>${escape(row.business_name || "—")}</h3>
+            <div class="owner">${escape(row.full_name || "—")}</div>
+            <dl class="field-row">
+              <dt>Telefon</dt><dd>${escape(row.contact || "—")}</dd>
+              <dt>Telegram</dt><dd>@${escape(row.telegram_username || "—")}</dd>
+              <dt>Yuborilgan</dt><dd>${formatDate(row.created_at)}</dd>
+              <dt>Holat</dt><dd>${escape(row.status || "—")}</dd>
+            </dl>
+            <div class="description"><strong>Muammo / og'riq nuqtasi:</strong><br>${escape(row.message || "—")}</div>
+            ${row.review_note ? `<div class="meta">Admin izohi: ${escape(row.review_note)}</div>` : ""}
+          `;
+          if (row.status === "pending") {
+            const actions = document.createElement("div");
+            actions.className = "actions";
+            const note = document.createElement("input");
+            note.placeholder = "Izoh (ixtiyoriy)";
+            const approve = document.createElement("button");
+            approve.className = "approve";
+            approve.textContent = "Tasdiqlash";
+            approve.onclick = () => review(row.id, "approve", note.value);
+            const reject = document.createElement("button");
+            reject.className = "reject";
+            reject.textContent = "Rad etish";
+            reject.onclick = () => review(row.id, "reject", note.value);
+            actions.append(note, approve, reject);
+            el.appendChild(actions);
+          }
+          list.appendChild(el);
+        });
+      } catch (e) {
+        list.innerHTML = `<div class="error">${escape(e.message)}</div>`;
+      }
+    }
+
+    async function review(id, action, review_note) {
+      const path = action === "approve" ? "approve" : "reject";
+      const response = await fetch(`/api/admin/access-requests/${id}/${path}`, {
+        method: "POST",
+        headers: headers(),
+        body: JSON.stringify({ review_note })
+      });
+      const data = await response.json();
+      if (!response.ok) alert(data.detail || "Xatolik");
+      await loadRequests();
+    }
+
+    function escape(value) {
+      return String(value)
+        .replaceAll("&", "&amp;")
+        .replaceAll("<", "&lt;")
+        .replaceAll(">", "&gt;")
+        .replaceAll('"', "&quot;");
+    }
+
+    document.querySelectorAll(".tab").forEach(btn => {
+      btn.addEventListener("click", () => {
+        document.querySelectorAll(".tab").forEach(t => t.classList.remove("active"));
+        btn.classList.add("active");
+        filter = btn.dataset.filter;
+        loadRequests();
+      });
+    });
+    document.getElementById("refresh-btn").addEventListener("click", loadRequests);
+    document.getElementById("logout-btn").addEventListener("click", logout);
+
+    (async function bootstrap() {
+      const cached = localStorage.getItem(ADMIN_AUTH_KEY);
+      if (cached) {
+        try {
+          const { user, token: t } = JSON.parse(cached);
+          if (user && t) setLoggedIn(user, t);
+        } catch (_) {
+          localStorage.removeItem(ADMIN_AUTH_KEY);
+        }
+      }
+      if (!token) await mountWidget();
+    })();
+  </script>
+</body>
+</html>

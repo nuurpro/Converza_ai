@@ -1,728 +1,2156 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="uz">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Converza Co-Pilot</title>
+  <title>Converza — AI operatsion tizimi</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
   <style>
-    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-
+    *, *::before, *::after { box-sizing: border-box; }
     :root {
-      --bg-primary:    #0d0d0f;
-      --bg-secondary:  #16161a;
-      --bg-tertiary:   #1e1e24;
-      --accent:        #facc15;
-      --accent-hover:  #eab308;
-      --accent-dim:    rgba(250, 204, 21, 0.12);
-      --text-primary:  #f0f0f5;
-      --text-secondary:#8888aa;
-      --text-on-accent:#0d0d0f;
-      --border:        #2a2a35;
-      --border-hover:  #3a3a48;
-      --radius-sm:     8px;
-      --radius-md:     14px;
-      --radius-lg:     20px;
+      --bg: #fafafa;
+      --surface: #ffffff;
+      --surface-2: #f4f4f5;
+      --ink: #09090b;
+      --muted: #71717a;
+      --line: #e4e4e7;
+      --blue: #0055ff;
+      --green: #0f8f68;
+      --accent: #0055ff;
+      --yellow: #0055ff;
+      --amber: #f59e0b;
+      --red: #ef4444;
+      --radius: 10px;
+      --shadow: 0 16px 40px rgba(9, 9, 11, 0.06);
     }
 
     html, body {
-      height: 100%;
-      font-family: 'Inter', system-ui, sans-serif;
-      background: var(--bg-primary);
-      color: var(--text-primary);
-      overflow: hidden;
+      min-height: 100%;
+      margin: 0;
+      font-family: Inter, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background: var(--bg);
+      color: var(--ink);
     }
 
-    /* ------------------------------------------------------------------ */
-    /* ONBOARDING                                                           */
-    /* ------------------------------------------------------------------ */
+    body { overflow-x: hidden; }
+    button, input, textarea, select { font: inherit; }
 
-    #onboarding {
-      position: fixed;
-      inset: 0;
-      background: var(--bg-primary);
+    .app {
+      min-height: 100vh;
       display: flex;
       flex-direction: column;
+    }
+
+    .brand {
+      display: flex;
       align-items: center;
-      justify-content: center;
-      gap: 48px;
-      z-index: 100;
-      transition: opacity 0.4s ease, visibility 0.4s ease;
+      gap: 10px;
+      font-weight: 800;
+      font-size: 18px;
+      color: var(--ink);
+      flex: 0 0 auto;
     }
 
-    #onboarding.hidden {
-      opacity: 0;
-      visibility: hidden;
-      pointer-events: none;
+    .mark {
+      width: 34px;
+      height: 34px;
+      display: grid;
+      place-items: center;
+      border-radius: 8px;
+      background: var(--blue);
+      color: #fff;
+      font-weight: 800;
     }
 
-    .onboarding-logo {
+    .topbar-end {
       display: flex;
-      flex-direction: column;
       align-items: center;
       gap: 12px;
+      margin-left: auto;
     }
 
-    .logo-mark {
-      width: 56px;
-      height: 56px;
-      background: var(--accent);
-      border-radius: 14px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
-
-    .logo-mark svg { width: 30px; height: 30px; }
-
-    .onboarding-logo h1 {
-      font-size: 28px;
-      font-weight: 700;
-      letter-spacing: -0.5px;
-    }
-
-    .onboarding-logo p {
-      font-size: 15px;
-      color: var(--text-secondary);
-      text-align: center;
-    }
-
-    .onboarding-question {
-      font-size: 18px;
-      font-weight: 600;
-      color: var(--text-primary);
-    }
-
-    .role-cards {
-      display: flex;
-      gap: 16px;
-    }
-
-    .role-card {
-      width: 220px;
-      padding: 28px 24px;
-      background: var(--bg-secondary);
-      border: 1.5px solid var(--border);
-      border-radius: var(--radius-lg);
-      cursor: pointer;
-      transition: border-color 0.2s, background 0.2s, transform 0.15s;
-      text-align: left;
-    }
-
-    .role-card:hover {
-      border-color: var(--accent);
-      background: var(--accent-dim);
-      transform: translateY(-2px);
-    }
-
-    .role-card-icon {
-      width: 40px;
-      height: 40px;
-      background: var(--accent-dim);
-      border-radius: var(--radius-sm);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      margin-bottom: 16px;
-      font-size: 20px;
-    }
-
-    .role-card h3 {
-      font-size: 16px;
-      font-weight: 600;
-      margin-bottom: 6px;
-    }
-
-    .role-card p {
-      font-size: 13px;
-      color: var(--text-secondary);
-      line-height: 1.5;
-    }
-
-    /* ------------------------------------------------------------------ */
-    /* CHAT LAYOUT                                                          */
-    /* ------------------------------------------------------------------ */
-
-    #chat-app {
+    .main {
+      min-width: 0;
       display: flex;
       flex-direction: column;
-      height: 100vh;
-      opacity: 0;
-      transition: opacity 0.4s ease;
     }
 
-    #chat-app.visible { opacity: 1; }
-
-    /* Header */
-    .chat-header {
-      flex-shrink: 0;
-      height: 60px;
-      background: var(--bg-secondary);
-      border-bottom: 1px solid var(--border);
+    .topbar {
+      min-height: 64px;
       display: flex;
       align-items: center;
       justify-content: space-between;
-      padding: 0 20px;
+      padding: 0 28px;
+      background: var(--surface);
+      border-bottom: 1px solid var(--line);
+      gap: 16px;
     }
 
-    .header-brand {
+    .tabs {
       display: flex;
-      align-items: center;
-      gap: 10px;
+      padding: 4px;
+      background: var(--surface-2);
+      border-radius: var(--radius);
+      gap: 4px;
     }
 
-    .header-logo {
-      width: 32px;
-      height: 32px;
-      background: var(--accent);
-      border-radius: 8px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
-
-    .header-logo svg { width: 18px; height: 18px; }
-
-    .header-brand span {
-      font-size: 16px;
-      font-weight: 700;
-      letter-spacing: -0.3px;
-    }
-
-    .role-badge {
-      font-size: 12px;
+    .tab {
+      border: 0;
+      border-radius: 6px;
+      background: transparent;
+      color: var(--muted);
+      padding: 8px 12px;
+      cursor: pointer;
       font-weight: 600;
-      padding: 4px 10px;
-      background: var(--accent-dim);
-      color: var(--accent);
-      border-radius: 20px;
-      border: 1px solid rgba(250, 204, 21, 0.25);
     }
 
-    /* Messages */
-    #messages {
-      flex: 1;
-      overflow-y: auto;
-      padding: 24px 0;
-      display: flex;
-      flex-direction: column;
-      gap: 6px;
-      scroll-behavior: smooth;
-    }
+    .tab.active { background: var(--surface); color: var(--ink); box-shadow: 0 1px 3px rgba(16,24,40,0.08); }
+    .tab:disabled { opacity: 0.48; cursor: not-allowed; }
 
-    #messages::-webkit-scrollbar { width: 4px; }
-    #messages::-webkit-scrollbar-track { background: transparent; }
-    #messages::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
-
-    .msg-row {
-      display: flex;
-      padding: 0 20px;
-    }
-
-    .msg-row.user { justify-content: flex-end; }
-    .msg-row.assistant { justify-content: flex-start; }
-
-    .bubble {
-      max-width: min(680px, 80%);
-      padding: 12px 16px;
-      font-size: 14.5px;
-      line-height: 1.65;
-      white-space: pre-wrap;
-      word-break: break-word;
-    }
-
-    .bubble.user {
-      background: var(--accent);
-      color: var(--text-on-accent);
-      border-radius: 18px 18px 4px 18px;
-      font-weight: 500;
-    }
-
-    .bubble.assistant {
-      background: var(--bg-tertiary);
-      color: var(--text-primary);
-      border-radius: 18px 18px 18px 4px;
-      border: 1px solid var(--border);
-    }
-
-    /* Typing indicator */
-    #typing-indicator {
-      display: none;
-      padding: 0 20px;
-    }
-
-    #typing-indicator.visible { display: flex; }
-
-    .typing-bubble {
-      background: var(--bg-tertiary);
-      border: 1px solid var(--border);
-      border-radius: 18px 18px 18px 4px;
-      padding: 14px 18px;
-      display: flex;
-      gap: 5px;
+    .status-pill {
+      display: inline-flex;
       align-items: center;
+      gap: 8px;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      padding: 8px 12px;
+      color: var(--muted);
+      font-size: 13px;
+      white-space: nowrap;
     }
 
     .dot {
-      width: 7px;
-      height: 7px;
-      background: var(--text-secondary);
-      border-radius: 50%;
-      animation: bounce 1.2s infinite ease-in-out;
+      width: 8px;
+      height: 8px;
+      border-radius: 999px;
+      background: var(--blue);
     }
 
-    .dot:nth-child(1) { animation-delay: 0s; }
-    .dot:nth-child(2) { animation-delay: 0.2s; }
-    .dot:nth-child(3) { animation-delay: 0.4s; }
-
-    @keyframes bounce {
-      0%, 60%, 100% { transform: translateY(0); opacity: 0.4; }
-      30% { transform: translateY(-5px); opacity: 1; }
+    .tg-icon {
+      width: 16px;
+      height: 16px;
+      vertical-align: middle;
+      flex: 0 0 auto;
     }
 
-    /* Input area */
-    .input-area {
-      flex-shrink: 0;
-      padding: 16px 20px;
-      background: var(--bg-secondary);
-      border-top: 1px solid var(--border);
+    .content {
+      width: min(1120px, 100%);
+      margin: 0 auto;
+      padding: 30px 28px 42px;
     }
 
-    .input-wrapper {
-      display: flex;
-      align-items: flex-end;
-      gap: 10px;
-      background: var(--bg-tertiary);
-      border: 1.5px solid var(--border);
-      border-radius: var(--radius-md);
-      padding: 10px 12px;
-      transition: border-color 0.2s;
+    .view { display: none; }
+    .view.active { display: block; }
+
+    .headline {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) 320px;
+      gap: 22px;
+      align-items: stretch;
+      margin-bottom: 22px;
     }
 
-    .input-wrapper:focus-within {
-      border-color: var(--accent);
+    .hero {
+      background: var(--surface);
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      padding: 24px;
     }
 
-    #message-input {
-      flex: 1;
-      background: transparent;
-      border: none;
-      outline: none;
-      color: var(--text-primary);
-      font-family: inherit;
-      font-size: 14.5px;
+    .hero h2 {
+      margin: 0 0 10px;
+      font-size: 30px;
+      line-height: 1.15;
+      letter-spacing: 0;
+    }
+
+    .hero p {
+      margin: 0;
+      color: var(--muted);
+      line-height: 1.6;
+      max-width: 720px;
+    }
+
+    .proof {
+      background: #0f8f68;
+      color: #fff;
+      border-radius: var(--radius);
+      padding: 22px;
+      box-shadow: var(--shadow);
+    }
+
+    .proof strong {
+      display: block;
+      font-size: 28px;
+      margin-bottom: 8px;
+    }
+
+    .proof span {
+      color: rgba(255,255,255,0.86);
       line-height: 1.5;
-      resize: none;
-      max-height: 120px;
-      overflow-y: auto;
+      display: block;
     }
 
-    #message-input::placeholder { color: var(--text-secondary); }
+    .panel {
+      background: var(--surface);
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      overflow: hidden;
+    }
 
-    #message-input::-webkit-scrollbar { width: 3px; }
-    #message-input::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
-
-    #send-btn {
-      flex-shrink: 0;
-      width: 36px;
-      height: 36px;
-      background: var(--accent);
-      border: none;
-      border-radius: 8px;
-      cursor: pointer;
+    .panel-head {
       display: flex;
+      justify-content: space-between;
+      gap: 16px;
+      padding: 18px 20px;
+      border-bottom: 1px solid var(--line);
       align-items: center;
+    }
+
+    .panel-head h3 { margin: 0; font-size: 18px; }
+    .panel-head p { margin: 4px 0 0; color: var(--muted); font-size: 13px; }
+
+    .form {
+      padding: 20px;
+      display: grid;
+      gap: 18px;
+    }
+
+    .grid-2 {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 16px;
+    }
+
+    label {
+      display: grid;
+      gap: 7px;
+      color: #344054;
+      font-weight: 600;
+      font-size: 13px;
+    }
+
+    input, textarea, select {
+      width: 100%;
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      background: #fff;
+      color: var(--ink);
+      padding: 11px 12px;
+      outline: none;
+    }
+
+    textarea {
+      min-height: 96px;
+      resize: vertical;
+      line-height: 1.5;
+    }
+
+    input:focus, textarea:focus, select:focus {
+      border-color: var(--blue);
+      box-shadow: 0 0 0 3px rgba(39,84,197,0.12);
+    }
+
+    .repeat-list {
+      display: grid;
+      gap: 10px;
+    }
+
+    .repeat-row {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) 40px;
+      gap: 10px;
+      align-items: start;
+    }
+
+    .repeat-row.pricing {
+      grid-template-columns: minmax(0, 1fr) 140px minmax(0, 1fr) 40px;
+    }
+
+    .icon-btn, .secondary, .primary {
+      border: 0;
+      border-radius: var(--radius);
+      cursor: pointer;
+      font-weight: 700;
+    }
+
+    .icon-btn {
+      height: 42px;
+      width: 40px;
+      background: var(--surface-2);
+      color: var(--muted);
+    }
+
+    .secondary {
+      background: var(--surface-2);
+      color: var(--ink);
+      padding: 10px 13px;
+    }
+
+    .primary {
+      background: var(--blue);
+      color: #fff;
+      padding: 11px 16px;
+    }
+
+    .primary:disabled { opacity: 0.55; cursor: not-allowed; }
+    .actions {
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      border-top: 1px solid var(--line);
+      padding: 16px 20px;
+      background: #fbfcfe;
+    }
+
+    .preview {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 12px;
+    }
+
+    .metric {
+      background: var(--surface);
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      padding: 14px;
+    }
+
+    .metric strong { display: block; font-size: 20px; margin-bottom: 4px; }
+    .metric span { color: var(--muted); font-size: 12px; line-height: 1.45; }
+
+    .notice {
+      margin-top: 14px;
+      border-radius: var(--radius);
+      border: 1px solid var(--line);
+      padding: 12px 14px;
+      color: var(--muted);
+      background: #fff;
+      line-height: 1.5;
+    }
+
+    .notice.success { border-color: rgba(15,143,104,0.28); color: #096246; background: #eefaf5; }
+    .notice.error { border-color: rgba(194,59,59,0.28); color: #9e2525; background: #fff1f1; }
+
+    .auth-hub {
+      display: flex;
       justify-content: center;
-      transition: background 0.15s, transform 0.1s, opacity 0.15s;
+      padding: 8px 0 12px;
     }
 
-    #send-btn:hover:not(:disabled) {
-      background: var(--accent-hover);
-      transform: scale(1.05);
+    .auth-card {
+      width: min(540px, 100%);
+      padding: 28px 28px 24px;
+      background: var(--surface);
+      border: 1px solid var(--line);
+      border-radius: calc(var(--radius) + 2px);
+      box-shadow: var(--shadow);
     }
 
-    #send-btn:disabled {
-      opacity: 0.35;
-      cursor: not-allowed;
-      transform: none;
+    .auth-card-head {
+      text-align: center;
+      margin-bottom: 18px;
     }
 
-    #send-btn svg { width: 16px; height: 16px; }
+    .auth-card-head h2 {
+      margin: 0 0 8px;
+      font-size: 22px;
+      line-height: 1.25;
+      letter-spacing: -0.02em;
+    }
 
-    .input-hint {
-      font-size: 11px;
-      color: var(--text-secondary);
-      margin-top: 8px;
+    .auth-card-head p {
+      margin: 0;
+      color: var(--muted);
+      font-size: 14px;
+      line-height: 1.55;
+    }
+
+    .auth-card > p {
+      margin: 0 0 14px;
+      color: var(--muted);
+      font-size: 14px;
+      line-height: 1.55;
       text-align: center;
     }
 
-    /* Welcome message */
-    .welcome-msg {
+    .auth-card.highlight-pulse {
+      box-shadow: 0 0 0 2px var(--blue), 0 0 0 8px rgba(0, 85, 255, 0.12), var(--shadow);
+      transition: box-shadow 0.25s ease;
+    }
+
+    .auth-user {
+      display: none;
+      align-items: center;
+      gap: 10px;
+      padding: 8px 12px;
+      border-radius: 999px;
+      background: rgba(15, 143, 104, 0.1);
+      border: 1px solid rgba(15, 143, 104, 0.24);
+      color: #096246;
+      font-size: 13px;
+      font-weight: 600;
+    }
+
+    .auth-user.visible { display: inline-flex; }
+
+    .auth-user button {
+      border: 0;
+      background: transparent;
+      color: var(--muted);
+      cursor: pointer;
+      font-size: 12px;
+      text-decoration: underline;
+      padding: 0;
+    }
+
+    .access-form {
       display: flex;
       flex-direction: column;
+      gap: 8px;
+    }
+
+    .access-form input,
+    .access-form textarea {
+      width: 100%;
+      padding: 10px 12px;
+      border-radius: 8px;
+      border: 1px solid var(--line);
+      background: var(--surface);
+      color: var(--ink);
+    }
+
+    .access-form input:focus,
+    .access-form textarea:focus {
+      outline: none;
+      border-color: var(--blue);
+      box-shadow: 0 0 0 3px rgba(0, 85, 255, 0.12);
+    }
+
+    .access-form textarea { min-height: 88px; resize: vertical; }
+
+    .access-form label {
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--ink);
+      margin-top: 4px;
+    }
+
+    .access-form button.primary {
+      margin-top: 8px;
+      width: 100%;
+      background: var(--blue);
+      color: #fff;
+      border: 0;
+      border-radius: 8px;
+      padding: 12px 14px;
+      font-weight: 700;
+      cursor: pointer;
+    }
+
+    .access-status {
+      padding: 16px;
+      border-radius: var(--radius);
+      background: var(--surface-2);
+      border: 1px solid var(--line);
+      font-size: 14px;
+      line-height: 1.55;
+      color: var(--ink);
+      text-align: center;
+    }
+
+    .access-status strong {
+      display: block;
+      margin-bottom: 8px;
+      font-size: 16px;
+    }
+
+    .access-status button {
+      margin-top: 12px;
+      border: 0;
+      background: transparent;
+      color: var(--blue);
+      cursor: pointer;
+      text-decoration: underline;
+      font-size: 13px;
+      font-weight: 600;
+      padding: 0;
+    }
+
+    #telegram-login-section {
+      text-align: center;
+    }
+
+    #telegram-login {
+      display: flex;
+      justify-content: center;
+      min-height: 44px;
+    }
+
+    .auth-hint {
+      margin: 10px 0 0;
+      color: var(--muted);
+      font-size: 12px;
+      line-height: 1.5;
+      text-align: center;
+    }
+
+    #setup-view.intro-active {
+      background-color: var(--bg);
+      background-image:
+        linear-gradient(rgba(228, 228, 231, 0.45) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(228, 228, 231, 0.45) 1px, transparent 1px);
+      background-size: 48px 48px;
+    }
+
+    #setup-blocked {
+      width: min(1080px, 100%);
+      margin: 0 auto;
+      padding: 0 0 24px;
+    }
+
+    .intro-funnel {
+      display: flex;
+      flex-direction: column;
+      gap: 52px;
+    }
+
+    .funnel-track {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
       align-items: center;
       justify-content: center;
-      flex: 1;
-      gap: 12px;
-      color: var(--text-secondary);
-      text-align: center;
-      padding: 40px 20px;
-      pointer-events: none;
+      padding: 14px 16px;
+      background: var(--surface);
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
     }
 
-    .welcome-msg .welcome-icon {
-      font-size: 40px;
-      opacity: 0.5;
-    }
-
-    .welcome-msg h2 {
-      font-size: 18px;
+    .funnel-step {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 6px 10px;
+      border-radius: 999px;
+      font-size: 12px;
       font-weight: 600;
-      color: var(--text-primary);
+      color: var(--muted);
+      background: var(--surface-2);
+      border: 1px solid transparent;
     }
 
-    .welcome-msg p {
+    .funnel-step .num {
+      width: 22px;
+      height: 22px;
+      display: grid;
+      place-items: center;
+      border-radius: 999px;
+      font-size: 11px;
+      background: #fff;
+      border: 1px solid var(--line);
+      color: var(--muted);
+    }
+
+    .funnel-step.done { color: var(--ink); }
+    .funnel-step.done .num { background: var(--green); border-color: var(--green); color: #fff; }
+    .funnel-step.active { color: var(--blue); background: rgba(0, 85, 255, 0.08); border-color: rgba(0, 85, 255, 0.22); }
+    .funnel-step.active .num { background: var(--blue); border-color: var(--blue); color: #fff; }
+
+    .funnel-cta-bar {
+      margin-left: auto;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      align-items: center;
+    }
+
+    .funnel-cta-bar p {
+      margin: 0;
+      font-size: 13px;
+      color: var(--muted);
+      max-width: 280px;
+      line-height: 1.45;
+    }
+
+    .funnel-cta {
+      border: 0;
+      border-radius: 8px;
+      padding: 10px 16px;
+      font-weight: 700;
+      font-size: 13px;
+      cursor: pointer;
+      background: var(--blue);
+      color: #fff;
+      white-space: nowrap;
+    }
+
+    .funnel-cta.secondary {
+      background: var(--surface);
+      color: var(--ink);
+      border: 1px solid var(--line);
+    }
+
+    .intro-hero { text-align: center; padding-top: 8px; }
+
+    .system-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 6px 12px;
+      border-radius: 999px;
+      border: 1px solid var(--line);
+      background: var(--surface);
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      color: var(--blue);
+      margin-bottom: 18px;
+    }
+
+    .system-pill .pulse {
+      width: 7px;
+      height: 7px;
+      border-radius: 999px;
+      background: var(--blue);
+      box-shadow: 0 0 0 4px rgba(0, 85, 255, 0.18);
+    }
+
+    .intro-title {
+      margin: 0;
+      font-size: clamp(42px, 7vw, 64px);
+      font-weight: 800;
+      letter-spacing: -0.03em;
+      line-height: 1;
+      color: var(--ink);
+    }
+
+    .intro-sub {
+      margin: 14px 0 0;
+      font-size: clamp(20px, 3vw, 28px);
+      line-height: 1.35;
+      color: var(--muted);
+      font-weight: 500;
+    }
+
+    .intro-sub em {
+      font-style: italic;
+      color: var(--blue);
+      font-weight: 700;
+    }
+
+    .intro-card {
+      margin: 28px auto 0;
+      max-width: 760px;
+      text-align: left;
+      padding: 18px 20px 18px 24px;
+      background: var(--surface);
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      border-left: 4px solid var(--blue);
+      font-size: 15px;
+      line-height: 1.65;
+      color: var(--muted);
+    }
+
+    .intro-card strong { color: var(--blue); font-weight: 600; }
+
+    .intro-section-head {
+      text-align: center;
+      margin-bottom: 22px;
+    }
+
+    .intro-section-head h2 {
+      margin: 0;
+      font-size: clamp(24px, 4vw, 34px);
+      line-height: 1.2;
+      letter-spacing: -0.02em;
+    }
+
+    .intro-section-head h2 em {
+      font-style: italic;
+      color: var(--blue);
+    }
+
+    .intro-section-head p {
+      margin: 10px 0 0;
+      color: var(--muted);
+      font-size: 15px;
+      line-height: 1.55;
+    }
+
+    .err-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 14px;
+    }
+
+    .err-card {
+      background: var(--surface);
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      padding: 18px;
+      box-shadow: var(--shadow);
+    }
+
+    .err-tag {
+      display: inline-block;
+      margin-bottom: 12px;
+      font-size: 10px;
+      font-weight: 800;
+      letter-spacing: 0.04em;
+      color: var(--red);
+      font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+    }
+
+    .err-card h3 {
+      margin: 0 0 8px;
+      font-size: 17px;
+      line-height: 1.25;
+    }
+
+    .err-card p {
+      margin: 0;
       font-size: 14px;
-      max-width: 400px;
+      line-height: 1.55;
+      color: var(--muted);
+    }
+
+    .pillar-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 14px;
+    }
+
+    .pillar-card {
+      background: var(--surface);
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      padding: 20px;
+      box-shadow: var(--shadow);
+    }
+
+    .pillar-card .label {
+      font-size: 11px;
+      font-weight: 800;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--blue);
+      margin-bottom: 8px;
+    }
+
+    .pillar-card h3 {
+      margin: 0 0 8px;
+      font-size: 18px;
+    }
+
+    .pillar-card p {
+      margin: 0;
+      font-size: 14px;
+      line-height: 1.55;
+      color: var(--muted);
+    }
+
+    .phase-lane {
+      position: relative;
+      padding: 28px 0 8px;
+    }
+
+    .phase-line {
+      position: absolute;
+      left: 8%;
+      right: 8%;
+      top: 50%;
+      height: 2px;
+      background: linear-gradient(90deg, var(--line), var(--blue), var(--line));
+      z-index: 0;
+    }
+
+    .phase-grid {
+      position: relative;
+      z-index: 1;
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 14px;
+      align-items: stretch;
+    }
+
+    .phase-card {
+      background: var(--surface);
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      padding: 18px;
+      box-shadow: var(--shadow);
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .phase-card.highlight {
+      border-color: var(--blue);
+      box-shadow: 0 0 0 1px rgba(0, 85, 255, 0.15), var(--shadow);
+    }
+
+    .phase-card .phase-num {
+      font-size: 11px;
+      font-weight: 800;
+      letter-spacing: 0.06em;
+      color: var(--blue);
+      text-transform: uppercase;
+    }
+
+    .phase-card h3 {
+      margin: 0;
+      font-size: 17px;
+      line-height: 1.25;
+    }
+
+    .phase-card.highlight h3 { color: var(--blue); }
+
+    .phase-card p {
+      margin: 0;
+      font-size: 13px;
+      line-height: 1.55;
+      color: var(--muted);
+    }
+
+    .phase-badge {
+      display: inline-flex;
+      align-self: flex-start;
+      margin-top: 4px;
+      padding: 4px 8px;
+      border-radius: 999px;
+      font-size: 11px;
+      font-weight: 700;
+      background: rgba(0, 85, 255, 0.1);
+      color: var(--blue);
+    }
+
+    .agent-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 14px;
+    }
+
+    .agent-card {
+      background: var(--surface);
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      padding: 18px;
+      box-shadow: var(--shadow);
+    }
+
+    .agent-card.featured {
+      border-color: var(--blue);
+      grid-column: 1 / -1;
+    }
+
+    .agent-card .agent-name {
+      font-size: 11px;
+      font-weight: 800;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      color: var(--blue);
+      margin-bottom: 6px;
+    }
+
+    .agent-card h3 {
+      margin: 0 0 8px;
+      font-size: 18px;
+    }
+
+    .agent-card p {
+      margin: 0;
+      font-size: 14px;
+      line-height: 1.55;
+      color: var(--muted);
+    }
+
+    @media (max-width: 900px) {
+      .err-grid, .pillar-grid, .phase-grid, .agent-grid { grid-template-columns: 1fr; }
+      .phase-line { display: none; }
+      .funnel-cta-bar { margin-left: 0; width: 100%; }
+      .funnel-track { flex-direction: column; align-items: stretch; }
+    }
+
+    .connection-panel {
+      margin-bottom: 18px;
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      padding: 16px 18px;
+      background: #f8fafc;
+    }
+
+    .connection-panel h3 { margin: 0 0 8px; font-size: 16px; }
+    .connection-panel p { margin: 0 0 10px; color: var(--muted); font-size: 14px; line-height: 1.5; }
+    .connection-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 6px 12px;
+      border-radius: 999px;
+      font-size: 13px;
+      font-weight: 600;
+    }
+    .connection-pill.on { background: #e8f8f1; color: var(--green); }
+    .connection-pill.off { background: #fff4e5; color: #b45309; }
+
+    #pdf-panel { margin-bottom: 18px; }
+
+    .pdf-drop {
+      border: 2px dashed var(--line);
+      border-radius: var(--radius);
+      padding: 22px;
+      text-align: center;
+      color: var(--muted);
+      cursor: pointer;
+      transition: border-color 0.15s ease, background 0.15s ease;
+    }
+
+    .pdf-drop.dragover { border-color: var(--blue); background: #eef2fc; }
+    .pdf-drop p { margin: 0; }
+    .pdf-browse { color: var(--blue); font-weight: 600; text-decoration: underline; }
+
+    .pdf-list {
+      list-style: none;
+      margin: 14px 0 0;
+      padding: 0;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      text-align: left;
+    }
+
+    .pdf-list li {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 8px 12px;
+      background: var(--surface-2);
+      border-radius: 6px;
+      font-size: 13px;
+      color: var(--ink);
+    }
+
+    .pdf-list li button {
+      margin-left: auto;
+      border: 0;
+      background: transparent;
+      color: var(--muted);
+      cursor: pointer;
+      font-size: 14px;
+    }
+
+    .chat-shell {
+      display: grid;
+      grid-template-rows: minmax(420px, 58vh) auto;
+      background: var(--surface);
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      overflow: hidden;
+    }
+
+    #messages {
+      padding: 18px;
+      overflow: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .bubble {
+      max-width: 760px;
+      padding: 12px 14px;
+      border-radius: var(--radius);
       line-height: 1.6;
+      white-space: pre-wrap;
     }
 
-    /* Error bubble */
-    .bubble.error {
-      background: rgba(239, 68, 68, 0.1);
-      color: #f87171;
-      border: 1px solid rgba(239, 68, 68, 0.25);
-      border-radius: 18px 18px 18px 4px;
+    .bubble.user { align-self: flex-end; background: var(--blue); color: #fff; }
+    .bubble.assistant { align-self: flex-start; background: var(--surface-2); color: var(--ink); }
+    .bubble.error { align-self: flex-start; background: #fff1f1; color: var(--red); border: 1px solid rgba(194,59,59,0.25); }
+
+    .composer {
+      border-top: 1px solid var(--line);
+      padding: 14px;
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto;
+      gap: 10px;
+      background: #fbfcfe;
     }
 
-    @media (max-width: 600px) {
-      .role-cards { flex-direction: column; }
-      .role-card { width: 100%; min-width: 280px; }
+    #message-input { min-height: 46px; max-height: 120px; }
+
+    @media (max-width: 900px) {
+      .headline, .grid-2, .preview { grid-template-columns: 1fr; }
+      .repeat-row, .repeat-row.pricing { grid-template-columns: 1fr; }
+      .topbar { align-items: flex-start; flex-wrap: wrap; padding: 14px; }
+      .topbar-end { margin-left: 0; width: 100%; justify-content: space-between; }
+      .content { padding: 18px 14px 30px; }
+      .auth-card { padding: 22px 18px; }
     }
   </style>
 </head>
 <body>
-
-  <!-- ================================================================ -->
-  <!-- ONBOARDING                                                        -->
-  <!-- ================================================================ -->
-  <div id="onboarding">
-    <div class="onboarding-logo">
-      <div class="logo-mark">
-        <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-          <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"
-                stroke="#0d0d0f" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
-        </svg>
-      </div>
-      <h1>Converza Co-Pilot</h1>
-      <p>Your autonomous AI marketing strategist</p>
-    </div>
-
-    <p class="onboarding-question">Who are you?</p>
-
-    <div class="role-cards">
-      <div class="role-card" data-role="Owner">
-        <div class="role-card-icon">&#x1F3AF;</div>
-        <h3>I'm the Owner</h3>
-        <p>Focus on growth, revenue, ROI & competitive strategy</p>
-      </div>
-      <div class="role-card" data-role="Marketer">
-        <div class="role-card-icon">&#x1F4CA;</div>
-        <h3>I'm a Marketer</h3>
-        <p>Focus on execution, metrics, content & workflows</p>
-      </div>
-    </div>
-  </div>
-
-  <!-- ================================================================ -->
-  <!-- CHAT APP                                                          -->
-  <!-- ================================================================ -->
-  <div id="chat-app">
-    <header class="chat-header">
-      <div class="header-brand">
-        <div class="header-logo">
-          <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"
-                  stroke="#0d0d0f" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
-          </svg>
+  <div class="app">
+    <main class="main">
+      <div class="topbar">
+        <div class="brand"><div class="mark">C</div><span>Converza</span></div>
+        <div class="tabs">
+          <button class="tab active" data-view="setup">DM Closer</button>
+          <button class="tab" data-view="copilot" id="copilot-tab" disabled>Co-Pilot</button>
         </div>
-        <span>Converza</span>
+        <div class="topbar-end">
+          <div class="auth-user" id="auth-user">
+            <span id="auth-label">Kirgansiz</span>
+            <button type="button" id="logout-btn">Chiqish</button>
+          </div>
+          <div class="status-pill"><svg class="tg-icon" viewBox="0 0 24 24" fill="#229ED9" aria-hidden="true" focusable="false"><path d="M21.94 4.49 18.9 19.16c-.23 1.02-.84 1.27-1.7.79l-4.7-3.47-2.27 2.18c-.25.25-.46.46-.95.46l.34-4.82 8.77-7.93c.38-.34-.08-.53-.6-.19l-10.84 6.83-4.67-1.46c-1.02-.32-1.04-1.02.21-1.5l18.26-7.04c.85-.31 1.59.2 1.31 1.47Z"/></svg><span class="dot" id="status-dot"></span><span id="status-text">Telegram orqali kiring</span></div>
+        </div>
       </div>
-      <div class="role-badge" id="role-badge">—</div>
-    </header>
 
-    <div id="messages">
-      <div class="welcome-msg" id="welcome-msg">
-        <div class="welcome-icon">&#x26A1;</div>
-        <h2>Ready when you are.</h2>
-        <p>Ask me anything about your marketing strategy, campaigns, copy, or competitive positioning.</p>
-      </div>
-    </div>
+      <section class="content view active intro-active" id="setup-view">
+        <div id="setup-blocked">
+          <div class="intro-funnel">
+            <div class="funnel-track" id="funnel-track">
+              <div class="funnel-step done" data-step="1"><span class="num">1</span> Tanishish</div>
+              <div class="funnel-step" data-step="2"><span class="num">2</span> Kirish so'rovi</div>
+              <div class="funnel-step" data-step="3"><span class="num">3</span> Admin tasdiqi</div>
+              <div class="funnel-step" data-step="4"><span class="num">4</span> Telegram kirish</div>
+              <div class="funnel-step" data-step="5"><span class="num">5</span> Brend pasporti</div>
+            </div>
 
-    <div id="typing-indicator">
-      <div class="typing-bubble">
-        <span class="dot"></span>
-        <span class="dot"></span>
-        <span class="dot"></span>
-      </div>
-    </div>
+            <section class="intro-hero">
+              <div class="system-pill"><span class="pulse"></span> Tizim faol</div>
+              <h1 class="intro-title">Converza</h1>
+              <p class="intro-sub">Biznes o'sishi uchun <em>AI operatsion tizimi.</em></p>
+              <div class="intro-card">
+                Converza qimmat marketing agentliklari va sotuv jamoalarini AI tizimi bilan almashtiradi —
+                <strong>lead yaratadi, 24/7 xabarlarga javob beradi va haqiqatan savdolarni yopadi.</strong>
+              </div>
+            </section>
 
-    <div class="input-area">
-      <div class="input-wrapper">
-        <textarea
-          id="message-input"
-          rows="1"
-          placeholder="Ask your Co-Pilot anything..."
-          autocomplete="off"
-          spellcheck="true"
-        ></textarea>
-        <button id="send-btn" disabled title="Send message">
-          <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <path d="M22 2L11 13M22 2L15 22l-4-9-9-4 20-7z"
-                  stroke="#0d0d0f" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
-          </svg>
-        </button>
-      </div>
-      <p class="input-hint">Enter to send &nbsp;&middot;&nbsp; Shift+Enter for new line</p>
-    </div>
+            <section class="auth-hub" id="auth-hub">
+              <div class="auth-card" id="auth-card">
+                <div class="auth-card-head" id="auth-card-head">
+                  <h2 id="auth-card-title">Yopiq access uchun ariza</h2>
+                  <p id="auth-card-subtitle">Asosiy muammoingizni yozing — admin ko'rib chiqadi va tasdiqlagach Telegram orqali kira olasiz.</p>
+                </div>
+                <div id="access-request-panel">
+                  <form class="access-form" id="access-request-form">
+                    <label for="req-name">To'liq ismingiz *</label>
+                    <input id="req-name" name="full_name" required minlength="2" placeholder="Ali Valiyev" />
+                    <label for="req-business">Biznes nomi *</label>
+                    <input id="req-business" name="business_name" required minlength="2" placeholder="Go'zallik saloni Nafis" />
+                    <label for="req-message">Sizni qiynayotgan asosiy muammo nima? *</label>
+                    <textarea id="req-message" name="message" required minlength="30" maxlength="500" placeholder="Masalan: kechqurun kelgan xabarlarga javob bera olmayman, mijozlar ketib qoladi yoki savdolarni qo'lda kuzatish qiyin..."></textarea>
+                    <label for="req-contact">Telefon raqami *</label>
+                    <input id="req-contact" name="contact" type="tel" required placeholder="+998901234567" />
+                    <label for="req-telegram">Telegram @username *</label>
+                    <input id="req-telegram" name="telegram_username" required placeholder="@username" />
+                    <button type="submit" class="primary">Kirish so'rovini yuborish</button>
+                  </form>
+                  <p class="auth-hint" id="access-form-hint">Telegram username login bilan bir xil bo'lishi kerak.</p>
+                </div>
+                <div class="access-status" id="access-pending-panel" hidden>
+                  <strong>So'rovingiz ko'rib chiqilmoqda</strong>
+                  <p>Admin tasdiqlagach, Telegram orqali kirish tugmasi ochiladi. Holatni yangilash uchun pastdagi tugmani bosing.</p>
+                  <button type="button" id="refresh-access-btn">Holatni yangilash</button>
+                </div>
+                <div class="access-status" id="access-rejected-panel" hidden>
+                  <strong>So'rov rad etildi</strong>
+                  <p id="access-rejected-note">Qayta urinib ko'rishingiz mumkin.</p>
+                  <button type="button" id="retry-access-btn">Yangi so'rov yuborish</button>
+                </div>
+                <div id="telegram-login-section" hidden>
+                  <p>So'rovingiz tasdiqlandi. Endi Telegram orqali kiring.</p>
+                  <div id="telegram-login"></div>
+                  <p class="auth-hint">Agar tugma ko'rinmasa, @BotFather'da bot domeni sozlanmagan bo'lishi mumkin.</p>
+                </div>
+              </div>
+            </section>
+
+            <section>
+              <div class="intro-section-head">
+                <h2>Eski jarayonlar orqali <em>daromad sizib ketmoqda.</em></h2>
+                <p>Telegram orqali sotadigan bizneslar uchun eng keng tarqalgan uchta muammo.</p>
+              </div>
+              <div class="err-grid">
+                <article class="err-card">
+                  <span class="err-tag">ERR: ASLEEP_AT_WHEEL</span>
+                  <h3>Inson kechikishi</h3>
+                  <p>Kechqurun kelgan xabarlar ertalab javobsiz qoladi — mijoz raqobatchidan xarid qiladi. Telegram'da bu eng ko'p yo'qotilgan savdo sababi.</p>
+                </article>
+                <article class="err-card">
+                  <span class="err-tag">ERR: THE_COST_TRAP</span>
+                  <h3>Ajratilgan marketing</h3>
+                  <p>Reklama agentliklari lead keltiradi, lekin DM'dagi savdolarni hech kim kuzatmaydi. Marketing va sotuv bir-biridan uzilgan.</p>
+                </article>
+                <article class="err-card">
+                  <span class="err-tag">ERR: LOST_KNOWLEDGE</span>
+                  <h3>Yo'qolgan bilim</h3>
+                  <p>Eng yaxshi sotuv argumentlari eski chatlar va hujjatlarda qolib ketadi — yangi xodim yoki AI ulardan foydalana olmaydi.</p>
+                </article>
+              </div>
+            </section>
+
+            <section>
+              <div class="intro-section-head">
+                <h2>Sotuv va marketingni boshqaradigan <em>«ikkinchi miya».</em></h2>
+              </div>
+              <div class="pillar-grid">
+                <article class="pillar-card">
+                  <div class="label">Miya</div>
+                  <h3>Ma'lumotlar bazasi</h3>
+                  <p>FAQ, o'tgan savdo suhbatlari va brend qoidalari xavfsiz vektor bazasiga yig'iladi — AI faqat sizning haqiqiy ma'lumotlaringizdan foydalanadi.</p>
+                </article>
+                <article class="pillar-card">
+                  <div class="label">Qo'llar</div>
+                  <h3>AI ishchilar</h3>
+                  <p>Kiruvchi xabarlarga darhol javob beradi, e'tirozlarni hal qiladi va uchrashuv yoki to'lovga olib keladi — Telegram Business hisobingiz orqali.</p>
+                </article>
+                <article class="pillar-card">
+                  <div class="label">Dvigatel</div>
+                  <h3>Faol tizim</h3>
+                  <p>Faqat kutmaydi — kontent yaratadi, post qiladi va trafikni Closer'ga yo'naltiradi. To'liq mijoz sayohati avtomatlashtiriladi.</p>
+                </article>
+              </div>
+            </section>
+
+            <section>
+              <div class="intro-section-head">
+                <h2>«Land and Expand» <em>strategiyasi.</em></h2>
+                <p>Hozir siz birinchi bosqichdan boshlaysiz — DM Closer.</p>
+              </div>
+              <div class="phase-lane">
+                <div class="phase-line" aria-hidden="true"></div>
+                <div class="phase-grid">
+                  <article class="phase-card highlight">
+                    <span class="phase-num">Bosqich 1</span>
+                    <h3>Wedge — DM Closer</h3>
+                    <p>Kechki yo'qotilgan leadlarni to'xtatadigan oddiy DM Closer. Birinchi haftada pul ishlashingizni isbotlaymiz.</p>
+                    <span class="phase-badge">Siz hozir shu yerda</span>
+                  </article>
+                  <article class="phase-card">
+                    <span class="phase-num">Bosqich 2</span>
+                    <h3>Ma'lumot yig'ish</h3>
+                    <p>Xabarlarni boshqarish orqali mijozlar qanday o'ylashi, qanday e'tiroz qilishi va qanday sotib olishini o'rganamiz.</p>
+                  </article>
+                  <article class="phase-card">
+                    <span class="phase-num">Bosqich 3</span>
+                    <h3>To'liq OS</h3>
+                    <p>Ishonch o'rnatilgach, marketing dvigatelini yoqamiz — qimmat agentliklarni butunlay almashtiramiz.</p>
+                  </article>
+                </div>
+              </div>
+            </section>
+
+            <section>
+              <div class="intro-section-head">
+                <h2>Converza <em>qanday ishlaydi.</em></h2>
+                <p>DM Closer — sizning Telegram sotuv agentingiz.</p>
+              </div>
+              <div class="agent-grid">
+                <article class="agent-card featured">
+                  <div class="agent-name">The Closer</div>
+                  <h3>DM Closer — 24/7 Telegram sotuvchi</h3>
+                  <p>Biznes hisobingizga ulangan AI har bir mijoz xabarini darhol ushlaydi: savollarga javob beradi, e'tirozlarni hal qiladi va Click orqali to'lovga olib keladi.</p>
+                </article>
+                <article class="agent-card">
+                  <div class="agent-name">The Learner</div>
+                  <h3>O'rganuvchi</h3>
+                  <p>Kompaniya tarixini o'rganib, siz qanday sotishingizni aks ettiruvchi brend pasportini yaratadi.</p>
+                </article>
+                <article class="agent-card">
+                  <div class="agent-name">The Optimizer</div>
+                  <h3>Optimizator</h3>
+                  <p>Har kecha nima ishlaganini tahlil qilib, keyingi kun strategiyasini yaxshilaydi.</p>
+                </article>
+              </div>
+            </section>
+
+            <section class="funnel-track" id="funnel-footer">
+              <div class="funnel-cta-bar" style="margin-left:0;width:100%;justify-content:space-between;">
+                <p id="funnel-footer-text">DM Closer'ni yoqish uchun kirish so'rovini yuboring — admin tasdiqlagach brend pasportini to'ldirasiz.</p>
+                <button type="button" class="funnel-cta" id="funnel-footer-btn">Boshlash</button>
+              </div>
+            </section>
+          </div>
+        </div>
+
+        <div id="passport-workspace" hidden>
+        <div class="headline">
+          <div class="hero">
+            <h2>Agent mijozlar bilan gaplashishidan oldin sotuv xotirasini yarating.</h2>
+            <p>Closer Telegram xabarlariga javob berishi, e'tirozlarni hal qilishi va haqiqiy narxlardan Click hisob-fakturalarini yaratishi uchun zarur biznes ma'lumotlarini to'plang.</p>
+          </div>
+          <div class="proof">
+            <strong>Birinchi hafta</strong>
+            <span>Ish vaqtidan keyin javob bering va tayyor xaridorlarni to'lovga olib keling.</span>
+          </div>
+        </div>
+
+        <div class="preview">
+          <div class="metric"><strong id="metric-brand">0</strong><span>To'ldirilgan brend maydonlari</span></div>
+          <div class="metric"><strong id="metric-pricing">0</strong><span>Hisob-fakturalar uchun narx darajalari</span></div>
+          <div class="metric"><strong id="metric-faq">0</strong><span>Telegram uchun tayyor savol-javoblar</span></div>
+          <div class="metric"><strong id="metric-objections">0</strong><span>Qo'shilgan e'tiroz javoblari</span></div>
+        </div>
+
+        <div class="connection-panel" id="connection-panel" hidden>
+          <h3>Telegram Business ulanishi</h3>
+          <p>DM Closer mijozlar bilan <strong>biznes hisobingiz</strong> orqali gaplashadi. Botni Telegram Business → Chatbots orqali ulang.</p>
+          <div class="connection-pill off" id="connection-pill">
+            <span id="connection-status-text">Tekshirilmoqda...</span>
+          </div>
+          <p style="margin-top:12px;font-size:13px;color:var(--muted);">
+            Telegram → Sozlamalar → Business → Chatbots → <strong id="bot-username-hint">@ConverzaSales_bot</strong> ni qo'shing.
+            Shundan so'ng mijozlar xabarlari avtomatik ishlanadi.
+          </p>
+        </div>
+
+        <div class="panel" id="pdf-panel">
+          <div class="panel-head">
+            <div>
+              <h3>PDF orqali avtomatik to'ldirish</h3>
+              <p>Biznesingiz haqidagi PDF hujjat(lar)ni yuklang — tizim brend pasportini avtomatik yaratadi. Kamida 1 ta fayl kerak.</p>
+            </div>
+          </div>
+          <div class="pdf-drop" id="pdf-drop">
+            <input type="file" id="pdf-input" accept="application/pdf,.pdf" multiple hidden />
+            <p id="pdf-drop-text">PDF fayllarni shu yerga tashlang yoki <span class="pdf-browse">tanlang</span></p>
+            <ul class="pdf-list" id="pdf-list"></ul>
+          </div>
+          <div class="actions">
+            <button type="button" class="secondary" id="pdf-clear">Tozalash</button>
+            <button type="button" class="primary" id="pdf-generate" disabled>PDF'dan yaratish</button>
+          </div>
+          <div id="pdf-result" class="notice" hidden></div>
+        </div>
+
+        <form class="panel" id="passport-form">
+          <div class="panel-head">
+            <div>
+              <h3>Brend pasporti haqida ma'lumotlar</h3>
+            </div>
+          </div>
+
+          <div class="form">
+            <div class="grid-2">
+              <label>Biznes nomi
+                <input name="brand_name" required placeholder="Converza" />
+              </label>
+              <label>Soha
+                <input name="industry" placeholder="Telegram sotuv avtomatlashtirish" />
+              </label>
+            </div>
+            <div class="grid-2">
+              <label>Joylashuv
+                <input name="target_location" value="O'zbekiston" />
+              </label>
+              <label>Muloqot ohangi
+                <select name="tone">
+                  <option>Samimiy, ishonchli va lo'nda</option>
+                  <option>Professional va to'g'ridan-to'g'ri</option>
+                  <option>Iliq va maslahatchi</option>
+                </select>
+              </label>
+            </div>
+
+            <label>Asosiy taklif
+              <textarea name="core_offer" required placeholder="Biz bizneslarga kechki mijozlarni yo'qotmaslik uchun oddiy DM Closer sotamiz."></textarea>
+            </label>
+            <label>Maqsadli auditoriya
+              <textarea name="target_audience" required placeholder="Telegram orqali sotadigan va ish vaqtidan keyin mijozlarni yo'qotadigan o'zbek kichik bizneslari."></textarea>
+            </label>
+            <label>Closer uchun qo'shimcha eslatmalar
+              <textarea name="raw_notes" placeholder="Qaytarish siyosati, yetkazib berish, sotuv qoidalari, afzal so'zlar, qochish kerak bo'lgan mavzular."></textarea>
+            </label>
+
+            <div>
+              <label>Telegram hisob-fakturalari uchun narx darajalari</label>
+              <div class="repeat-list" id="pricing-list"></div>
+              <button type="button" class="secondary" id="add-pricing">Narx qo'shish</button>
+            </div>
+            <div>
+              <label>Closer qayta ishlatadigan savol-javoblar</label>
+              <div class="repeat-list" id="faq-list"></div>
+              <button type="button" class="secondary" id="add-faq">Savol-javob qo'shish</button>
+            </div>
+            <div>
+              <label>Keng tarqalgan e'tirozlar</label>
+              <div class="repeat-list" id="objection-list"></div>
+              <button type="button" class="secondary" id="add-objection">E'tiroz qo'shish</button>
+            </div>
+
+            <div class="notice">
+              Saqlash sizning Telegram hisobingiz uchun umumiy brend pasportini yaratadi yoki yangilaydi
+              (<strong id="org-id-label">kirilmagan</strong>).
+              DM Closer va Co-Pilot agentlari aynan shu pasportdan foydalanadi.
+            </div>
+            <div class="grid-2">
+              <label>Telegram sotuv boti
+                <input value="@ConverzaSales_bot" readonly />
+              </label>
+              <label>Click provayder tokeni (ixtiyoriy)
+                <input name="click_token" placeholder="@BotFather Payments sozlamalaridan" />
+              </label>
+            </div>
+          </div>
+
+          <div id="save-result" class="notice" hidden></div>
+
+          <div class="actions">
+            <button type="submit" class="primary" id="save-btn">Brend pasportini saqlash</button>
+          </div>
+        </form>
+        </div>
+      </section>
+
+      <section class="content view" id="copilot-view">
+        <div class="headline">
+          <div class="hero">
+            <h2>Co-Pilot — ikkilamchi vosita.</h2>
+            <p>Brend pasporti saqlangandan so'ng undan pozitsiyalash, skriptlar, kampaniyalar va ishga tushirish g'oyalarini ishlab chiqish uchun foydalaning — DM Closer sozlashga xalaqit bermaydi.</p>
+          </div>
+          <div class="proof"><strong id="saved-brand">Tayyor</strong><span>Ushbu seansda saqlangan eng so'nggi brend pasporti yuklangan.</span></div>
+        </div>
+        <div class="chat-shell">
+          <div id="messages">
+            <div class="bubble assistant">Ishga tushirish skriptlari, Telegram xabar namunalari, e'tirozlarni hal qilish yoki birinchi hafta rejasini so'rang. Tezkor suhbat rejimi brend pasportingiz asosida strategik maslahat beradi.</div>
+          </div>
+          <div class="composer">
+            <textarea id="message-input" placeholder="Sozlashdan so'ng Co-Pilot'dan so'rang..." spellcheck="true"></textarea>
+            <button class="primary" id="send-btn" type="button">Yuborish</button>
+          </div>
+        </div>
+      </section>
+    </main>
   </div>
 
-  <!-- ================================================================ -->
-  <!-- SCRIPT                                                            -->
-  <!-- ================================================================ -->
   <script>
-    // ----------------------------------------------------------------
-    // State
-    // ----------------------------------------------------------------
+    const AUTH_STORAGE_KEY = "converza_auth";
+    const ACCESS_REQUEST_KEY = "converza_access_request_id";
     const state = {
-      userRole: null,
+      saved: false,
+      orgId: null,
+      token: null,
+      user: null,
+      brandId: null,
+      accessMode: "form",
+      copilotMode: "chat",
+      conversationId: null,
       conversationHistory: [],
-      currentConversationId: null,
-      isStreaming: false,
       clientContext: {
         brand_name: "",
         industry: "",
-        target_location: "",
+        target_location: "O'zbekiston",
         hex_colors: [],
         target_audience: "",
         core_offer: ""
       }
     };
 
-    // ----------------------------------------------------------------
-    // DOM refs
-    // ----------------------------------------------------------------
-    const onboardingEl     = document.getElementById("onboarding");
-    const chatAppEl        = document.getElementById("chat-app");
-    const messagesEl       = document.getElementById("messages");
-    const welcomeMsgEl     = document.getElementById("welcome-msg");
-    const typingIndicator  = document.getElementById("typing-indicator");
-    const messageInput     = document.getElementById("message-input");
-    const sendBtn          = document.getElementById("send-btn");
-    const roleBadge        = document.getElementById("role-badge");
+    const form = document.getElementById("passport-form");
+    const saveBtn = document.getElementById("save-btn");
+    const saveResult = document.getElementById("save-result");
+    const statusText = document.getElementById("status-text");
+    const statusDot = document.getElementById("status-dot");
+    const copilotTab = document.getElementById("copilot-tab");
 
-    // ----------------------------------------------------------------
-    // Onboarding
-    // ----------------------------------------------------------------
-    document.querySelectorAll(".role-card").forEach(card => {
-      card.addEventListener("click", () => {
-        state.userRole = card.dataset.role;
-        roleBadge.textContent = state.userRole;
-
-        onboardingEl.classList.add("hidden");
-        chatAppEl.classList.add("visible");
-
-        setTimeout(() => messageInput.focus(), 420);
-      });
-    });
-
-    // ----------------------------------------------------------------
-    // Input auto-resize
-    // ----------------------------------------------------------------
-    messageInput.addEventListener("input", () => {
-      messageInput.style.height = "auto";
-      messageInput.style.height = Math.min(messageInput.scrollHeight, 120) + "px";
-      sendBtn.disabled = messageInput.value.trim() === "" || state.isStreaming;
-    });
-
-    // ----------------------------------------------------------------
-    // Send on Enter (Shift+Enter = newline)
-    // ----------------------------------------------------------------
-    messageInput.addEventListener("keydown", e => {
-      if (e.key === "Enter" && !e.shiftKey) {
-        e.preventDefault();
-        if (!sendBtn.disabled) handleSend();
-      }
-    });
-
-    sendBtn.addEventListener("click", handleSend);
-
-    // ----------------------------------------------------------------
-    // Core send logic
-    // ----------------------------------------------------------------
-    function handleSend() {
-      const text = messageInput.value.trim();
-      if (!text || state.isStreaming) return;
-
-      messageInput.value = "";
-      messageInput.style.height = "auto";
-      sendBtn.disabled = true;
-
-      sendMessage(text);
+    function apiHeaders(extra = {}) {
+      const headers = { ...extra };
+      if (state.token) headers.Authorization = `Bearer ${state.token}`;
+      return headers;
     }
 
-    async function sendMessage(userText) {
-      state.isStreaming = true;
+    function addPricing(tier = "", price = "", features = "") {
+      const row = document.createElement("div");
+      row.className = "repeat-row pricing";
+      row.innerHTML = `
+        <input data-field="tier" placeholder="Telegram Pro" value="${escapeAttr(tier)}" />
+        <input data-field="price" placeholder="$30 yoki 375000 so'm" value="${escapeAttr(price)}" />
+        <input data-field="features" placeholder="kelgan xabarlarga javob berish, hisob-faktura yuborish" value="${escapeAttr(features)}" />
+        <button type="button" class="icon-btn" title="O'chirish">x</button>
+      `;
+      row.querySelector("button").addEventListener("click", () => { row.remove(); updateMetrics(); });
+      document.getElementById("pricing-list").appendChild(row);
+      row.querySelectorAll("input").forEach(input => input.addEventListener("input", updateMetrics));
+      updateMetrics();
+    }
 
-      // Remove welcome message on first send
-      if (welcomeMsgEl) welcomeMsgEl.remove();
+    function addFaq(question = "", answer = "") {
+      const row = document.createElement("div");
+      row.className = "repeat-row";
+      row.innerHTML = `
+        <input data-field="question" placeholder="Kechasi ham ishlaydimi?" value="${escapeAttr(question)}" />
+        <input data-field="answer" placeholder="Ha, closer 24/7 javob bera oladi." value="${escapeAttr(answer)}" />
+        <button type="button" class="icon-btn" title="O'chirish">x</button>
+      `;
+      row.querySelector("button").addEventListener("click", () => { row.remove(); updateMetrics(); });
+      document.getElementById("faq-list").appendChild(row);
+      row.querySelectorAll("input").forEach(input => input.addEventListener("input", updateMetrics));
+      updateMetrics();
+    }
 
-      // Render user bubble
-      appendBubble("user", userText);
+    function addObjection(objection = "", response = "") {
+      const row = document.createElement("div");
+      row.className = "repeat-row";
+      row.innerHTML = `
+        <input data-field="objection" placeholder="Juda qimmat" value="${escapeAttr(objection)}" />
+        <input data-field="response" placeholder="Bitta qaytarilgan savdo rejaning narxini qoplaydi." value="${escapeAttr(response)}" />
+        <button type="button" class="icon-btn" title="O'chirish">x</button>
+      `;
+      row.querySelector("button").addEventListener("click", () => { row.remove(); updateMetrics(); });
+      document.getElementById("objection-list").appendChild(row);
+      row.querySelectorAll("input").forEach(input => input.addEventListener("input", updateMetrics));
+      updateMetrics();
+    }
 
-      // Add to history
-      const historySnapshot = [...state.conversationHistory];
-      state.conversationHistory.push({ role: "user", content: userText });
+    function escapeAttr(value) {
+      return String(value).replaceAll("&", "&amp;").replaceAll('"', "&quot;").replaceAll("<", "&lt;");
+    }
 
-      // Show typing indicator
-      showTyping();
+    function collectRows(listId) {
+      return [...document.querySelectorAll(`#${listId} .repeat-row`)].map(row => {
+        const item = {};
+        row.querySelectorAll("[data-field]").forEach(input => item[input.dataset.field] = input.value.trim());
+        return item;
+      }).filter(item => Object.values(item).some(Boolean));
+    }
 
-      let assistantBubble = null;
-      let fullResponse = "";
-      let firstToken = true;
+    function showAccessPanel(mode) {
+      state.accessMode = mode;
+      document.getElementById("access-request-panel").hidden = mode !== "form";
+      document.getElementById("access-pending-panel").hidden = mode !== "pending";
+      document.getElementById("access-rejected-panel").hidden = mode !== "rejected";
+      document.getElementById("telegram-login-section").hidden = mode !== "login";
+      const headWrap = document.getElementById("auth-card-head");
+      if (headWrap) headWrap.hidden = mode === "pending" || mode === "rejected";
+      if (mode !== "login") {
+        document.getElementById("telegram-login").innerHTML = "";
+      }
+      updateSetupVisibility();
+      updateFunnelState();
+    }
 
+    function highlightAuthCard() {
+      const card = document.getElementById("auth-card");
+      card.classList.add("highlight-pulse");
+      window.setTimeout(() => card.classList.remove("highlight-pulse"), 2200);
+    }
+
+    function scrollToAuth(focusId) {
+      const hub = document.getElementById("auth-hub");
+      hub.scrollIntoView({ behavior: "smooth", block: "center" });
+      highlightAuthCard();
+      if (focusId) {
+        const el = document.getElementById(focusId);
+        if (el) window.setTimeout(() => el.focus(), 400);
+      }
+    }
+
+    function funnelStepForMode(mode) {
+      if (mode === "pending") return 3;
+      if (mode === "rejected") return 2;
+      if (mode === "login" || mode === "approved") return 4;
+      return 2;
+    }
+
+    function updateFunnelState() {
+      const activeStep = funnelStepForMode(state.accessMode);
+      document.querySelectorAll(".funnel-step").forEach(step => {
+        const n = Number(step.dataset.step);
+        step.classList.toggle("done", n < activeStep);
+        step.classList.toggle("active", n === activeStep);
+      });
+
+      const headCopy = {
+        form: {
+          title: "Yopiq access uchun ariza",
+          subtitle: "Asosiy muammoingizni yozing — admin ko'rib chiqadi va tasdiqlagach Telegram orqali kira olasiz."
+        },
+        pending: {
+          title: "So'rov yuborildi",
+          subtitle: "Admin tasdiqlaguncha kuting. Holatni yangilash uchun tugmani bosing."
+        },
+        rejected: {
+          title: "So'rov rad etildi",
+          subtitle: "Yangi kirish so'rovi yuborishingiz mumkin."
+        },
+        approved: {
+          title: "Kirish tasdiqlandi",
+          subtitle: "Endi Telegram orqali kiring — keyin brend pasportini to'ldirasiz."
+        },
+        login: {
+          title: "Kirish tasdiqlandi",
+          subtitle: "Endi Telegram orqali kiring — keyin brend pasportini to'ldirasiz."
+        }
+      };
+
+      const footerCopy = {
+        form: { footer: "DM Closer'ni yoqish uchun yuqoridagi formani to'ldiring.", btn: "Formaga o'tish", action: "request" },
+        pending: { footer: "Admin tasdiqlaguncha brend pasporti ochilmaydi.", btn: "Holatni yangilash", action: "refresh" },
+        rejected: { footer: "Qayta urinish uchun yangi kirish so'rovi yuboring.", btn: "Yangi so'rov", action: "retry" },
+        approved: { footer: "Tasdiq olindi — Telegram orqali kiring.", btn: "Telegram kirish", action: "login" },
+        login: { footer: "Tasdiq olindi — Telegram orqali kiring.", btn: "Telegram kirish", action: "login" }
+      };
+
+      const mode = state.accessMode === "approved" ? "approved" : state.accessMode;
+      const head = headCopy[mode] || headCopy.form;
+      const foot = footerCopy[mode] || footerCopy.form;
+
+      const titleEl = document.getElementById("auth-card-title");
+      const subtitleEl = document.getElementById("auth-card-subtitle");
+      if (titleEl) titleEl.textContent = head.title;
+      if (subtitleEl) subtitleEl.textContent = head.subtitle;
+
+      const headWrap = document.getElementById("auth-card-head");
+      if (headWrap) headWrap.hidden = mode === "pending" || mode === "rejected";
+
+      const footerText = document.getElementById("funnel-footer-text");
+      const footerBtn = document.getElementById("funnel-footer-btn");
+      if (footerText) footerText.textContent = foot.footer;
+      if (footerBtn) {
+        footerBtn.textContent = foot.btn;
+        footerBtn.dataset.action = foot.action;
+      }
+    }
+
+    function handleFunnelAction(action) {
+      if (action === "refresh") {
+        refreshAccessStatus();
+        scrollToAuth();
+        return;
+      }
+      if (action === "retry") {
+        showAccessPanel("form");
+        updateFunnelState();
+        scrollToAuth("req-name");
+        return;
+      }
+      if (action === "login") {
+        scrollToAuth();
+        return;
+      }
+      scrollToAuth("req-name");
+    }
+
+    function updateSetupVisibility() {
+      const workspace = document.getElementById("passport-workspace");
+      const blocked = document.getElementById("setup-blocked");
+      const setupView = document.getElementById("setup-view");
+      if (state.orgId) {
+        workspace.hidden = false;
+        blocked.hidden = true;
+        setupView.classList.remove("intro-active");
+        return;
+      }
+      workspace.hidden = true;
+      blocked.hidden = false;
+      setupView.classList.add("intro-active");
+      updateFunnelState();
+    }
+
+    async function refreshAccessStatus() {
+      const requestId = localStorage.getItem(ACCESS_REQUEST_KEY);
+      if (!requestId) {
+        showAccessPanel("form");
+        return;
+      }
       try {
-        const response = await fetch("/chat", {
+        const response = await fetch(`/api/access-request/${requestId}`);
+        if (!response.ok) {
+          localStorage.removeItem(ACCESS_REQUEST_KEY);
+          showAccessPanel("form");
+          return;
+        }
+        const data = await response.json();
+        if (data.status === "approved") {
+          state.accessMode = "approved";
+          showAccessPanel("login");
+          await mountTelegramWidget();
+          statusText.textContent = "Kirish tasdiqlandi — Telegram orqali kiring";
+          statusDot.style.background = "var(--green)";
+          updateSetupVisibility();
+          return;
+        }
+        if (data.status === "rejected") {
+          showAccessPanel("rejected");
+          const note = document.getElementById("access-rejected-note");
+          note.textContent = data.review_note
+            ? `Sabab: ${data.review_note}`
+            : "Qayta urinib ko'rishingiz mumkin.";
+          statusText.textContent = "Kirish so'rovi rad etildi";
+          statusDot.style.background = "var(--red)";
+          return;
+        }
+        showAccessPanel("pending");
+        statusText.textContent = "So'rov ko'rib chiqilmoqda";
+        statusDot.style.background = "var(--amber)";
+      } catch (_) {
+        showAccessPanel("pending");
+      }
+    }
+
+    function validateAccessForm(fd) {
+      const message = String(fd.get("message") || "").trim();
+      const phone = String(fd.get("contact") || "").replace(/\D/g, "");
+      const username = String(fd.get("telegram_username") || "").trim().replace(/^@/, "");
+      if (message.length < 30) {
+        return "Muammoingizni kamida 30 belgi bilan yozing.";
+      }
+      if (phone.length < 9) {
+        return "To'g'ri telefon raqamini kiriting.";
+      }
+      if (username.length < 3) {
+        return "Telegram @username kiriting.";
+      }
+      return null;
+    }
+
+    async function submitAccessRequest(event) {
+      event.preventDefault();
+      const fd = new FormData(event.target);
+      const hint = document.getElementById("access-form-hint");
+      const clientError = validateAccessForm(fd);
+      if (clientError) {
+        hint.textContent = clientError;
+        return;
+      }
+      hint.textContent = "Yuborilmoqda...";
+      try {
+        const response = await fetch("/api/access-request", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
-            message: userText,
-            client_context: state.clientContext,
-            user_role: state.userRole,
-            conversation_history: historySnapshot
+            full_name: String(fd.get("full_name")).trim(),
+            business_name: String(fd.get("business_name")).trim(),
+            telegram_username: String(fd.get("telegram_username")).trim(),
+            contact: String(fd.get("contact")).trim(),
+            message: String(fd.get("message")).trim()
           })
         });
+        const result = await response.json();
+        if (!response.ok) throw new Error(result.detail || response.statusText);
+        localStorage.setItem(ACCESS_REQUEST_KEY, result.request_id);
+        event.target.reset();
+        hint.textContent = "";
+        await refreshAccessStatus();
+      } catch (error) {
+        hint.textContent = error.message;
+      }
+    }
 
-        if (!response.ok) {
-          hideTyping();
-          appendBubble("error", `Server error: ${response.status} ${response.statusText}`);
-          rollbackLastUserMessage();
-          finishStreaming();
-          return;
+    function setAuthenticated(user, orgId, token) {
+      state.user = user;
+      state.orgId = orgId;
+      state.token = token || null;
+      localStorage.setItem(AUTH_STORAGE_KEY, JSON.stringify({ user, orgId, token: state.token }));
+      showAccessPanel("login");
+      document.getElementById("telegram-login-section").hidden = true;
+      document.getElementById("access-request-panel").hidden = true;
+      document.getElementById("access-pending-panel").hidden = true;
+      document.getElementById("access-rejected-panel").hidden = true;
+      const authUser = document.getElementById("auth-user");
+      authUser.classList.add("visible");
+      const label = user.username ? `@${user.username}` : user.first_name;
+      document.getElementById("auth-label").textContent = `${label} sifatida kirdingiz`;
+      document.getElementById("org-id-label").textContent = orgId;
+      statusText.textContent = state.saved ? "Brend pasporti saqlangan" : "Kirildi — saqlashga tayyor";
+      statusDot.style.background = state.saved ? "var(--green)" : "var(--amber)";
+      document.getElementById("connection-panel").hidden = false;
+      updateSetupVisibility();
+      loadConnectionStatus();
+    }
+
+    function clearAuth() {
+      state.user = null;
+      state.orgId = null;
+      state.token = null;
+      state.saved = false;
+      state.brandId = null;
+      localStorage.removeItem(AUTH_STORAGE_KEY);
+      document.getElementById("auth-user").classList.remove("visible");
+      document.getElementById("org-id-label").textContent = "kirilmagan";
+      copilotTab.disabled = true;
+      document.getElementById("connection-panel").hidden = true;
+      refreshAccessStatus();
+    }
+
+    async function loadConnectionStatus() {
+      if (!state.token) return;
+      const pill = document.getElementById("connection-pill");
+      const label = document.getElementById("connection-status-text");
+      try {
+        const response = await fetch("/api/org/connection-status", {
+          headers: apiHeaders()
+        });
+        if (!response.ok) return;
+        const data = await response.json();
+        if (data.connected) {
+          pill.className = "connection-pill on";
+          label.textContent = "Biznes ulanishi faol";
+        } else {
+          pill.className = "connection-pill off";
+          label.textContent = "Biznes ulanishi yo'q";
         }
+      } catch (_) {
+        pill.className = "connection-pill off";
+        label.textContent = "Holatni yuklab bo'lmadi";
+      }
+    }
 
-        const reader = response.body.getReader();
-        const decoder = new TextDecoder();
+    async function mountTelegramWidget() {
+      const container = document.getElementById("telegram-login");
+      container.innerHTML = "";
+      try {
+        const config = await fetch("/api/auth/config").then(r => r.json());
+        const hint = document.getElementById("bot-username-hint");
+        if (hint && config.bot_username) hint.textContent = `@${config.bot_username}`;
+        const script = document.createElement("script");
+        script.async = true;
+        script.src = "https://telegram.org/js/telegram-widget.js?22";
+        script.setAttribute("data-telegram-login", config.bot_username);
+        script.setAttribute("data-size", "medium");
+        script.setAttribute("data-radius", "8");
+        script.setAttribute("data-onauth", "onTelegramAuth(user)");
+        script.setAttribute("data-request-access", "write");
+        container.appendChild(script);
+      } catch (error) {
+        container.textContent = "Telegram orqali kirishni yuklab bo'lmadi.";
+      }
+    }
 
-        while (true) {
-          const { done, value } = await reader.read();
-          if (done) break;
-
-          const chunk = decoder.decode(value, { stream: true });
-          const lines = chunk.split("\n");
-
-          for (const line of lines) {
-            if (!line.startsWith("data: ")) continue;
-            const jsonStr = line.slice(6).trim();
-            if (!jsonStr) continue;
-
-            let data;
-            try { data = JSON.parse(jsonStr); } catch { continue; }
-
-            if (data.error) {
-              hideTyping();
-              appendBubble("error", data.error);
-              rollbackLastUserMessage();
-              finishStreaming();
-              return;
-            }
-
-            if (data.token) {
-              if (firstToken) {
-                hideTyping();
-                assistantBubble = createAssistantBubble();
-                firstToken = false;
-              }
-              fullResponse += data.token;
-              assistantBubble.textContent = fullResponse;
-              scrollToBottom();
-            }
-
-            if (data.done) {
-              state.currentConversationId = data.conversation_id;
-            }
-          }
+    window.onTelegramAuth = async function onTelegramAuth(user) {
+      try {
+        const response = await fetch("/api/auth/telegram", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(user)
+        });
+        const result = await response.json();
+        if (!response.ok) throw new Error(result.detail || response.statusText);
+        setAuthenticated(
+          { first_name: result.first_name, username: result.username },
+          result.org_id,
+          result.token
+        );
+        await loadExistingPassport();
+        if (state.orgId && !state.saved && !document.getElementById("pricing-list").children.length) {
+          seedExamples();
         }
-
-        // Save assistant turn to history
-        if (fullResponse) {
-          state.conversationHistory.push({ role: "assistant", content: fullResponse });
+      } catch (error) {
+        const msg = String(error.message || "");
+        if (msg.includes("admin tasdig")) {
+          showAccessPanel("pending");
+          updateSetupVisibility();
+          statusText.textContent = "Kirish uchun admin tasdiqi kerak";
         }
+        showSave(msg, "error");
+      }
+    };
 
-      } catch (err) {
-        hideTyping();
-        appendBubble("error", `Connection error: ${err.message}`);
-        rollbackLastUserMessage();
+    function collectPassport() {
+      const data = new FormData(form);
+      return {
+        org_id: state.orgId,
+        brand_name: data.get("brand_name").trim(),
+        industry: data.get("industry").trim(),
+        target_location: data.get("target_location").trim() || "O'zbekiston",
+        target_audience: data.get("target_audience").trim(),
+        core_offer: data.get("core_offer").trim(),
+        tone: data.get("tone"),
+        raw_notes: data.get("raw_notes").trim(),
+        click_token: (data.get("click_token") || "").trim(),
+        pricing: collectRows("pricing-list").map(item => ({
+          tier: item.tier,
+          price: item.price,
+          features: item.features ? item.features.split(",").map(v => v.trim()).filter(Boolean) : []
+        })),
+        faq: collectRows("faq-list"),
+        objections: collectRows("objection-list")
+      };
+    }
+
+    function populateForm(passport) {
+      form.brand_name.value = passport.brand_name || "";
+      form.industry.value = passport.industry || "";
+      form.target_location.value = passport.target_location || "O'zbekiston";
+      form.target_audience.value = passport.target_audience || "";
+      form.core_offer.value = passport.core_offer || "";
+      form.raw_notes.value = passport.raw_notes || "";
+      if (passport.tone) {
+        const match = [...form.tone.options].some(o => o.value === passport.tone);
+        if (match) {
+          [...form.tone.options].forEach(option => {
+            option.selected = option.value === passport.tone;
+          });
+        }
       }
 
-      finishStreaming();
+      const pricingFeatures = item =>
+        Array.isArray(item.features) ? item.features.join(", ") : (item.features || "");
+
+      document.getElementById("pricing-list").innerHTML = "";
+      document.getElementById("faq-list").innerHTML = "";
+      document.getElementById("objection-list").innerHTML = "";
+
+      (passport.pricing || []).forEach(item => {
+        addPricing(item.tier || "", item.price || "", pricingFeatures(item));
+      });
+      (passport.faq || []).forEach(item => addFaq(item.question || "", item.answer || ""));
+      (passport.objections || []).forEach(item => addObjection(item.objection || "", item.response || ""));
+      updateMetrics();
     }
 
-    // ----------------------------------------------------------------
-    // Helpers
-    // ----------------------------------------------------------------
+    function applySavedPassport(passport) {
+      populateForm(passport);
+      if (form.click_token) form.click_token.value = "";
+
+      state.saved = true;
+      state.brandId = passport.id;
+      state.clientContext = {
+        brand_name: passport.brand_name || "",
+        industry: passport.industry || "",
+        target_location: passport.target_location || "O'zbekiston",
+        hex_colors: passport.hex_colors || [],
+        target_audience: passport.target_audience || "",
+        core_offer: passport.core_offer || ""
+      };
+      copilotTab.disabled = false;
+      statusText.textContent = "Brend pasporti yuklandi";
+      statusDot.style.background = "var(--green)";
+      document.getElementById("saved-brand").textContent = passport.brand_name || "Tayyor";
+      updateMetrics();
+    }
+
+    async function loadExistingPassport() {
+      if (!state.orgId) return;
+      try {
+        const response = await fetch(`/api/brand-passport/by-org/${state.orgId}`, {
+          headers: apiHeaders()
+        });
+        if (!response.ok) return;
+        const passport = await response.json();
+        applySavedPassport(passport);
+      } catch (_) {
+        // No saved passport yet — keep the empty form.
+      }
+    }
+
+    function updateMetrics() {
+      const p = collectPassport();
+      const basics = ["brand_name", "industry", "target_location", "target_audience", "core_offer"].filter(k => p[k]).length;
+      document.getElementById("metric-brand").textContent = basics;
+      document.getElementById("metric-pricing").textContent = p.pricing.length;
+      document.getElementById("metric-faq").textContent = p.faq.length;
+      document.getElementById("metric-objections").textContent = p.objections.length;
+    }
+
+    async function savePassport(event) {
+      event.preventDefault();
+      if (!state.orgId) {
+        showSave("Brend pasporti faqat kirish so'rovi tasdiqlangach va Telegram orqali kirgandan keyin ochiladi.", "error");
+        return;
+      }
+      const passport = collectPassport();
+      if (!passport.brand_name || !passport.target_audience || !passport.core_offer) {
+        showSave("Biznes nomi, maqsadli auditoriya va asosiy taklif majburiy.", "error");
+        return;
+      }
+      if (!passport.pricing.length) {
+        showSave("Telegram hisob-fakturalari haqiqiy narxlardan foydalanishi uchun kamida bitta narx darajasini qo'shing.", "error");
+        return;
+      }
+
+      saveBtn.disabled = true;
+      showSave("Brend pasporti saqlanmoqda...", "");
+      try {
+        const response = await fetch("/api/dm-closer/onboard", {
+          method: "POST",
+          headers: apiHeaders({ "Content-Type": "application/json" }),
+          body: JSON.stringify(passport)
+        });
+        const result = await response.json();
+        if (!response.ok) throw new Error(result.detail || response.statusText);
+        state.saved = true;
+        state.brandId = result.brand_id;
+        state.clientContext = {
+          brand_name: passport.brand_name,
+          industry: passport.industry,
+          target_location: passport.target_location,
+          hex_colors: [],
+          target_audience: passport.target_audience,
+          core_offer: passport.core_offer
+        };
+        copilotTab.disabled = false;
+        statusText.textContent = "Brend pasporti saqlandi";
+        statusDot.style.background = "var(--green)";
+        document.getElementById("saved-brand").textContent = passport.brand_name;
+        showSave(`Saqlandi. Telegram DM Closer endi ${passport.pricing.length} ta narx darajasidan foydalana oladi.`, "success");
+        loadConnectionStatus();
+      } catch (error) {
+        showSave(error.message, "error");
+      } finally {
+        saveBtn.disabled = false;
+      }
+    }
+
+    function showSave(message, type) {
+      saveResult.hidden = false;
+      saveResult.textContent = message;
+      saveResult.className = `notice ${type || ""}`;
+      saveResult.scrollIntoView({ behavior: "smooth", block: "nearest" });
+    }
+
+    function switchView(view) {
+      document.querySelectorAll(".tab").forEach(tab => tab.classList.toggle("active", tab.dataset.view === view));
+      document.querySelectorAll(".view").forEach(section => section.classList.toggle("active", section.id === `${view}-view`));
+    }
+
     function appendBubble(role, text) {
-      const row = document.createElement("div");
-      row.className = `msg-row ${role === "error" ? "assistant" : role}`;
-
       const bubble = document.createElement("div");
-      bubble.className = `bubble ${role === "error" ? "error" : role}`;
+      bubble.className = `bubble ${role}`;
       bubble.textContent = text;
-
-      row.appendChild(bubble);
-      messagesEl.appendChild(row);
-      scrollToBottom();
+      document.getElementById("messages").appendChild(bubble);
+      bubble.scrollIntoView({ block: "end" });
       return bubble;
     }
 
-    function createAssistantBubble() {
-      const row = document.createElement("div");
-      row.className = "msg-row assistant";
-
-      const bubble = document.createElement("div");
-      bubble.className = "bubble assistant";
-
-      row.appendChild(bubble);
-      messagesEl.appendChild(row);
-      scrollToBottom();
-      return bubble;
+    async function streamSse(response, assistant, onEvent) {
+      if (!response.ok || !response.body) throw new Error(`${response.status} ${response.statusText}`);
+      const reader = response.body.getReader();
+      const decoder = new TextDecoder();
+      let buffer = "";
+      while (true) {
+        const { done, value } = await reader.read();
+        if (done) break;
+        buffer += decoder.decode(value, { stream: true });
+        const lines = buffer.split("\n");
+        buffer = lines.pop() || "";
+        for (const line of lines) {
+          if (!line.startsWith("data: ")) continue;
+          const raw = line.slice(6).trim();
+          if (!raw) continue;
+          const event = JSON.parse(raw);
+          onEvent(event, assistant);
+        }
+      }
     }
 
-    function showTyping() {
-      typingIndicator.classList.add("visible");
-      scrollToBottom();
+    async function sendCopilot() {
+      const input = document.getElementById("message-input");
+      const text = input.value.trim();
+      if (!text) return;
+      if (!state.orgId) {
+        appendBubble("error", "Avval Telegram orqali kiring.");
+        return;
+      }
+      if (!state.brandId) {
+        appendBubble("error", "Avval brend pasportini saqlang, shunda agentlar biznes ma'lumotlaringizni yuklay oladi.");
+        return;
+      }
+      input.value = "";
+      appendBubble("user", text);
+      const history = [...state.conversationHistory];
+      state.conversationHistory.push({ role: "user", content: text });
+      const assistant = appendBubble("assistant", "");
+
+      try {
+        const endpoint = "/chat";
+        const payload = {
+          message: text,
+          brand_id: state.brandId,
+          client_context: state.clientContext,
+          user_role: "Owner",
+          conversation_history: history
+        };
+
+        const response = await fetch(endpoint, {
+          method: "POST",
+          headers: apiHeaders({ "Content-Type": "application/json" }),
+          body: JSON.stringify(payload)
+        });
+
+        let full = "";
+        await streamSse(response, assistant, (event) => {
+          if (event.error) throw new Error(event.error);
+          if (event.conversation_id) state.conversationId = event.conversation_id;
+          if (event.type === "dag_plan") {
+            full += `\n\n[Agent rejasi: ${event.plan?.campaign_name || "kampaniya"}]`;
+            assistant.textContent = full.trim();
+          }
+          if (event.type === "dag_result") {
+            full += `\n\n[Kampaniya tayyor: ${event.campaign_name || "bajarildi"}]`;
+            assistant.textContent = full.trim();
+          }
+          if (event.type === "dag_error") throw new Error(event.error);
+          const token = event.token;
+          if (token) {
+            full += token;
+            assistant.textContent = full;
+          }
+        });
+        if (full) state.conversationHistory.push({ role: "assistant", content: full });
+      } catch (error) {
+        assistant.className = "bubble error";
+        assistant.textContent = error.message;
+      }
     }
 
-    function hideTyping() {
-      typingIndicator.classList.remove("visible");
+    form.addEventListener("input", updateMetrics);
+    form.addEventListener("submit", savePassport);
+    document.getElementById("add-pricing").addEventListener("click", () => addPricing());
+    document.getElementById("add-faq").addEventListener("click", () => addFaq());
+    document.getElementById("add-objection").addEventListener("click", () => addObjection());
+    document.querySelectorAll(".topbar .tab").forEach(tab => tab.addEventListener("click", () => switchView(tab.dataset.view)));
+    document.getElementById("logout-btn").addEventListener("click", clearAuth);
+    document.getElementById("access-request-form").addEventListener("submit", submitAccessRequest);
+    document.getElementById("refresh-access-btn").addEventListener("click", refreshAccessStatus);
+    document.getElementById("retry-access-btn").addEventListener("click", () => {
+      localStorage.removeItem(ACCESS_REQUEST_KEY);
+      showAccessPanel("form");
+      statusText.textContent = "Kirish so'rovini yuboring";
+      statusDot.style.background = "var(--blue)";
+      updateFunnelState();
+    });
+    document.getElementById("send-btn").addEventListener("click", sendCopilot);
+    document.getElementById("message-input").addEventListener("keydown", event => {
+      if (event.key === "Enter" && !event.shiftKey) {
+        event.preventDefault();
+        sendCopilot();
+      }
+    });
+
+    function seedExamples() {
+      addPricing("Telegram Pro", "$30", "kelgan xabarlarga javob berish, hisob-faktura yuborish, suhbatlarni boshqarish");
+      addFaq("Qaysi platformada ishlaydi?", "Hozircha Converza Telegram'da ishlaydi.");
+      addFaq("Kechasi ham javob beradimi?", "Ha, u 24/7 javob bera oladi va kechki mijozlarni qaytaradi.");
+      addObjection("Juda qimmat", "Bitta qaytarilgan savdo rejaning narxini qoplaydi.");
     }
 
-    function scrollToBottom() {
-      messagesEl.scrollTop = messagesEl.scrollHeight;
+    // ── PDF upload → auto-generate brand passport ──────────────────────────
+    const pdfState = { files: [] };
+    const pdfInput = document.getElementById("pdf-input");
+    const pdfDrop = document.getElementById("pdf-drop");
+    const pdfList = document.getElementById("pdf-list");
+    const pdfGenerate = document.getElementById("pdf-generate");
+    const pdfClear = document.getElementById("pdf-clear");
+    const pdfResult = document.getElementById("pdf-result");
+
+    function showPdfResult(message, type) {
+      pdfResult.hidden = false;
+      pdfResult.textContent = message;
+      pdfResult.className = `notice ${type || ""}`;
     }
 
-    function finishStreaming() {
-      state.isStreaming = false;
-      sendBtn.disabled = messageInput.value.trim() === "";
-      messageInput.focus();
+    function renderPdfList() {
+      pdfList.innerHTML = "";
+      pdfState.files.forEach((file, index) => {
+        const li = document.createElement("li");
+        const sizeKb = Math.max(1, Math.round(file.size / 1024));
+        li.innerHTML = `<span>📄</span><span>${escapeAttr(file.name)} — ${sizeKb} KB</span><button type="button" title="O'chirish">✕</button>`;
+        li.querySelector("button").addEventListener("click", (e) => {
+          e.stopPropagation();
+          pdfState.files.splice(index, 1);
+          renderPdfList();
+        });
+        pdfList.appendChild(li);
+      });
+      pdfGenerate.disabled = pdfState.files.length === 0;
     }
 
-    function rollbackLastUserMessage() {
-      // Remove the user message we just added so history stays consistent
-      const last = state.conversationHistory[state.conversationHistory.length - 1];
-      if (last && last.role === "user") state.conversationHistory.pop();
+    function addPdfFiles(fileList) {
+      for (const file of fileList) {
+        if (!file.name.toLowerCase().endsWith(".pdf")) continue;
+        const exists = pdfState.files.some(f => f.name === file.name && f.size === file.size);
+        if (!exists) pdfState.files.push(file);
+      }
+      renderPdfList();
     }
+
+    async function generateFromPdf() {
+      if (!state.orgId) {
+        showPdfResult("Avval kirish so'rovingiz tasdiqlanishi va Telegram orqali kirishingiz kerak.", "error");
+        return;
+      }
+      if (!pdfState.files.length) return;
+      pdfGenerate.disabled = true;
+      showPdfResult(`${pdfState.files.length} ta hujjat tahlil qilinmoqda... ⏳`, "");
+      try {
+        const fd = new FormData();
+        pdfState.files.forEach(file => fd.append("files", file, file.name));
+        const response = await fetch("/api/dm-closer/parse-pdf", {
+          method: "POST",
+          headers: apiHeaders(),
+          body: fd
+        });
+        const result = await response.json();
+        if (!response.ok) throw new Error(result.detail || response.statusText);
+        populateForm(result.passport);
+        showPdfResult(
+          `✅ ${result.files_processed} ta hujjatdan brend pasporti yaratildi. Quyida ko'rib chiqing va saqlang.`,
+          "success"
+        );
+      } catch (error) {
+        showPdfResult(`Xatolik: ${error.message}`, "error");
+      } finally {
+        pdfGenerate.disabled = pdfState.files.length === 0;
+      }
+    }
+
+    pdfList.addEventListener("click", e => e.stopPropagation());
+    pdfDrop.addEventListener("click", () => pdfInput.click());
+    pdfInput.addEventListener("change", () => { addPdfFiles(pdfInput.files); pdfInput.value = ""; });
+    pdfDrop.addEventListener("dragover", e => { e.preventDefault(); pdfDrop.classList.add("dragover"); });
+    pdfDrop.addEventListener("dragleave", () => pdfDrop.classList.remove("dragover"));
+    pdfDrop.addEventListener("drop", e => {
+      e.preventDefault();
+      pdfDrop.classList.remove("dragover");
+      if (e.dataTransfer?.files) addPdfFiles(e.dataTransfer.files);
+    });
+    pdfClear.addEventListener("click", () => { pdfState.files = []; renderPdfList(); pdfResult.hidden = true; });
+    pdfGenerate.addEventListener("click", generateFromPdf);
+
+    document.getElementById("funnel-footer-btn").addEventListener("click", e => {
+      handleFunnelAction(e.currentTarget.dataset.action || "request");
+    });
+
+    async function bootstrap() {
+      updateSetupVisibility();
+
+      const cached = localStorage.getItem(AUTH_STORAGE_KEY);
+      if (cached) {
+        try {
+          const { user, orgId, token } = JSON.parse(cached);
+          if (user && orgId && token) {
+            setAuthenticated(user, orgId, token);
+            await loadExistingPassport();
+          } else if (user && orgId && !token) {
+            localStorage.removeItem(AUTH_STORAGE_KEY);
+          }
+        } catch (_) {
+          localStorage.removeItem(AUTH_STORAGE_KEY);
+        }
+      }
+
+      if (!state.orgId) {
+        await refreshAccessStatus();
+      }
+
+      if (state.orgId && !state.saved && !document.getElementById("pricing-list").children.length) {
+        seedExamples();
+      }
+    }
+    bootstrap();
   </script>
 </body>
 </html>

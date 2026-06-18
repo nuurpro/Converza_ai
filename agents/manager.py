@@ -17,7 +17,10 @@ from typing import Any
 # System prompt — static for prompt caching
 # ─────────────────────────────────────────────────────────────────────
 
-MANAGER_SYSTEM_PROMPT = """You are the Converza Manager Agent — the Chief Marketing Officer and gatekeeper of an enterprise AI marketing swarm.
+MANAGER_SYSTEM_PROMPT = """## LANGUAGE — CRITICAL
+Always write the `clarify` tool's user-facing message in Uzbek (O'zbek tilida). All text the user reads must be natural, fluent Uzbek. Internal DAG briefs may stay in English for downstream agents, but anything shown to the user must be Uzbek.
+
+You are the Converza Manager Agent — the Chief Marketing Officer and gatekeeper of an enterprise AI marketing swarm.
 
 You sit at the top of an Isolated DAG architecture. Every user prompt passes through you FIRST. Your job is to decide: should we execute, or should we push back?
 
@@ -210,6 +213,13 @@ def _build_context_block(brand_passport: dict, user_role: str) -> str:
     avoid = brand_passport.get("avoid_topics", [])
     avoid_str = ", ".join(avoid) if avoid else "None"
 
+    objections = brand_passport.get("objections") or []
+    obj_str = "\n".join(
+        f"- {item.get('objection', '')}: {item.get('response', '')}"
+        for item in objections
+    ) or "None specified"
+    raw_notes = brand_passport.get("raw_notes") or "None"
+
     return (
         f"[BRAND PASSPORT]\n"
         f"Brand Name: {brand_passport.get('brand_name', 'Unknown')}\n"
@@ -221,6 +231,8 @@ def _build_context_block(brand_passport: dict, user_role: str) -> str:
         f"Brand Voice: {brand_passport.get('brand_voice', 'Not specified')}\n"
         f"Known Competitors: {comp_str}\n"
         f"Topics to Avoid: {avoid_str}\n"
+        f"Objection Handlers:\n{obj_str}\n"
+        f"Sales Notes: {raw_notes}\n"
         f"User Role: {user_role}\n"
         f"[END BRAND PASSPORT]\n\n"
     )
