@@ -28,6 +28,7 @@ from services.brand_passport import (
     sync_organization,
     upsert_passport,
 )
+from services.payments import payments_configured
 from services.access_requests import (
     approve_request,
     create_request,
@@ -539,18 +540,21 @@ async def connection_status(user: Annotated[dict, Depends(get_current_user)]):
         result = (
             get_supabase()
             .table("organizations")
-            .select("business_connection_id")
+            .select("business_connection_id, click_token")
             .eq("id", org_id)
             .maybe_single()
             .execute()
         )
         conn_id = None
+        click_token = None
         if result and result.data:
             conn_id = result.data.get("business_connection_id")
+            click_token = result.data.get("click_token")
         return {
             "org_id": org_id,
             "connected": bool(conn_id),
             "business_connection_id": conn_id,
+            "payments_enabled": payments_configured(click_token),
         }
     except Exception as exc:
         raise HTTPException(status_code=500, detail=str(exc))

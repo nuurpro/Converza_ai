@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Converza — AI operatsion tizimi</title>
+  <title>Converza</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
   <style>
@@ -160,17 +160,18 @@
     }
 
     .hero h2 {
-      margin: 0 0 10px;
-      font-size: 30px;
-      line-height: 1.15;
-      letter-spacing: 0;
+      margin: 0 0 8px;
+      font-size: 24px;
+      line-height: 1.2;
+      letter-spacing: -0.02em;
     }
 
     .hero p {
       margin: 0;
       color: var(--muted);
-      line-height: 1.6;
-      max-width: 720px;
+      line-height: 1.5;
+      max-width: 520px;
+      font-size: 14px;
     }
 
     .proof {
@@ -562,7 +563,7 @@
     .intro-funnel {
       display: flex;
       flex-direction: column;
-      gap: 52px;
+      gap: 32px;
     }
 
     .funnel-track {
@@ -642,7 +643,7 @@
       border: 1px solid var(--line);
     }
 
-    .intro-hero { text-align: center; padding-top: 8px; }
+    .intro-hero { text-align: center; padding-top: 4px; }
 
     .system-pill {
       display: inline-flex;
@@ -670,43 +671,55 @@
 
     .intro-title {
       margin: 0;
-      font-size: clamp(42px, 7vw, 64px);
+      font-size: clamp(36px, 6vw, 52px);
       font-weight: 800;
       letter-spacing: -0.03em;
-      line-height: 1;
+      line-height: 1.05;
       color: var(--ink);
     }
 
     .intro-sub {
-      margin: 14px 0 0;
-      font-size: clamp(20px, 3vw, 28px);
-      line-height: 1.35;
+      margin: 10px 0 0;
+      font-size: 17px;
+      line-height: 1.45;
       color: var(--muted);
       font-weight: 500;
+      max-width: 420px;
+      margin-inline: auto;
     }
 
-    .intro-sub em {
-      font-style: italic;
-      color: var(--blue);
-      font-weight: 700;
+    .intro-points {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 12px;
+      max-width: 720px;
+      margin: 0 auto;
     }
 
-    .intro-card {
-      margin: 28px auto 0;
-      max-width: 760px;
-      text-align: left;
-      padding: 18px 20px 18px 24px;
+    .intro-points article {
+      text-align: center;
+      padding: 16px 12px;
       background: var(--surface);
       border: 1px solid var(--line);
       border-radius: var(--radius);
-      box-shadow: var(--shadow);
-      border-left: 4px solid var(--blue);
-      font-size: 15px;
-      line-height: 1.65;
-      color: var(--muted);
     }
 
-    .intro-card strong { color: var(--blue); font-weight: 600; }
+    .intro-points strong {
+      display: block;
+      font-size: 15px;
+      margin-bottom: 4px;
+      color: var(--ink);
+    }
+
+    .intro-points span {
+      font-size: 13px;
+      color: var(--muted);
+      line-height: 1.4;
+    }
+
+    @media (max-width: 700px) {
+      .intro-points { grid-template-columns: 1fr; }
+    }
 
     .intro-section-head {
       text-align: center;
@@ -1067,28 +1080,24 @@
         <div id="setup-blocked">
           <div class="intro-funnel">
             <div class="funnel-track" id="funnel-track">
-              <div class="funnel-step done" data-step="1"><span class="num">1</span> Tanishish</div>
-              <div class="funnel-step" data-step="2"><span class="num">2</span> Kirish so'rovi</div>
-              <div class="funnel-step" data-step="3"><span class="num">3</span> Admin tasdiqi</div>
-              <div class="funnel-step" data-step="4"><span class="num">4</span> Telegram kirish</div>
-              <div class="funnel-step" data-step="5"><span class="num">5</span> Brend pasporti</div>
+              <div class="funnel-step done" data-step="1"><span class="num">1</span> Kirish</div>
+              <div class="funnel-step" data-step="2"><span class="num">2</span> Ariza</div>
+              <div class="funnel-step" data-step="3"><span class="num">3</span> Tasdiq</div>
+              <div class="funnel-step" data-step="4"><span class="num">4</span> Telegram</div>
+              <div class="funnel-step" data-step="5"><span class="num">5</span> Pasport</div>
             </div>
 
             <section class="intro-hero">
-              <div class="system-pill"><span class="pulse"></span> Tizim faol</div>
+              <div class="system-pill"><span class="pulse"></span> Faol</div>
               <h1 class="intro-title">Converza</h1>
-              <p class="intro-sub">Biznes o'sishi uchun <em>AI operatsion tizimi.</em></p>
-              <div class="intro-card">
-                Converza qimmat marketing agentliklari va sotuv jamoalarini AI tizimi bilan almashtiradi —
-                <strong>lead yaratadi, 24/7 xabarlarga javob beradi va haqiqatan savdolarni yopadi.</strong>
-              </div>
+              <p class="intro-sub">Telegram'da sotuv va marketing uchun AI tizim.</p>
             </section>
 
             <section class="auth-hub" id="auth-hub">
               <div class="auth-card" id="auth-card">
                 <div class="auth-card-head" id="auth-card-head">
-                  <h2 id="auth-card-title">Yopiq access uchun ariza</h2>
-                  <p id="auth-card-subtitle">Asosiy muammoingizni yozing — admin ko'rib chiqadi va tasdiqlagach Telegram orqali kira olasiz.</p>
+                  <h2 id="auth-card-title">Kirish</h2>
+                  <p id="auth-card-subtitle">Yangi foydalanuvchi — ariza. Tasdiqlangan — Telegram.</p>
                 </div>
                 <div class="auth-tabs" id="auth-tabs" hidden>
                   <button type="button" class="auth-tab active" data-auth-tab="request">Yangi ariza</button>
@@ -1100,144 +1109,51 @@
                     <input id="req-name" name="full_name" required minlength="2" placeholder="Ali Valiyev" />
                     <label for="req-business">Biznes nomi *</label>
                     <input id="req-business" name="business_name" required minlength="2" placeholder="Go'zallik saloni Nafis" />
-                    <label for="req-message">Sizni qiynayotgan asosiy muammo nima? *</label>
-                    <textarea id="req-message" name="message" required minlength="30" maxlength="500" placeholder="Masalan: kechqurun kelgan xabarlarga javob bera olmayman, mijozlar ketib qoladi yoki savdolarni qo'lda kuzatish qiyin..."></textarea>
+                    <label for="req-message">Asosiy muammo *</label>
+                    <textarea id="req-message" name="message" required minlength="30" maxlength="500" placeholder="Kechqurun xabarlarga javob bera olmayman, mijozlar ketadi..."></textarea>
                     <label for="req-contact">Telefon raqami *</label>
                     <input id="req-contact" name="contact" type="tel" required placeholder="+998901234567" />
                     <label for="req-telegram">Telegram @username *</label>
                     <input id="req-telegram" name="telegram_username" required placeholder="@username" />
-                    <button type="submit" class="primary">Kirish so'rovini yuborish</button>
+                    <button type="submit" class="primary">Arizani yuborish</button>
                   </form>
-                  <p class="auth-hint" id="access-form-hint">Telegram username login bilan bir xil bo'lishi kerak.</p>
+                  <p class="auth-hint" id="access-form-hint">@username login bilan bir xil bo'lsin.</p>
                   <p class="auth-switch-link" id="access-to-login-link">
-                    Allaqachon tasdiqlanganmisiz?
-                    <button type="button" id="goto-returning-login">Telegram orqali davom eting</button>
+                    Tasdiqlanganmisiz?
+                    <button type="button" id="goto-returning-login">Telegram kirish</button>
                   </p>
                 </div>
                 <div class="access-status" id="access-pending-panel" hidden>
-                  <strong>So'rovingiz ko'rib chiqilmoqda</strong>
-                  <p>Admin tasdiqlagach, Telegram orqali kirish tugmasi ochiladi. Holatni yangilash uchun pastdagi tugmani bosing.</p>
-                  <button type="button" id="refresh-access-btn">Holatni yangilash</button>
+                  <strong>Kutilmoqda</strong>
+                  <p>Admin tasdiqlagach Telegram ochiladi.</p>
+                  <button type="button" id="refresh-access-btn">Yangilash</button>
                 </div>
                 <div class="access-status" id="access-rejected-panel" hidden>
-                  <strong>So'rov rad etildi</strong>
-                  <p id="access-rejected-note">Qayta urinib ko'rishingiz mumkin.</p>
-                  <button type="button" id="retry-access-btn">Yangi so'rov yuborish</button>
+                  <strong>Rad etildi</strong>
+                  <p id="access-rejected-note">Qayta urinishingiz mumkin.</p>
+                  <button type="button" id="retry-access-btn">Yangi ariza</button>
                 </div>
                 <div id="telegram-login-section" hidden>
-                  <p id="telegram-login-copy">So'rovingiz tasdiqlandi. Endi Telegram orqali kiring.</p>
+                  <p id="telegram-login-copy">Telegram orqali kiring.</p>
                   <div id="telegram-login"></div>
-                  <p class="auth-hint">Agar tugma ko'rinmasa, @BotFather'da bot domeni sozlanmagan bo'lishi mumkin.</p>
+                  <p class="auth-hint">Tugma ko'rinmasa — BotFather'da domen tekshiring.</p>
                   <p class="auth-switch-link" id="login-to-request-link" hidden>
-                    Hali tasdiqlanmadingizmi?
-                    <button type="button" id="goto-access-request">Kirish so'rovini yuboring</button>
+                    Hali yo'qsiz?
+                    <button type="button" id="goto-access-request">Ariza yuborish</button>
                   </p>
                 </div>
               </div>
             </section>
 
-            <section>
-              <div class="intro-section-head">
-                <h2>Eski jarayonlar orqali <em>daromad sizib ketmoqda.</em></h2>
-                <p>Telegram orqali sotadigan bizneslar uchun eng keng tarqalgan uchta muammo.</p>
-              </div>
-              <div class="err-grid">
-                <article class="err-card">
-                  <span class="err-tag">ERR: ASLEEP_AT_WHEEL</span>
-                  <h3>Inson kechikishi</h3>
-                  <p>Kechqurun kelgan xabarlar ertalab javobsiz qoladi — mijoz raqobatchidan xarid qiladi. Telegram'da bu eng ko'p yo'qotilgan savdo sababi.</p>
-                </article>
-                <article class="err-card">
-                  <span class="err-tag">ERR: THE_COST_TRAP</span>
-                  <h3>Ajratilgan marketing</h3>
-                  <p>Reklama agentliklari lead keltiradi, lekin DM'dagi savdolarni hech kim kuzatmaydi. Marketing va sotuv bir-biridan uzilgan.</p>
-                </article>
-                <article class="err-card">
-                  <span class="err-tag">ERR: LOST_KNOWLEDGE</span>
-                  <h3>Yo'qolgan bilim</h3>
-                  <p>Eng yaxshi sotuv argumentlari eski chatlar va hujjatlarda qolib ketadi — yangi xodim yoki AI ulardan foydalana olmaydi.</p>
-                </article>
-              </div>
-            </section>
-
-            <section>
-              <div class="intro-section-head">
-                <h2>Sotuv va marketingni boshqaradigan <em>«ikkinchi miya».</em></h2>
-              </div>
-              <div class="pillar-grid">
-                <article class="pillar-card">
-                  <div class="label">Miya</div>
-                  <h3>Ma'lumotlar bazasi</h3>
-                  <p>FAQ, o'tgan savdo suhbatlari va brend qoidalari xavfsiz vektor bazasiga yig'iladi — AI faqat sizning haqiqiy ma'lumotlaringizdan foydalanadi.</p>
-                </article>
-                <article class="pillar-card">
-                  <div class="label">Qo'llar</div>
-                  <h3>AI ishchilar</h3>
-                  <p>Kiruvchi xabarlarga darhol javob beradi, e'tirozlarni hal qiladi va uchrashuv yoki to'lovga olib keladi — Telegram Business hisobingiz orqali.</p>
-                </article>
-                <article class="pillar-card">
-                  <div class="label">Dvigatel</div>
-                  <h3>Faol tizim</h3>
-                  <p>Faqat kutmaydi — kontent yaratadi, post qiladi va trafikni Closer'ga yo'naltiradi. To'liq mijoz sayohati avtomatlashtiriladi.</p>
-                </article>
-              </div>
-            </section>
-
-            <section>
-              <div class="intro-section-head">
-                <h2>«Land and Expand» <em>strategiyasi.</em></h2>
-                <p>Hozir siz birinchi bosqichdan boshlaysiz — DM Closer.</p>
-              </div>
-              <div class="phase-lane">
-                <div class="phase-line" aria-hidden="true"></div>
-                <div class="phase-grid">
-                  <article class="phase-card highlight">
-                    <span class="phase-num">Bosqich 1</span>
-                    <h3>Wedge — DM Closer</h3>
-                    <p>Kechki yo'qotilgan leadlarni to'xtatadigan oddiy DM Closer. Birinchi haftada pul ishlashingizni isbotlaymiz.</p>
-                    <span class="phase-badge">Siz hozir shu yerda</span>
-                  </article>
-                  <article class="phase-card">
-                    <span class="phase-num">Bosqich 2</span>
-                    <h3>Ma'lumot yig'ish</h3>
-                    <p>Xabarlarni boshqarish orqali mijozlar qanday o'ylashi, qanday e'tiroz qilishi va qanday sotib olishini o'rganamiz.</p>
-                  </article>
-                  <article class="phase-card">
-                    <span class="phase-num">Bosqich 3</span>
-                    <h3>To'liq OS</h3>
-                    <p>Ishonch o'rnatilgach, marketing dvigatelini yoqamiz — qimmat agentliklarni butunlay almashtiramiz.</p>
-                  </article>
-                </div>
-              </div>
-            </section>
-
-            <section>
-              <div class="intro-section-head">
-                <h2>Converza <em>qanday ishlaydi.</em></h2>
-                <p>DM Closer — sizning Telegram sotuv agentingiz.</p>
-              </div>
-              <div class="agent-grid">
-                <article class="agent-card featured">
-                  <div class="agent-name">The Closer</div>
-                  <h3>DM Closer — 24/7 Telegram sotuvchi</h3>
-                  <p>Biznes hisobingizga ulangan AI har bir mijoz xabarini darhol ushlaydi: savollarga javob beradi, e'tirozlarni hal qiladi va Click orqali to'lovga olib keladi.</p>
-                </article>
-                <article class="agent-card">
-                  <div class="agent-name">The Learner</div>
-                  <h3>O'rganuvchi</h3>
-                  <p>Kompaniya tarixini o'rganib, siz qanday sotishingizni aks ettiruvchi brend pasportini yaratadi.</p>
-                </article>
-                <article class="agent-card">
-                  <div class="agent-name">The Optimizer</div>
-                  <h3>Optimizator</h3>
-                  <p>Har kecha nima ishlaganini tahlil qilib, keyingi kun strategiyasini yaxshilaydi.</p>
-                </article>
-              </div>
+            <section class="intro-points" aria-label="Asosiy imkoniyatlar">
+              <article><strong>24/7 DM</strong><span>Mijoz xabarlariga javob</span></article>
+              <article><strong>Click</strong><span>Hisob-faktura va to'lov</span></article>
+              <article><strong>Brend pasporti</strong><span>Bitta manba — barcha agentlar</span></article>
             </section>
 
             <section class="funnel-track" id="funnel-footer">
               <div class="funnel-cta-bar" style="margin-left:0;width:100%;justify-content:space-between;">
-                <p id="funnel-footer-text">DM Closer'ni yoqish uchun kirish so'rovini yuboring — admin tasdiqlagach brend pasportini to'ldirasiz.</p>
+                <p id="funnel-footer-text">Boshlash uchun ariza yoki Telegram kirish.</p>
                 <button type="button" class="funnel-cta" id="funnel-footer-btn">Boshlash</button>
               </div>
             </section>
@@ -1247,39 +1163,41 @@
         <div id="passport-workspace" hidden>
         <div class="headline">
           <div class="hero">
-            <h2>Agent mijozlar bilan gaplashishidan oldin sotuv xotirasini yarating.</h2>
-            <p>Closer Telegram xabarlariga javob berishi, e'tirozlarni hal qilishi va haqiqiy narxlardan Click hisob-fakturalarini yaratishi uchun zarur biznes ma'lumotlarini to'plang.</p>
+            <h2>Brend pasporti</h2>
+            <p>DM Closer ishlashi uchun to'ldiring.</p>
           </div>
           <div class="proof">
-            <strong>Birinchi hafta</strong>
-            <span>Ish vaqtidan keyin javob bering va tayyor xaridorlarni to'lovga olib keling.</span>
+            <strong>1-hafta</strong>
+            <span>Kechki xabarlarga javob, to'lovga olib kelish.</span>
           </div>
         </div>
 
         <div class="preview">
-          <div class="metric"><strong id="metric-brand">0</strong><span>To'ldirilgan brend maydonlari</span></div>
-          <div class="metric"><strong id="metric-pricing">0</strong><span>Hisob-fakturalar uchun narx darajalari</span></div>
-          <div class="metric"><strong id="metric-faq">0</strong><span>Telegram uchun tayyor savol-javoblar</span></div>
-          <div class="metric"><strong id="metric-objections">0</strong><span>Qo'shilgan e'tiroz javoblari</span></div>
+          <div class="metric"><strong id="metric-brand">0</strong><span>Brend maydonlari</span></div>
+          <div class="metric"><strong id="metric-pricing">0</strong><span>Narxlar</span></div>
+          <div class="metric"><strong id="metric-faq">0</strong><span>FAQ</span></div>
+          <div class="metric"><strong id="metric-objections">0</strong><span>E'tirozlar</span></div>
         </div>
 
         <div class="connection-panel" id="connection-panel" hidden>
-          <h3>Telegram Business ulanishi</h3>
-          <p>DM Closer mijozlar bilan <strong>biznes hisobingiz</strong> orqali gaplashadi. Botni Telegram Business → Chatbots orqali ulang.</p>
+          <h3>Telegram Business</h3>
+          <p>DM Closer <strong>biznes hisobingiz</strong> orqali javob beradi.</p>
           <div class="connection-pill off" id="connection-pill">
             <span id="connection-status-text">Tekshirilmoqda...</span>
           </div>
+          <div class="connection-pill off" id="payments-pill" style="margin-top:8px;">
+            <span id="payments-status-text">Click: tekshirilmoqda...</span>
+          </div>
           <p style="margin-top:12px;font-size:13px;color:var(--muted);">
-            Telegram → Sozlamalar → Business → Chatbots → <strong id="bot-username-hint">@ConverzaSales_bot</strong> ni qo'shing.
-            Shundan so'ng mijozlar xabarlari avtomatik ishlanadi.
+            Sozlamalar → Business → Chatbots → <strong id="bot-username-hint">@ConverzaSales_bot</strong>
           </p>
         </div>
 
         <div class="panel" id="pdf-panel">
           <div class="panel-head">
             <div>
-              <h3>PDF orqali avtomatik to'ldirish</h3>
-              <p>Biznesingiz haqidagi PDF hujjat(lar)ni yuklang — tizim brend pasportini avtomatik yaratadi. Kamida 1 ta fayl kerak.</p>
+              <h3>PDF dan to'ldirish</h3>
+              <p>Hujjat yuklang — pasport avtomatik yaratiladi.</p>
             </div>
           </div>
           <div class="pdf-drop" id="pdf-drop">
@@ -1297,7 +1215,7 @@
         <form class="panel" id="passport-form">
           <div class="panel-head">
             <div>
-              <h3>Brend pasporti haqida ma'lumotlar</h3>
+              <h3>Brend ma'lumotlari</h3>
             </div>
           </div>
 
@@ -1329,17 +1247,17 @@
             <label>Maqsadli auditoriya
               <textarea name="target_audience" required placeholder="Telegram orqali sotadigan va ish vaqtidan keyin mijozlarni yo'qotadigan o'zbek kichik bizneslari."></textarea>
             </label>
-            <label>Closer uchun qo'shimcha eslatmalar
-              <textarea name="raw_notes" placeholder="Qaytarish siyosati, yetkazib berish, sotuv qoidalari, afzal so'zlar, qochish kerak bo'lgan mavzular."></textarea>
+            <label>Closer eslatmalari
+              <textarea name="raw_notes" placeholder="Qaytarish, yetkazish, taqiqlangan mavzular."></textarea>
             </label>
 
             <div>
-              <label>Telegram hisob-fakturalari uchun narx darajalari</label>
+              <label>Narxlar (Click uchun)</label>
               <div class="repeat-list" id="pricing-list"></div>
               <button type="button" class="secondary" id="add-pricing">Narx qo'shish</button>
             </div>
             <div>
-              <label>Closer qayta ishlatadigan savol-javoblar</label>
+              <label>FAQ</label>
               <div class="repeat-list" id="faq-list"></div>
               <button type="button" class="secondary" id="add-faq">Savol-javob qo'shish</button>
             </div>
@@ -1350,24 +1268,26 @@
             </div>
 
             <div class="notice">
-              Saqlash sizning Telegram hisobingiz uchun umumiy brend pasportini yaratadi yoki yangilaydi
-              (<strong id="org-id-label">kirilmagan</strong>).
-              DM Closer va Co-Pilot agentlari aynan shu pasportdan foydalanadi.
+              Org: <strong id="org-id-label">kirilmagan</strong>. DM Closer va Co-Pilot shu pasportdan foydalanadi.
             </div>
             <div class="grid-2">
-              <label>Telegram sotuv boti
+              <label>Sotuv boti
                 <input value="@ConverzaSales_bot" readonly />
               </label>
-              <label>Click provayder tokeni (ixtiyoriy)
-                <input name="click_token" placeholder="@BotFather Payments sozlamalaridan" />
+              <label>Click token (ixtiyoriy)
+                <input name="click_token" type="password" autocomplete="off" placeholder="BotFather → Payments → Click" />
               </label>
             </div>
+            <p style="font-size:13px;color:var(--muted);margin:0;">
+              O'z Click provider tokeningizni qo'shsangiz, mijozlarga to'lov havolasi yuboriladi.
+              Token bermasangiz, DM Closer faqat matnli javob beradi.
+            </p>
           </div>
 
           <div id="save-result" class="notice" hidden></div>
 
           <div class="actions">
-            <button type="submit" class="primary" id="save-btn">Brend pasportini saqlash</button>
+            <button type="submit" class="primary" id="save-btn">Saqlash</button>
           </div>
         </form>
         </div>
@@ -1376,17 +1296,17 @@
       <section class="content view" id="copilot-view">
         <div class="headline">
           <div class="hero">
-            <h2>Co-Pilot — ikkilamchi vosita.</h2>
-            <p>Brend pasporti saqlangandan so'ng undan pozitsiyalash, skriptlar, kampaniyalar va ishga tushirish g'oyalarini ishlab chiqish uchun foydalaning — DM Closer sozlashga xalaqit bermaydi.</p>
+            <h2>Co-Pilot</h2>
+            <p>Strategiya va matnlar — brend pasportingiz asosida.</p>
           </div>
-          <div class="proof"><strong id="saved-brand">Tayyor</strong><span>Ushbu seansda saqlangan eng so'nggi brend pasporti yuklangan.</span></div>
+          <div class="proof"><strong id="saved-brand">Tayyor</strong><span>Saqlangan pasport yuklangan.</span></div>
         </div>
         <div class="chat-shell">
           <div id="messages">
-            <div class="bubble assistant">Ishga tushirish skriptlari, Telegram xabar namunalari, e'tirozlarni hal qilish yoki birinchi hafta rejasini so'rang. Tezkor suhbat rejimi brend pasportingiz asosida strategik maslahat beradi.</div>
+            <div class="bubble assistant">Savol bering: skript, e'tiroz, kontent rejasi.</div>
           </div>
           <div class="composer">
-            <textarea id="message-input" placeholder="Sozlashdan so'ng Co-Pilot'dan so'rang..." spellcheck="true"></textarea>
+            <textarea id="message-input" placeholder="Co-Pilot'ga yozing..." spellcheck="true"></textarea>
             <button class="primary" id="send-btn" type="button">Yuborish</button>
           </div>
         </div>
@@ -1504,8 +1424,8 @@
       const backToRequest = document.getElementById("login-to-request-link");
       if (loginCopy) {
         loginCopy.textContent = mode === "returning"
-          ? "Oldin tasdiqlangan hisobingiz bilan Telegram orqali kiring — brend pasportingiz va sozlamalaringiz saqlanadi."
-          : "So'rovingiz tasdiqlandi. Endi Telegram orqali kiring.";
+          ? "Tasdiqlangan hisob — Telegram orqali kiring."
+          : "Telegram orqali kiring.";
       }
       if (backToRequest) backToRequest.hidden = mode !== "returning";
 
@@ -1528,13 +1448,13 @@
 
     function showReturningLogin() {
       showAccessPanel("returning");
-      statusText.textContent = "Telegram orqali kiring";
+      statusText.textContent = "Telegram kirish";
       statusDot.style.background = "var(--blue)";
     }
 
     function showAccessRequestForm() {
       showAccessPanel("form");
-      statusText.textContent = "Kirish so'rovi yoki Telegram kirish";
+      statusText.textContent = "Kirish";
       statusDot.style.background = "var(--amber)";
     }
 
@@ -1571,38 +1491,38 @@
 
       const headCopy = {
         form: {
-          title: "Yopiq access uchun ariza",
-          subtitle: "Asosiy muammoingizni yozing — admin ko'rib chiqadi va tasdiqlagach Telegram orqali kira olasiz."
+          title: "Kirish",
+          subtitle: "Yangi — ariza. Tasdiqlangan — Telegram."
         },
         returning: {
-          title: "Qaytgan foydalanuvchi",
-          subtitle: "Oldin tasdiqlangan hisobingiz bilan Telegram orqali kiring — brend pasportingiz shu yerda."
+          title: "Telegram kirish",
+          subtitle: "Tasdiqlangan hisobingiz bilan kiring."
         },
         pending: {
-          title: "So'rov yuborildi",
-          subtitle: "Admin tasdiqlaguncha kuting. Holatni yangilash uchun tugmani bosing."
+          title: "Kutilmoqda",
+          subtitle: "Admin tasdiqlaguncha kuting."
         },
         rejected: {
-          title: "So'rov rad etildi",
-          subtitle: "Yangi kirish so'rovi yuborishingiz mumkin."
+          title: "Rad etildi",
+          subtitle: "Yangi ariza yuborishingiz mumkin."
         },
         approved: {
-          title: "Kirish tasdiqlandi",
-          subtitle: "Endi Telegram orqali kiring — keyin brend pasportini to'ldirasiz."
+          title: "Tasdiqlandi",
+          subtitle: "Telegram orqali kiring."
         },
         login: {
-          title: "Kirish tasdiqlandi",
-          subtitle: "Endi Telegram orqali kiring — keyin brend pasportini to'ldirasiz."
+          title: "Tasdiqlandi",
+          subtitle: "Telegram orqali kiring."
         }
       };
 
       const footerCopy = {
-        form: { footer: "DM Closer'ni yoqish uchun yuqoridagi formani to'ldiring yoki Telegram orqali kiring.", btn: "Formaga o'tish", action: "request" },
-        returning: { footer: "Tasdiqlangan hisobingiz bilan Telegram orqali davom eting.", btn: "Telegram kirish", action: "returning" },
-        pending: { footer: "Admin tasdiqlaguncha brend pasporti ochilmaydi.", btn: "Holatni yangilash", action: "refresh" },
-        rejected: { footer: "Qayta urinish uchun yangi kirish so'rovi yuboring.", btn: "Yangi so'rov", action: "retry" },
-        approved: { footer: "Tasdiq olindi — Telegram orqali kiring.", btn: "Telegram kirish", action: "login" },
-        login: { footer: "Tasdiq olindi — Telegram orqali kiring.", btn: "Telegram kirish", action: "login" }
+        form: { footer: "Ariza yoki Telegram kirish.", btn: "Forma", action: "request" },
+        returning: { footer: "Telegram orqali davom eting.", btn: "Telegram", action: "returning" },
+        pending: { footer: "Tasdiq kutilmoqda.", btn: "Yangilash", action: "refresh" },
+        rejected: { footer: "Yangi ariza yuboring.", btn: "Ariza", action: "retry" },
+        approved: { footer: "Telegram orqali kiring.", btn: "Telegram", action: "login" },
+        login: { footer: "Telegram orqali kiring.", btn: "Telegram", action: "login" }
       };
 
       const mode = state.accessMode === "approved" ? "approved" : state.accessMode;
@@ -1680,7 +1600,7 @@
           state.accessMode = "approved";
           showAccessPanel("login");
           await mountTelegramWidget();
-          statusText.textContent = "Kirish tasdiqlandi — Telegram orqali kiring";
+          statusText.textContent = "Tasdiqlandi — Telegram";
           statusDot.style.background = "var(--green)";
           updateSetupVisibility();
           return;
@@ -1691,12 +1611,12 @@
           note.textContent = data.review_note
             ? `Sabab: ${data.review_note}`
             : "Qayta urinib ko'rishingiz mumkin.";
-          statusText.textContent = "Kirish so'rovi rad etildi";
+          statusText.textContent = "Rad etildi";
           statusDot.style.background = "var(--red)";
           return;
         }
         showAccessPanel("pending");
-        statusText.textContent = "So'rov ko'rib chiqilmoqda";
+        statusText.textContent = "Kutilmoqda";
         statusDot.style.background = "var(--amber)";
       } catch (_) {
         showAccessPanel("pending");
@@ -1767,7 +1687,7 @@
       const label = user.username ? `@${user.username}` : user.first_name;
       document.getElementById("auth-label").textContent = `${label} sifatida kirdingiz`;
       document.getElementById("org-id-label").textContent = orgId;
-      statusText.textContent = state.saved ? "Brend pasporti saqlangan" : "Kirildi — saqlashga tayyor";
+      statusText.textContent = state.saved ? "Saqlangan" : "Kirildi";
       statusDot.style.background = state.saved ? "var(--green)" : "var(--amber)";
       document.getElementById("connection-panel").hidden = false;
       updateSetupVisibility();
@@ -1819,6 +1739,8 @@
       if (!state.token) return;
       const pill = document.getElementById("connection-pill");
       const label = document.getElementById("connection-status-text");
+      const paymentsPill = document.getElementById("payments-pill");
+      const paymentsLabel = document.getElementById("payments-status-text");
       try {
         const response = await fetch("/api/org/connection-status", {
           headers: apiHeaders()
@@ -1832,9 +1754,18 @@
           pill.className = "connection-pill off";
           label.textContent = "Biznes ulanishi yo'q";
         }
+        if (data.payments_enabled) {
+          paymentsPill.className = "connection-pill on";
+          paymentsLabel.textContent = "Click to'lovi yoqilgan";
+        } else {
+          paymentsPill.className = "connection-pill off";
+          paymentsLabel.textContent = "Click to'lovi yo'q (ixtiyoriy)";
+        }
       } catch (_) {
         pill.className = "connection-pill off";
         label.textContent = "Holatni yuklab bo'lmadi";
+        paymentsPill.className = "connection-pill off";
+        paymentsLabel.textContent = "Click holati noma'lum";
       }
     }
 
@@ -1956,7 +1887,7 @@
         core_offer: passport.core_offer || ""
       };
       copilotTab.disabled = false;
-      statusText.textContent = "Brend pasporti yuklandi";
+      statusText.textContent = "Yuklandi";
       statusDot.style.background = "var(--green)";
       document.getElementById("saved-brand").textContent = passport.brand_name || "Tayyor";
       updateMetrics();
@@ -1988,21 +1919,21 @@
     async function savePassport(event) {
       event.preventDefault();
       if (!state.orgId) {
-        showSave("Brend pasporti faqat kirish so'rovi tasdiqlangach va Telegram orqali kirgandan keyin ochiladi.", "error");
+        showSave("Avval Telegram orqali kiring.", "error");
         return;
       }
       const passport = collectPassport();
       if (!passport.brand_name || !passport.target_audience || !passport.core_offer) {
-        showSave("Biznes nomi, maqsadli auditoriya va asosiy taklif majburiy.", "error");
+        showSave("Biznes nomi, auditoriya va taklif kerak.", "error");
         return;
       }
       if (!passport.pricing.length) {
-        showSave("Telegram hisob-fakturalari haqiqiy narxlardan foydalanishi uchun kamida bitta narx darajasini qo'shing.", "error");
+        showSave("Kamida bitta narx qo'shing.", "error");
         return;
       }
 
       saveBtn.disabled = true;
-      showSave("Brend pasporti saqlanmoqda...", "");
+      showSave("Saqlanmoqda...", "");
       try {
         const response = await fetch("/api/dm-closer/onboard", {
           method: "POST",
@@ -2022,10 +1953,10 @@
           core_offer: passport.core_offer
         };
         copilotTab.disabled = false;
-        statusText.textContent = "Brend pasporti saqlandi";
+        statusText.textContent = "Saqlandi";
         statusDot.style.background = "var(--green)";
         document.getElementById("saved-brand").textContent = passport.brand_name;
-        showSave(`Saqlandi. Telegram DM Closer endi ${passport.pricing.length} ta narx darajasidan foydalana oladi.`, "success");
+        showSave(`Saqlandi (${passport.pricing.length} narx).`, "success");
         loadConnectionStatus();
       } catch (error) {
         showSave(error.message, "error");
@@ -2106,7 +2037,7 @@
         return;
       }
       if (!state.brandId) {
-        appendBubble("error", "Avval brend pasportini saqlang, shunda agentlar biznes ma'lumotlaringizni yuklay oladi.");
+        appendBubble("error", "Avval pasportni saqlang.");
         return;
       }
       input.value = "";
@@ -2245,7 +2176,7 @@
 
     async function generateFromPdf() {
       if (!state.orgId) {
-        showPdfResult("Avval kirish so'rovingiz tasdiqlanishi va Telegram orqali kirishingiz kerak.", "error");
+        showPdfResult("Avval Telegram orqali kiring.", "error");
         return;
       }
       if (!pdfState.files.length) return;
@@ -2263,7 +2194,7 @@
         if (!response.ok) throw new Error(parseApiError(result, response.statusText));
         populateForm(result.passport);
         showPdfResult(
-          `✅ ${result.files_processed} ta hujjatdan brend pasporti yaratildi. Quyida ko'rib chiqing va saqlang.`,
+          `${result.files_processed} ta PDF dan yaratildi. Tekshirib saqlang.`,
           "success"
         );
       } catch (error) {
