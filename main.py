@@ -341,6 +341,17 @@ async def auth_config():
     }
 
 
+@app.get("/api/auth/me")
+async def auth_me(user: Annotated[dict, Depends(get_current_user)]):
+    """Validate JWT and return session info for returning users."""
+    return {
+        "ok": True,
+        "org_id": user.get("org_id"),
+        "telegram_id": user.get("telegram_id"),
+        "role": user.get("role", "user"),
+    }
+
+
 # ---------------------------------------------------------------------------
 # Telegram webhook proxy → converza_bot
 # Lets a single public domain (ngrok → this web app) serve both the web login

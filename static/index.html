@@ -382,6 +382,53 @@
       transition: box-shadow 0.25s ease;
     }
 
+    .auth-tabs {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 18px;
+      padding: 4px;
+      background: var(--bg);
+      border-radius: 10px;
+      border: 1px solid var(--line);
+    }
+
+    .auth-tab {
+      flex: 1;
+      border: 0;
+      background: transparent;
+      color: var(--muted);
+      font-size: 13px;
+      font-weight: 600;
+      padding: 10px 12px;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: background 0.15s ease, color 0.15s ease;
+    }
+
+    .auth-tab.active {
+      background: var(--surface);
+      color: var(--ink);
+      box-shadow: 0 1px 3px rgba(15, 23, 42, 0.08);
+    }
+
+    .auth-switch-link {
+      margin: 14px 0 0;
+      text-align: center;
+      font-size: 13px;
+      color: var(--muted);
+    }
+
+    .auth-switch-link button {
+      border: 0;
+      background: transparent;
+      color: var(--blue);
+      font-weight: 600;
+      cursor: pointer;
+      text-decoration: underline;
+      padding: 0;
+      font-size: inherit;
+    }
+
     .auth-user {
       display: none;
       align-items: center;
@@ -1043,6 +1090,10 @@
                   <h2 id="auth-card-title">Yopiq access uchun ariza</h2>
                   <p id="auth-card-subtitle">Asosiy muammoingizni yozing — admin ko'rib chiqadi va tasdiqlagach Telegram orqali kira olasiz.</p>
                 </div>
+                <div class="auth-tabs" id="auth-tabs" hidden>
+                  <button type="button" class="auth-tab active" data-auth-tab="request">Yangi ariza</button>
+                  <button type="button" class="auth-tab" data-auth-tab="returning">Telegram kirish</button>
+                </div>
                 <div id="access-request-panel">
                   <form class="access-form" id="access-request-form">
                     <label for="req-name">To'liq ismingiz *</label>
@@ -1058,6 +1109,10 @@
                     <button type="submit" class="primary">Kirish so'rovini yuborish</button>
                   </form>
                   <p class="auth-hint" id="access-form-hint">Telegram username login bilan bir xil bo'lishi kerak.</p>
+                  <p class="auth-switch-link" id="access-to-login-link">
+                    Allaqachon tasdiqlanganmisiz?
+                    <button type="button" id="goto-returning-login">Telegram orqali davom eting</button>
+                  </p>
                 </div>
                 <div class="access-status" id="access-pending-panel" hidden>
                   <strong>So'rovingiz ko'rib chiqilmoqda</strong>
@@ -1070,9 +1125,13 @@
                   <button type="button" id="retry-access-btn">Yangi so'rov yuborish</button>
                 </div>
                 <div id="telegram-login-section" hidden>
-                  <p>So'rovingiz tasdiqlandi. Endi Telegram orqali kiring.</p>
+                  <p id="telegram-login-copy">So'rovingiz tasdiqlandi. Endi Telegram orqali kiring.</p>
                   <div id="telegram-login"></div>
                   <p class="auth-hint">Agar tugma ko'rinmasa, @BotFather'da bot domeni sozlanmagan bo'lishi mumkin.</p>
+                  <p class="auth-switch-link" id="login-to-request-link" hidden>
+                    Hali tasdiqlanmadingizmi?
+                    <button type="button" id="goto-access-request">Kirish so'rovini yuboring</button>
+                  </p>
                 </div>
               </div>
             </section>
@@ -1428,17 +1487,55 @@
 
     function showAccessPanel(mode) {
       state.accessMode = mode;
-      document.getElementById("access-request-panel").hidden = mode !== "form";
+      const showTabs = mode === "form" || mode === "returning";
+      const showForm = mode === "form";
+      const showLogin = mode === "login" || mode === "approved" || mode === "returning";
+
+      document.getElementById("auth-tabs").hidden = !showTabs;
+      document.getElementById("access-request-panel").hidden = !showForm;
       document.getElementById("access-pending-panel").hidden = mode !== "pending";
       document.getElementById("access-rejected-panel").hidden = mode !== "rejected";
-      document.getElementById("telegram-login-section").hidden = mode !== "login";
+      document.getElementById("telegram-login-section").hidden = !showLogin;
+
       const headWrap = document.getElementById("auth-card-head");
       if (headWrap) headWrap.hidden = mode === "pending" || mode === "rejected";
-      if (mode !== "login") {
+
+      const loginCopy = document.getElementById("telegram-login-copy");
+      const backToRequest = document.getElementById("login-to-request-link");
+      if (loginCopy) {
+        loginCopy.textContent = mode === "returning"
+          ? "Oldin tasdiqlangan hisobingiz bilan Telegram orqali kiring — brend pasportingiz va sozlamalaringiz saqlanadi."
+          : "So'rovingiz tasdiqlandi. Endi Telegram orqali kiring.";
+      }
+      if (backToRequest) backToRequest.hidden = mode !== "returning";
+
+      document.querySelectorAll(".auth-tab").forEach(tab => {
+        const active = mode === "returning"
+          ? tab.dataset.authTab === "returning"
+          : tab.dataset.authTab === "request";
+        tab.classList.toggle("active", active);
+      });
+
+      if (showLogin) {
+        mountTelegramWidget();
+      } else {
         document.getElementById("telegram-login").innerHTML = "";
       }
+
       updateSetupVisibility();
       updateFunnelState();
+    }
+
+    function showReturningLogin() {
+      showAccessPanel("returning");
+      statusText.textContent = "Telegram orqali kiring";
+      statusDot.style.background = "var(--blue)";
+    }
+
+    function showAccessRequestForm() {
+      showAccessPanel("form");
+      statusText.textContent = "Kirish so'rovi yoki Telegram kirish";
+      statusDot.style.background = "var(--amber)";
     }
 
     function highlightAuthCard() {
@@ -1460,7 +1557,7 @@
     function funnelStepForMode(mode) {
       if (mode === "pending") return 3;
       if (mode === "rejected") return 2;
-      if (mode === "login" || mode === "approved") return 4;
+      if (mode === "returning" || mode === "login" || mode === "approved") return 4;
       return 2;
     }
 
@@ -1476,6 +1573,10 @@
         form: {
           title: "Yopiq access uchun ariza",
           subtitle: "Asosiy muammoingizni yozing — admin ko'rib chiqadi va tasdiqlagach Telegram orqali kira olasiz."
+        },
+        returning: {
+          title: "Qaytgan foydalanuvchi",
+          subtitle: "Oldin tasdiqlangan hisobingiz bilan Telegram orqali kiring — brend pasportingiz shu yerda."
         },
         pending: {
           title: "So'rov yuborildi",
@@ -1496,7 +1597,8 @@
       };
 
       const footerCopy = {
-        form: { footer: "DM Closer'ni yoqish uchun yuqoridagi formani to'ldiring.", btn: "Formaga o'tish", action: "request" },
+        form: { footer: "DM Closer'ni yoqish uchun yuqoridagi formani to'ldiring yoki Telegram orqali kiring.", btn: "Formaga o'tish", action: "request" },
+        returning: { footer: "Tasdiqlangan hisobingiz bilan Telegram orqali davom eting.", btn: "Telegram kirish", action: "returning" },
         pending: { footer: "Admin tasdiqlaguncha brend pasporti ochilmaydi.", btn: "Holatni yangilash", action: "refresh" },
         rejected: { footer: "Qayta urinish uchun yangi kirish so'rovi yuboring.", btn: "Yangi so'rov", action: "retry" },
         approved: { footer: "Tasdiq olindi — Telegram orqali kiring.", btn: "Telegram kirish", action: "login" },
@@ -1536,7 +1638,8 @@
         scrollToAuth("req-name");
         return;
       }
-      if (action === "login") {
+      if (action === "login" || action === "returning") {
+        showReturningLogin();
         scrollToAuth();
         return;
       }
@@ -1562,14 +1665,14 @@
     async function refreshAccessStatus() {
       const requestId = localStorage.getItem(ACCESS_REQUEST_KEY);
       if (!requestId) {
-        showAccessPanel("form");
+        showAccessRequestForm();
         return;
       }
       try {
         const response = await fetch(`/api/access-request/${requestId}`);
         if (!response.ok) {
           localStorage.removeItem(ACCESS_REQUEST_KEY);
-          showAccessPanel("form");
+          showAccessRequestForm();
           return;
         }
         const data = await response.json();
@@ -1682,7 +1785,34 @@
       document.getElementById("org-id-label").textContent = "kirilmagan";
       copilotTab.disabled = true;
       document.getElementById("connection-panel").hidden = true;
-      refreshAccessStatus();
+      showReturningLogin();
+      updateSetupVisibility();
+    }
+
+    async function restoreSession() {
+      const cached = localStorage.getItem(AUTH_STORAGE_KEY);
+      if (!cached) return false;
+      try {
+        const { user, orgId, token } = JSON.parse(cached);
+        if (!user || !orgId || !token) {
+          localStorage.removeItem(AUTH_STORAGE_KEY);
+          return false;
+        }
+        const response = await fetch("/api/auth/me", {
+          headers: { Authorization: `Bearer ${token}` }
+        });
+        if (!response.ok) {
+          localStorage.removeItem(AUTH_STORAGE_KEY);
+          return false;
+        }
+        const me = await response.json();
+        setAuthenticated(user, me.org_id || orgId, token);
+        await loadExistingPassport();
+        return true;
+      } catch (_) {
+        localStorage.removeItem(AUTH_STORAGE_KEY);
+        return false;
+      }
     }
 
     async function loadConnectionStatus() {
@@ -2038,10 +2168,25 @@
     document.getElementById("refresh-access-btn").addEventListener("click", refreshAccessStatus);
     document.getElementById("retry-access-btn").addEventListener("click", () => {
       localStorage.removeItem(ACCESS_REQUEST_KEY);
-      showAccessPanel("form");
-      statusText.textContent = "Kirish so'rovini yuboring";
-      statusDot.style.background = "var(--blue)";
-      updateFunnelState();
+      showAccessRequestForm();
+      scrollToAuth("req-name");
+    });
+    document.getElementById("goto-returning-login").addEventListener("click", () => {
+      showReturningLogin();
+      scrollToAuth();
+    });
+    document.getElementById("goto-access-request").addEventListener("click", () => {
+      showAccessRequestForm();
+      scrollToAuth("req-name");
+    });
+    document.querySelectorAll(".auth-tab").forEach(tab => {
+      tab.addEventListener("click", () => {
+        if (tab.dataset.authTab === "returning") {
+          showReturningLogin();
+        } else {
+          showAccessRequestForm();
+        }
+      });
     });
     document.getElementById("send-btn").addEventListener("click", sendCopilot);
     document.getElementById("message-input").addEventListener("keydown", event => {
@@ -2148,22 +2293,8 @@
     async function bootstrap() {
       updateSetupVisibility();
 
-      const cached = localStorage.getItem(AUTH_STORAGE_KEY);
-      if (cached) {
-        try {
-          const { user, orgId, token } = JSON.parse(cached);
-          if (user && orgId && token) {
-            setAuthenticated(user, orgId, token);
-            await loadExistingPassport();
-          } else if (user && orgId && !token) {
-            localStorage.removeItem(AUTH_STORAGE_KEY);
-          }
-        } catch (_) {
-          localStorage.removeItem(AUTH_STORAGE_KEY);
-        }
-      }
-
-      if (!state.orgId) {
+      const restored = await restoreSession();
+      if (!restored && !state.orgId) {
         await refreshAccessStatus();
       }
 
