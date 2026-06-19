@@ -38,6 +38,7 @@ from services.access_requests import (
     reject_request,
 )
 from services.config import is_production, require_env_vars
+from services.supabase_errors import format_supabase_error
 from services.pdf_parser import process_documents
 from services.session import (
     assert_org_access,
@@ -564,8 +565,10 @@ async def onboard_dm_closer(
             "org_id": saved["org_id"],
             "brand_name": saved["brand_name"],
         }
-    except Exception as e:
+    except ValueError as e:
         raise HTTPException(status_code=400, detail=str(e))
+    except Exception as e:
+        raise HTTPException(status_code=400, detail=format_supabase_error(e))
 
 
 @app.post("/api/dm-closer/parse-pdf")

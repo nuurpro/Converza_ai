@@ -1639,7 +1639,7 @@
           })
         });
         const result = await response.json();
-        if (!response.ok) throw new Error(result.detail || response.statusText);
+        if (!response.ok) throw new Error(parseApiError(result, response.statusText));
         localStorage.setItem(ACCESS_REQUEST_KEY, result.request_id);
         event.target.reset();
         hint.textContent = "";
@@ -1737,7 +1737,7 @@
           body: JSON.stringify(user)
         });
         const result = await response.json();
-        if (!response.ok) throw new Error(result.detail || response.statusText);
+        if (!response.ok) throw new Error(parseApiError(result, response.statusText));
         setAuthenticated(
           { first_name: result.first_name, username: result.username },
           result.org_id,
@@ -1880,7 +1880,7 @@
           body: JSON.stringify(passport)
         });
         const result = await response.json();
-        if (!response.ok) throw new Error(result.detail || response.statusText);
+        if (!response.ok) throw new Error(parseApiError(result, response.statusText));
         state.saved = true;
         state.brandId = result.brand_id;
         state.clientContext = {
@@ -1902,6 +1902,27 @@
       } finally {
         saveBtn.disabled = false;
       }
+    }
+
+    function parseApiError(result, fallback) {
+      const detail = result?.detail;
+      if (!detail) return fallback || "So'rov bajarilmadi.";
+      if (typeof detail === "string") {
+        if (detail.includes("Could not find") && detail.includes("column")) {
+          return "Ma'lumotlar bazasi yangilanmagan. Administratorga xabar bering yoki keyinroq qayta urinib ko'ring.";
+        }
+        if (detail.startsWith("{") && detail.includes("message")) {
+          try {
+            const parsed = JSON.parse(detail.replace(/'/g, "\""));
+            if (parsed.message) return parseApiError({ detail: parsed.message }, fallback);
+          } catch (_) { /* use raw string */ }
+        }
+        return detail;
+      }
+      if (Array.isArray(detail)) {
+        return detail.map((item) => item.msg || item).join("; ");
+      }
+      return fallback || "So'rov bajarilmadi.";
     }
 
     function showSave(message, type) {
@@ -2094,7 +2115,7 @@
           body: fd
         });
         const result = await response.json();
-        if (!response.ok) throw new Error(result.detail || response.statusText);
+        if (!response.ok) throw new Error(parseApiError(result, response.statusText));
         populateForm(result.passport);
         showPdfResult(
           `✅ ${result.files_processed} ta hujjatdan brend pasporti yaratildi. Quyida ko'rib chiqing va saqlang.`,
