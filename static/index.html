@@ -5,30 +5,34 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Converza</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Google+Sans+Flex:opsz,wght@6..144,400..700&family=Roboto:wght@400;500;700&display=swap" rel="stylesheet" />
   <style>
     *, *::before, *::after { box-sizing: border-box; }
     :root {
-      --bg: #fafafa;
+      --bg: #f8f9fa;
       --surface: #ffffff;
-      --surface-2: #f4f4f5;
-      --ink: #09090b;
-      --muted: #71717a;
-      --line: #e4e4e7;
-      --blue: #0055ff;
-      --green: #0f8f68;
-      --accent: #0055ff;
-      --yellow: #0055ff;
-      --amber: #f59e0b;
-      --red: #ef4444;
-      --radius: 10px;
-      --shadow: 0 16px 40px rgba(9, 9, 11, 0.06);
+      --surface-2: #f1f3f4;
+      --surface-3: #e8eaed;
+      --ink: #202124;
+      --muted: #5f6368;
+      --line: #dadce0;
+      --blue: #1a73e8;
+      --blue-soft: #e8f0fe;
+      --green: #188038;
+      --green-soft: #e6f4ea;
+      --amber: #f9ab00;
+      --red: #d93025;
+      --radius: 12px;
+      --radius-lg: 16px;
+      --shadow: 0 1px 2px rgba(60,64,67,.15), 0 1px 3px rgba(60,64,67,.1);
+      --shadow-lg: 0 4px 16px rgba(60,64,67,.12);
+      --sidebar-w: 248px;
     }
 
     html, body {
       min-height: 100%;
       margin: 0;
-      font-family: Inter, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      font-family: "Google Sans Flex", Roboto, system-ui, sans-serif;
       background: var(--bg);
       color: var(--ink);
     }
@@ -38,29 +42,117 @@
 
     .app {
       min-height: 100vh;
+      display: grid;
+      grid-template-columns: var(--sidebar-w) 1fr;
+    }
+
+    .sidebar {
+      background: var(--surface);
+      border-right: 1px solid var(--line);
       display: flex;
       flex-direction: column;
+      padding: 20px 14px;
+      position: sticky;
+      top: 0;
+      height: 100vh;
+      z-index: 20;
     }
 
     .brand {
       display: flex;
       align-items: center;
       gap: 10px;
-      font-weight: 800;
-      font-size: 18px;
+      font-weight: 700;
+      font-size: 17px;
       color: var(--ink);
-      flex: 0 0 auto;
+      padding: 4px 8px 20px;
     }
 
     .mark {
-      width: 34px;
-      height: 34px;
+      width: 32px;
+      height: 32px;
       display: grid;
       place-items: center;
       border-radius: 8px;
-      background: var(--blue);
+      background: linear-gradient(135deg, #1a73e8, #4285f4);
       color: #fff;
-      font-weight: 800;
+      font-weight: 700;
+      font-size: 14px;
+    }
+
+    .nav {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      flex: 1;
+    }
+
+    .nav-btn {
+      border: 0;
+      background: transparent;
+      color: var(--muted);
+      text-align: left;
+      padding: 10px 12px;
+      border-radius: 999px;
+      cursor: pointer;
+      font-weight: 500;
+      font-size: 14px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .nav-btn:hover { background: var(--surface-2); color: var(--ink); }
+    .nav-btn.active { background: var(--blue-soft); color: var(--blue); font-weight: 600; }
+    .nav-btn:disabled { opacity: 0.45; cursor: not-allowed; }
+
+    .nav-icon {
+      width: 20px;
+      height: 20px;
+      border-radius: 6px;
+      background: var(--surface-3);
+      display: grid;
+      place-items: center;
+      font-size: 11px;
+      font-weight: 700;
+    }
+
+    .nav-btn.active .nav-icon { background: #d2e3fc; color: var(--blue); }
+
+    .sidebar-foot {
+      border-top: 1px solid var(--line);
+      padding-top: 14px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .main {
+      min-width: 0;
+      display: flex;
+      flex-direction: column;
+      min-height: 100vh;
+    }
+
+    .main > .view.active {
+      flex: 1;
+    }
+
+    .topbar {
+      min-height: 56px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 24px;
+      background: var(--surface);
+      border-bottom: 1px solid var(--line);
+      gap: 16px;
+    }
+
+    .topbar-title {
+      font-size: 15px;
+      font-weight: 500;
+      color: var(--muted);
     }
 
     .topbar-end {
@@ -70,30 +162,7 @@
       margin-left: auto;
     }
 
-    .main {
-      min-width: 0;
-      display: flex;
-      flex-direction: column;
-    }
-
-    .topbar {
-      min-height: 64px;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      padding: 0 28px;
-      background: var(--surface);
-      border-bottom: 1px solid var(--line);
-      gap: 16px;
-    }
-
-    .tabs {
-      display: flex;
-      padding: 4px;
-      background: var(--surface-2);
-      border-radius: var(--radius);
-      gap: 4px;
-    }
+    .tabs { display: none; }
 
     .tab {
       border: 0;
@@ -1008,47 +1077,127 @@
     }
 
     .chat-shell {
-      display: grid;
-      grid-template-rows: minmax(420px, 58vh) auto;
+      display: flex;
+      flex-direction: column;
+      flex: 1;
+      min-height: calc(100vh - 120px);
       background: var(--surface);
       border: 1px solid var(--line);
-      border-radius: var(--radius);
+      border-radius: var(--radius-lg);
       box-shadow: var(--shadow);
       overflow: hidden;
     }
 
     #messages {
-      padding: 18px;
-      overflow: auto;
+      flex: 1;
+      overflow-y: auto;
+      padding: 24px;
       display: flex;
       flex-direction: column;
-      gap: 10px;
+      gap: 14px;
+      background: linear-gradient(180deg, #fafbfc 0%, #fff 120px);
     }
 
     .bubble {
-      max-width: 760px;
-      padding: 12px 14px;
-      border-radius: var(--radius);
-      line-height: 1.6;
+      max-width: min(720px, 88%);
+      padding: 12px 16px;
+      border-radius: 18px;
+      line-height: 1.55;
+      font-size: 14px;
       white-space: pre-wrap;
     }
 
-    .bubble.user { align-self: flex-end; background: var(--blue); color: #fff; }
-    .bubble.assistant { align-self: flex-start; background: var(--surface-2); color: var(--ink); }
-    .bubble.error { align-self: flex-start; background: #fff1f1; color: var(--red); border: 1px solid rgba(194,59,59,0.25); }
+    .bubble.user {
+      align-self: flex-end;
+      background: var(--blue);
+      color: #fff;
+      border-bottom-right-radius: 4px;
+    }
+
+    .bubble.assistant {
+      align-self: flex-start;
+      background: var(--surface-2);
+      color: var(--ink);
+      border-bottom-left-radius: 4px;
+    }
+
+    .bubble.error {
+      align-self: flex-start;
+      background: #fce8e6;
+      color: var(--red);
+      border: 1px solid #f5c6c2;
+    }
 
     .composer {
-      border-top: 1px solid var(--line);
-      padding: 14px;
-      display: grid;
-      grid-template-columns: minmax(0, 1fr) auto;
+      display: flex;
       gap: 10px;
-      background: #fbfcfe;
+      padding: 16px 20px;
+      border-top: 1px solid var(--line);
+      background: var(--surface);
+      align-items: flex-end;
+    }
+
+    .composer textarea {
+      flex: 1;
+      min-height: 48px;
+      max-height: 160px;
+      resize: vertical;
+      border: 1px solid var(--line);
+      border-radius: 24px;
+      padding: 12px 18px;
+      background: var(--surface-2);
+    }
+
+    .composer textarea:focus {
+      outline: 2px solid var(--blue-soft);
+      border-color: var(--blue);
+      background: #fff;
+    }
+
+    .panel {
+      background: var(--surface);
+      border: 1px solid var(--line);
+      border-radius: var(--radius-lg);
+      box-shadow: var(--shadow);
+    }
+
+    #copilot-view.active {
+      display: flex;
+      flex-direction: column;
+      flex: 1;
+      width: 100%;
+      max-width: none;
+      padding-bottom: 16px;
+    }
+
+    #copilot-view .headline {
+      width: min(1120px, 100%);
+      margin-left: auto;
+      margin-right: auto;
+    }
+
+    #copilot-view .chat-shell {
+      flex: 1;
+      width: min(1120px, 100%);
+      margin: 0 auto;
+      min-height: calc(100vh - 220px);
     }
 
     #message-input { min-height: 46px; max-height: 120px; }
 
     @media (max-width: 900px) {
+      .app { grid-template-columns: 1fr; }
+      .sidebar {
+        position: relative;
+        height: auto;
+        flex-direction: row;
+        flex-wrap: wrap;
+        padding: 12px;
+        border-right: 0;
+        border-bottom: 1px solid var(--line);
+      }
+      .nav { flex-direction: row; flex-wrap: wrap; }
+      .sidebar-foot { display: none; }
       .headline, .grid-2, .preview { grid-template-columns: 1fr; }
       .repeat-row, .repeat-row.pricing { grid-template-columns: 1fr; }
       .topbar { align-items: flex-start; flex-wrap: wrap; padding: 14px; }
@@ -1060,20 +1209,29 @@
 </head>
 <body>
   <div class="app">
+    <aside class="sidebar">
+      <div class="brand"><div class="mark">C</div><span>Converza</span></div>
+      <nav class="nav">
+        <button type="button" class="nav-btn active" data-view="setup"><span class="nav-icon">DM</span> DM Closer</button>
+        <button type="button" class="nav-btn" data-view="copilot" id="copilot-tab" disabled><span class="nav-icon">AI</span> Co-Pilot</button>
+      </nav>
+      <div class="sidebar-foot">
+        <div class="status-pill"><svg class="tg-icon" viewBox="0 0 24 24" fill="#229ED9" aria-hidden="true" focusable="false" width="16" height="16"><path d="M21.94 4.49 18.9 19.16c-.23 1.02-.84 1.27-1.7.79l-4.7-3.47-2.27 2.18c-.25.25-.46.46-.95.46l.34-4.82 8.77-7.93c.38-.34-.08-.53-.6-.19l-10.84 6.83-4.67-1.46c-1.02-.32-1.04-1.02.21-1.5l18.26-7.04c.85-.31 1.59.2 1.31 1.47Z"/></svg><span class="dot" id="status-dot"></span><span id="status-text">Telegram orqali kiring</span></div>
+      </div>
+    </aside>
     <main class="main">
       <div class="topbar">
-        <div class="brand"><div class="mark">C</div><span>Converza</span></div>
-        <div class="tabs">
-          <button class="tab active" data-view="setup">DM Closer</button>
-          <button class="tab" data-view="copilot" id="copilot-tab" disabled>Co-Pilot</button>
-        </div>
+        <div class="topbar-title" id="topbar-title">DM Closer</div>
         <div class="topbar-end">
           <div class="auth-user" id="auth-user">
             <span id="auth-label">Kirgansiz</span>
             <button type="button" id="logout-btn">Chiqish</button>
           </div>
-          <div class="status-pill"><svg class="tg-icon" viewBox="0 0 24 24" fill="#229ED9" aria-hidden="true" focusable="false"><path d="M21.94 4.49 18.9 19.16c-.23 1.02-.84 1.27-1.7.79l-4.7-3.47-2.27 2.18c-.25.25-.46.46-.95.46l.34-4.82 8.77-7.93c.38-.34-.08-.53-.6-.19l-10.84 6.83-4.67-1.46c-1.02-.32-1.04-1.02.21-1.5l18.26-7.04c.85-.31 1.59.2 1.31 1.47Z"/></svg><span class="dot" id="status-dot"></span><span id="status-text">Telegram orqali kiring</span></div>
         </div>
+      </div>
+      <div class="tabs" hidden aria-hidden="true">
+        <button class="tab active" data-view="setup">DM Closer</button>
+        <button class="tab" data-view="copilot" id="copilot-tab-legacy" disabled>Co-Pilot</button>
       </div>
 
       <section class="content view active intro-active" id="setup-view">
@@ -1097,7 +1255,7 @@
               <div class="auth-card" id="auth-card">
                 <div class="auth-card-head" id="auth-card-head">
                   <h2 id="auth-card-title">Kirish</h2>
-                  <p id="auth-card-subtitle">Yangi foydalanuvchi — ariza. Tasdiqlangan — Telegram.</p>
+                  <p id="auth-card-subtitle">Yangi foydalanuvchi — ariza. Tasdiqlangan — @ConverzaApp_bot orqali kirish.</p>
                 </div>
                 <div class="auth-tabs" id="auth-tabs" hidden>
                   <button type="button" class="auth-tab active" data-auth-tab="request">Yangi ariza</button>
@@ -1185,11 +1343,17 @@
           <div class="connection-pill off" id="connection-pill">
             <span id="connection-status-text">Tekshirilmoqda...</span>
           </div>
+          <div class="connection-pill off" id="subscription-pill" style="margin-top:8px;">
+            <span id="subscription-status-text">Obuna: tekshirilmoqda...</span>
+          </div>
           <div class="connection-pill off" id="payments-pill" style="margin-top:8px;">
-            <span id="payments-status-text">Click: tekshirilmoqda...</span>
+            <span id="payments-status-text">Mijozlar Click: tekshirilmoqda...</span>
           </div>
           <p style="margin-top:12px;font-size:13px;color:var(--muted);">
-            Sozlamalar → Business → Chatbots → <strong id="bot-username-hint">@ConverzaSales_bot</strong>
+            Sales bot: Sozlamalar → Business → Chatbots → <strong id="bot-username-hint" data-sales-bot>@ConverzaSales_bot</strong>
+          </p>
+          <p style="margin-top:8px;font-size:13px;color:var(--muted);">
+            Converza obunasi: <strong>@ConverzaApp_bot</strong> da /subscribe
           </p>
         </div>
 
@@ -1271,8 +1435,8 @@
               Org: <strong id="org-id-label">kirilmagan</strong>. DM Closer va Co-Pilot shu pasportdan foydalanadi.
             </div>
             <div class="grid-2">
-              <label>Sotuv boti
-                <input value="@ConverzaSales_bot" readonly />
+              <label>Sotuv boti (Business DM)
+                <input value="@ConverzaSales_bot" readonly data-sales-bot />
               </label>
               <label>Click token (ixtiyoriy)
                 <input name="click_token" type="password" autocomplete="off" placeholder="BotFather → Payments → Click" />
@@ -1739,6 +1903,8 @@
       if (!state.token) return;
       const pill = document.getElementById("connection-pill");
       const label = document.getElementById("connection-status-text");
+      const subPill = document.getElementById("subscription-pill");
+      const subLabel = document.getElementById("subscription-status-text");
       const paymentsPill = document.getElementById("payments-pill");
       const paymentsLabel = document.getElementById("payments-status-text");
       try {
@@ -1754,16 +1920,25 @@
           pill.className = "connection-pill off";
           label.textContent = "Biznes ulanishi yo'q";
         }
+        if (data.subscription_active) {
+          subPill.className = "connection-pill on";
+          subLabel.textContent = "Converza obunasi faol";
+        } else {
+          subPill.className = "connection-pill off";
+          subLabel.textContent = "Obuna yo'q — @ConverzaApp_bot /subscribe";
+        }
         if (data.payments_enabled) {
           paymentsPill.className = "connection-pill on";
-          paymentsLabel.textContent = "Click to'lovi yoqilgan";
+          paymentsLabel.textContent = "Mijozlar Click to'lovi yoqilgan";
         } else {
           paymentsPill.className = "connection-pill off";
-          paymentsLabel.textContent = "Click to'lovi yo'q (ixtiyoriy)";
+          paymentsLabel.textContent = "Mijozlar Click yo'q (ixtiyoriy)";
         }
       } catch (_) {
         pill.className = "connection-pill off";
         label.textContent = "Holatni yuklab bo'lmadi";
+        subPill.className = "connection-pill off";
+        subLabel.textContent = "Obuna holati noma'lum";
         paymentsPill.className = "connection-pill off";
         paymentsLabel.textContent = "Click holati noma'lum";
       }
@@ -1775,11 +1950,15 @@
       try {
         const config = await fetch("/api/auth/config").then(r => r.json());
         const hint = document.getElementById("bot-username-hint");
-        if (hint && config.bot_username) hint.textContent = `@${config.bot_username}`;
+        const salesBot = config.sales_bot_username || "ConverzaSales_bot";
+        if (hint) hint.textContent = `@${salesBot}`;
+        document.querySelectorAll("[data-sales-bot]").forEach(el => {
+          el.textContent = `@${salesBot}`;
+        });
         const script = document.createElement("script");
         script.async = true;
         script.src = "https://telegram.org/js/telegram-widget.js?22";
-        script.setAttribute("data-telegram-login", config.bot_username);
+        script.setAttribute("data-telegram-login", config.bot_username || "ConverzaApp_bot");
         script.setAttribute("data-size", "medium");
         script.setAttribute("data-radius", "8");
         script.setAttribute("data-onauth", "onTelegramAuth(user)");
@@ -1994,8 +2173,15 @@
     }
 
     function switchView(view) {
-      document.querySelectorAll(".tab").forEach(tab => tab.classList.toggle("active", tab.dataset.view === view));
-      document.querySelectorAll(".view").forEach(section => section.classList.toggle("active", section.id === `${view}-view`));
+      document.querySelectorAll(".nav-btn, .tab").forEach(btn => {
+        btn.classList.toggle("active", btn.dataset.view === view);
+      });
+      document.querySelectorAll(".view").forEach(section => {
+        section.classList.toggle("active", section.id === `${view}-view`);
+      });
+      const titles = { setup: "DM Closer", copilot: "Co-Pilot" };
+      const titleEl = document.getElementById("topbar-title");
+      if (titleEl) titleEl.textContent = titles[view] || "Converza";
     }
 
     function appendBubble(role, text) {
@@ -2093,7 +2279,12 @@
     document.getElementById("add-pricing").addEventListener("click", () => addPricing());
     document.getElementById("add-faq").addEventListener("click", () => addFaq());
     document.getElementById("add-objection").addEventListener("click", () => addObjection());
-    document.querySelectorAll(".topbar .tab").forEach(tab => tab.addEventListener("click", () => switchView(tab.dataset.view)));
+    document.querySelectorAll(".nav-btn, .topbar .tab").forEach(btn => {
+      btn.addEventListener("click", () => {
+        if (btn.disabled) return;
+        switchView(btn.dataset.view);
+      });
+    });
     document.getElementById("logout-btn").addEventListener("click", clearAuth);
     document.getElementById("access-request-form").addEventListener("submit", submitAccessRequest);
     document.getElementById("refresh-access-btn").addEventListener("click", refreshAccessStatus);

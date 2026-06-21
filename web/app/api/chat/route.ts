@@ -1,21 +1,14 @@
 import { NextRequest } from "next/server";
 
 // ---------------------------------------------------------------------------
-// OpenClaw SSE Translation Proxy
-// Accepts Converza ChatRequest → calls OpenClaw /v1/chat/completions → emits
+// Hermes SSE Translation Proxy
+// Accepts Converza ChatRequest → calls Hermes /v1/chat/completions → emits
 // Converza-format SSE events ({token, done, error, approval_request}) back to
 // the frontend.
-//
-// Permission modes:
-//   ask    — agent yields APPROVAL_REQUIRED blocks for high-cost actions
-//   auto   — agent executes everything without pausing
-//   plan   — agent only outlines plans, never executes
-//   bypass — agent executes with zero safety checks
 // ---------------------------------------------------------------------------
 
-const OPENCLAW_URL =
-  process.env.OPENCLAW_URL ?? "http://127.0.0.1:18789";
-const OPENCLAW_TOKEN = process.env.OPENCLAW_BEARER_TOKEN ?? "";
+const HERMES_URL = process.env.HERMES_URL ?? "http://127.0.0.1:8642";
+const HERMES_TOKEN = process.env.HERMES_API_KEY ?? "";
 
 type PermissionMode = "ask" | "auto" | "plan" | "bypass";
 
@@ -108,10 +101,6 @@ function buildPermissionInstruction(mode: PermissionMode): string {
   }
 }
 
-// ---------------------------------------------------------------------------
-// Approval block parser — detects ```approval_required ... ``` in the stream
-// ---------------------------------------------------------------------------
-
 const APPROVAL_OPEN = "```approval_required";
 const APPROVAL_CLOSE = "```";
 
@@ -120,14 +109,12 @@ function tryParseApprovalBlock(text: string): ApprovalRequest | null {
   if (startIdx === -1) return null;
 
   const jsonStart = startIdx + APPROVAL_OPEN.length;
-  // Find the closing ``` after the opening marker
   const closeIdx = text.indexOf(APPROVAL_CLOSE, jsonStart);
   if (closeIdx === -1) return null;
 
   const jsonStr = text.slice(jsonStart, closeIdx).trim();
   try {
     const parsed = JSON.parse(jsonStr);
-    // Validate required fields
     if (!parsed.action_id || !parsed.title || !parsed.description) return null;
     return {
       action_id: parsed.action_id,
@@ -142,10 +129,6 @@ function tryParseApprovalBlock(text: string): ApprovalRequest | null {
     return null;
   }
 }
-
-// ---------------------------------------------------------------------------
-// SSE helper
-// ---------------------------------------------------------------------------
 
 function sseHeaders() {
   return {
@@ -171,10 +154,6 @@ function errorStream(message: string): Response {
   return new Response(stream, { headers: sseHeaders() });
 }
 
-// ---------------------------------------------------------------------------
-// POST /api/chat
-// ---------------------------------------------------------------------------
-
 export async function POST(request: NextRequest) {
   const body = await request.json();
   const {
@@ -189,18 +168,11 @@ export async function POST(request: NextRequest) {
   const contextBlock = buildContextBlock(client_context, user_role);
   const permissionBlock = buildPermissionInstruction(permission_mode);
 
-  // Build OpenAI-format messages array
   const messages: { role: string; content: string }[] = [];
-
-  // System-level permission instruction goes first as a system message
-  messages.push({
-    role: "system",
-    content: permissionBlock,
-  });
+  messages.push({ role: "system", content: permissionBlock });
 
   if (conversation_history.length > 0) {
     const history = [...conversation_history];
-    // Inject context into first user message
     const firstContent = history[0]?.content ?? "";
     if (!firstContent.includes("[CLIENT CONTEXT]")) {
       history[0] = { ...history[0], content: contextBlock + firstContent };
@@ -211,46 +183,41 @@ export async function POST(request: NextRequest) {
     messages.push({ role: "user", content: contextBlock + message });
   }
 
-  // Call OpenClaw /v1/chat/completions with streaming
   let upstreamResponse: Response;
   try {
-    upstreamResponse = await fetch(
-      `${OPENCLAW_URL}/v1/chat/completions`,
-      {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          ...(OPENCLAW_TOKEN
-            ? { Authorization: `Bearer ${OPENCLAW_TOKEN}` }
-            : {}),
-        },
-        body: JSON.stringify({
-          model: "openclaw",
-          messages,
-          stream: true,
-        }),
-      }
-    );
+    upstreamResponse = await fetch(`${HERMES_URL}/v1/chat/completions`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        ...(HERMES_TOKEN ? { Authorization: `Bearer ${HERMES_TOKEN}` } : {}),
+      },
+      body: JSON.stringify({
+        model: "hermes-agent",
+        messages,
+        stream: true,
+      }),
+    });
   } catch {
     return errorStream(
-      `Failed to connect to OpenClaw at ${OPENCLAW_URL}. Is the engine running?`
+      `Failed to connect to Hermes at ${HERMES_URL}. Is the gateway running?`
     );
   }
 
   if (!upstreamResponse.ok) {
     const errText = await upstreamResponse.text().catch(() => "Unknown error");
     return errorStream(
-      `OpenClaw returned ${upstreamResponse.status}: ${errText.slice(0, 200)}`
+      `Hermes returned ${upstreamResponse.status}: ${errText.slice(0, 200)}`
     );
   }
 
-  // Transform OpenAI SSE → Converza SSE with approval block detection
   const encoder = new TextEncoder();
   const transformStream = new ReadableStream({
     async start(controller) {
       const reader = upstreamResponse.body?.getReader();
       if (!reader) {
-        controller.enqueue(ssePayload(encoder, { error: "No response body from OpenClaw" }));
+        controller.enqueue(
+          ssePayload(encoder, { error: "No response body from Hermes" })
+        );
         controller.close();
         return;
       }
@@ -258,9 +225,7 @@ export async function POST(request: NextRequest) {
       const decoder = new TextDecoder();
       let buffer = "";
       let fullContent = "";
-      // Track if we're inside an approval block to suppress token emission
       let insideApprovalBlock = false;
-      let approvalBuffer = "";
 
       try {
         while (true) {
@@ -283,33 +248,24 @@ export async function POST(request: NextRequest) {
 
               fullContent += content;
 
-              // ── Approval block state machine ──
-              // Check if we've entered an approval block
               if (!insideApprovalBlock && fullContent.includes(APPROVAL_OPEN)) {
                 insideApprovalBlock = true;
-                // Extract everything from the approval marker onward
-                const markerIdx = fullContent.lastIndexOf(APPROVAL_OPEN);
-                approvalBuffer = fullContent.slice(markerIdx);
               }
 
               if (insideApprovalBlock) {
-                approvalBuffer += "";  // fullContent already accumulated
-                approvalBuffer = fullContent.slice(
+                const approvalBuffer = fullContent.slice(
                   fullContent.lastIndexOf(APPROVAL_OPEN)
                 );
-
-                // Check if the block is complete
                 const afterOpen = approvalBuffer.slice(APPROVAL_OPEN.length);
                 const closeIdx = afterOpen.indexOf(APPROVAL_CLOSE);
 
                 if (closeIdx !== -1) {
-                  // Block complete — try to parse
-                  const fullBlock =
-                    approvalBuffer.slice(0, APPROVAL_OPEN.length + closeIdx + APPROVAL_CLOSE.length);
+                  const fullBlock = approvalBuffer.slice(
+                    0,
+                    APPROVAL_OPEN.length + closeIdx + APPROVAL_CLOSE.length
+                  );
                   const approval = tryParseApprovalBlock(fullBlock);
-
                   if (approval) {
-                    // Emit approval_request event instead of tokens
                     controller.enqueue(
                       ssePayload(encoder, {
                         approval_request: approval,
@@ -317,15 +273,11 @@ export async function POST(request: NextRequest) {
                       })
                     );
                   }
-
                   insideApprovalBlock = false;
-                  approvalBuffer = "";
                 }
-                // While inside the block, don't emit tokens
                 continue;
               }
 
-              // Normal token emission
               controller.enqueue(
                 ssePayload(encoder, {
                   token: content,
@@ -333,12 +285,11 @@ export async function POST(request: NextRequest) {
                 })
               );
             } catch {
-              // Malformed chunk — skip
+              // skip malformed chunk
             }
           }
         }
 
-        // Stream complete
         controller.enqueue(
           ssePayload(encoder, { done: true, conversation_id: conversationId })
         );

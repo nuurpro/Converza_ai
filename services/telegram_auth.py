@@ -1,4 +1,4 @@
-"""Telegram Login Widget hash verification."""
+"""Telegram Login Widget hash verification (@ConverzaApp_bot)."""
 
 import hashlib
 import hmac
@@ -16,7 +16,10 @@ def verify_telegram_auth(data: dict, max_age_seconds: int = 86400) -> bool:
     if auth_date and time.time() - auth_date > max_age_seconds:
         return False
 
-    bot_token = os.environ.get("TELEGRAM_BOT_TOKEN", "")
+    bot_token = (
+        os.environ.get("TELEGRAM_APP_BOT_TOKEN", "").strip()
+        or os.environ.get("TELEGRAM_BOT_TOKEN", "").strip()
+    )
     if not bot_token:
         return False
 

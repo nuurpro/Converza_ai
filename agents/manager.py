@@ -10,88 +10,17 @@ The Manager uses a single LLM call with structured tool_use to branch:
 """
 
 import json
-import anthropic
 from typing import Any
 
-# ─────────────────────────────────────────────────────────────────────
-# System prompt — static for prompt caching
-# ─────────────────────────────────────────────────────────────────────
-
-MANAGER_SYSTEM_PROMPT = """## LANGUAGE — CRITICAL
-Always write the `clarify` tool's user-facing message in Uzbek (O'zbek tilida). All text the user reads must be natural, fluent Uzbek. Internal DAG briefs may stay in English for downstream agents, but anything shown to the user must be Uzbek.
-
-You are the Converza Manager Agent — the Chief Marketing Officer and gatekeeper of an enterprise AI marketing swarm.
-
-You sit at the top of an Isolated DAG architecture. Every user prompt passes through you FIRST. Your job is to decide: should we execute, or should we push back?
-
-## YOUR TWO STATES
-
-### STATE 1: CLARIFY (The Pushback)
-Invoke the `clarify` tool when ANY of these are true:
-- The request is missing critical execution data (no platform, no audience, no objective)
-- The strategy is fundamentally flawed (e.g., "make a viral 10-minute TikTok" — TikTok caps at 10 min and long-form rarely goes viral there)
-- The request contradicts the Brand Passport (e.g., luxury brand asking for discount-bait content)
-- The request is too vague to produce quality output ("make me some content")
-- The request ignores channel-specific best practices
-
-When clarifying, be a CONSULTANT, not a yes-man:
-- Explain WHY you're pushing back with specific reasoning
-- Offer a concrete alternative or pivot
-- Ask ONE focused question to unblock execution
-- Never lecture — be direct and professional
-
-### STATE 2: COMPILE DAG (The Compiler)
-Invoke the `compile_dag` tool when ALL of these are true:
-- The objective is clear and measurable
-- The target platform(s) are specified or inferable
-- The audience segment is defined or derivable from Brand Passport
-- The strategy is sound and channel-appropriate
-- You have enough data to brief downstream agents
-
-When compiling, produce:
-- A Strategic Thesis: one sentence capturing the campaign's core insight
-- The DAG node list with dependencies and per-node briefs
-- Each node brief must contain enough context for an isolated agent to execute without asking questions
-
-## AGENT ROSTER (available DAG nodes)
-
-| Agent | Type | What it does |
-|-------|------|-------------|
-| Intelligence_Agent | research | Competitor analysis, trend signals, content gaps |
-| ProductManager_Agent | strategy | Campaign brief, angle, channels, KPIs, audience segment |
-| Copywriter_Agent | creative | Scripts, hooks, CTAs, captions, text overlays |
-| ContentCreator_Agent | production | Video prompts for Higgsfield/Fal.ai generation |
-| UGC_Creator_Agent | creative | UGC scripts, casting briefs, delivery notes |
-
-VideoEditor_Agent and Publisher_Agent are Phase 2 — do NOT include them in DAG plans.
-
-## DAG DEPENDENCY RULES
-
-- Intelligence_Agent has NO upstream dependencies (can run first or in parallel)
-- ProductManager_Agent can run in parallel with Intelligence_Agent
-- Copywriter_Agent DEPENDS ON ProductManager_Agent output
-- ContentCreator_Agent DEPENDS ON Copywriter_Agent output
-- UGC_Creator_Agent DEPENDS ON ProductManager_Agent output
-- Multiple agents at the same dependency level run IN PARALLEL
-
-## RESPONSE STYLE
-
-- Think like a CMO with a $50M portfolio
-- Be direct. No filler. No "Certainly!" or "Great question!"
-- When clarifying, be the senior strategist who saves the client from burning budget on bad ideas
-- When compiling, be precise — every node brief must be actionable
-
-## ROLE ADAPTATION
-
-The client's role (Owner or Marketer) is in their context block.
-- Owner: Frame pushback around ROI and market position. Frame execution around business outcomes.
-- Marketer: Frame pushback around channel best practices and metrics. Frame execution around tactical deliverables."""
-
+from converza_agent.runtime import run_agent_json
 
 # ─────────────────────────────────────────────────────────────────────
-# Tool definitions — the branching mechanism
+# System prompt — imported from converza_agent (Hermes runtime)
 # ─────────────────────────────────────────────────────────────────────
 
+# MANAGER_SYSTEM_PROMPT imported above
+
+# Legacy tool schemas kept for reference in DAG node briefs.
 MANAGER_TOOLS = [
     {
         "name": "clarify",
@@ -256,9 +185,6 @@ async def run_manager(
       {"state": "executing",  "strategic_thesis": "...", "campaign_name": "...",
        "target_platforms": [...], "nodes": [...]}
     """
-    client = anthropic.AsyncAnthropic()
-
-    # Build messages with Brand Passport context in first user turn
     history: list[dict[str, Any]] = list(conversation_history or [])
     context_block = _build_context_block(brand_passport, user_role)
 
@@ -273,48 +199,33 @@ async def run_manager(
     else:
         messages = [{"role": "user", "content": context_block + user_message}]
 
-    response = await client.messages.create(
-        model="claude-sonnet-4-6",
+    payload = await run_agent_json(
+        "manager",
+        messages,
+        session_key=f"converza:manager:{brand_passport.get('brand_name', 'unknown')}",
         max_tokens=4096,
-        system=[
-            {
-                "type": "text",
-                "text": MANAGER_SYSTEM_PROMPT,
-                "cache_control": {"type": "ephemeral"},
-            }
-        ],
-        tools=MANAGER_TOOLS,
-        tool_choice={"type": "any"},  # Force a tool call — must pick clarify OR compile_dag
-        messages=messages,
     )
 
-    # Extract the tool call
-    for block in response.content:
-        if block.type != "tool_use":
-            continue
+    action = payload.get("action")
+    if action == "clarify":
+        return {
+            "state": "clarifying",
+            "reason": payload.get("reason", ""),
+            "response": payload.get("response", ""),
+        }
+    if action == "compile_dag":
+        return {
+            "state": "executing",
+            "strategic_thesis": payload.get("strategic_thesis", ""),
+            "campaign_name": payload.get("campaign_name", ""),
+            "target_platforms": payload.get("target_platforms", []),
+            "nodes": payload.get("nodes", []),
+        }
 
-        if block.name == "clarify":
-            return {
-                "state": "clarifying",
-                "reason": block.input["reason"],
-                "response": block.input["response"],
-            }
-
-        if block.name == "compile_dag":
-            return {
-                "state": "executing",
-                "strategic_thesis": block.input["strategic_thesis"],
-                "campaign_name": block.input["campaign_name"],
-                "target_platforms": block.input["target_platforms"],
-                "nodes": block.input["nodes"],
-            }
-
-    # Fallback — should never happen with tool_choice=any
-    text_parts = [b.text for b in response.content if b.type == "text"]
     return {
         "state": "clarifying",
         "reason": "Unable to assess request",
-        "response": "\n\n".join(text_parts) or "I need more details to proceed.",
+        "response": payload.get("response") or "Batafsilroq ma'lumot kerak.",
     }
 
 
