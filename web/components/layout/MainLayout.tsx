@@ -3,6 +3,7 @@
 import Sidebar from "@/components/sidebar/Sidebar";
 import { useState } from "react";
 import { Menu } from "lucide-react";
+import { usePathname } from "next/navigation";
 
 interface MainLayoutProps {
   children: React.ReactNode;
@@ -10,6 +11,12 @@ interface MainLayoutProps {
 
 export default function MainLayout({ children }: MainLayoutProps) {
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const pathname = usePathname();
+
+  // Marketing/landing routes render without the dashboard shell.
+  if (pathname?.startsWith("/landing")) {
+    return <>{children}</>;
+  }
 
   return (
     <div className="flex h-screen overflow-hidden bg-bg-primary">

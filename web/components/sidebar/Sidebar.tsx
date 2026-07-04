@@ -1,46 +1,29 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { usePathname } from "next/navigation";
 import Link from "next/link";
 import clsx from "clsx";
+import { AnimatePresence, motion } from "motion/react";
 import {
-  Terminal,
-  MessageSquare,
-  GitBranch,
-  FolderKanban,
-  Package,
-  BarChart3,
-  CalendarDays,
-  Settings,
-  Palette,
-  KeyRound,
-  CreditCard,
-  User,
-  Brain,
-  Cpu,
+  LayoutDashboard,
+  Compass,
+  Crosshair,
   ChevronDown,
-  ChevronRight,
-  Zap,
   X,
+  MessageSquareText,
 } from "lucide-react";
 
 // ─────────────────────────────────────────────────────────────────────
 // Types
 // ─────────────────────────────────────────────────────────────────────
 
-interface SubItem {
-  label: string;
-  href: string;
-  icon: React.ElementType;
-}
-
 interface NavItem {
   id: string;
   label: string;
   href: string;
   icon: React.ElementType;
-  children?: SubItem[];
+  hint?: string;
 }
 
 interface SidebarProps {
@@ -49,60 +32,22 @@ interface SidebarProps {
 }
 
 // ─────────────────────────────────────────────────────────────────────
-// Navigation config
+// IA — single nav focused on data input for the AI
 // ─────────────────────────────────────────────────────────────────────
 
-const primaryNav: NavItem[] = [
-  {
-    id: "command-center",
-    label: "Command Center",
-    href: "/",
-    icon: Terminal,
-    children: [
-      { label: "Recent Chats", href: "/chats", icon: MessageSquare },
-      { label: "Agent Threads", href: "/threads", icon: GitBranch },
-    ],
-  },
-  {
-    id: "projects",
-    label: "Projects",
-    href: "/projects",
-    icon: FolderKanban,
-  },
-  {
-    id: "products",
-    label: "Products",
-    href: "/products",
-    icon: Package,
-  },
-  {
-    id: "analytics",
-    label: "Analytics",
-    href: "/analytics",
-    icon: BarChart3,
-  },
-  {
-    id: "calendar",
-    label: "Content Calendar",
-    href: "/calendar",
-    icon: CalendarDays,
-  },
+const navItems: NavItem[] = [
+  { id: "dashboard", label: "Dashboard", href: "/", icon: LayoutDashboard },
+  { id: "strategy", label: "Strategy", href: "/strategy", icon: Compass },
+  { id: "competitors", label: "Competitors", href: "/competitors", icon: Crosshair },
 ];
 
-const settingsNav: NavItem = {
-  id: "settings",
-  label: "Settings",
-  href: "/settings",
-  icon: Settings,
-  children: [
-    { label: "Brand Passport", href: "/settings/brand", icon: Palette },
-    { label: "API Tokens", href: "/settings/tokens", icon: KeyRound },
-    { label: "Billing & Payments", href: "/settings/billing", icon: CreditCard },
-    { label: "Personal Profile", href: "/settings/profile", icon: User },
-    { label: "Agent Memory", href: "/settings/memory", icon: Brain },
-    { label: "LLM Model Selection", href: "/settings/models", icon: Cpu },
-  ],
-};
+const chatHistoryItems = [
+  { id: "campaign-brief", title: "Campaign brief", meta: "Today" },
+  { id: "creative-hooks", title: "Creative hooks", meta: "Yesterday" },
+  { id: "competitor-review", title: "Competitor review", meta: "Mon" },
+];
+
+const BRAND_NAME_STORAGE_KEY = "converza.brandName";
 
 // ─────────────────────────────────────────────────────────────────────
 // Component
@@ -110,122 +55,103 @@ const settingsNav: NavItem = {
 
 export default function Sidebar({ open, onClose }: SidebarProps) {
   const pathname = usePathname();
-  const [expanded, setExpanded] = useState<Record<string, boolean>>({
-    "command-center": true,
-  });
+  const [chatHistoryOpen, setChatHistoryOpen] = useState(false);
+  const [brandName, setBrandName] = useState("Osman Skincare");
+  const isCopilot = pathname.startsWith("/copilot");
 
-  function toggleExpand(id: string) {
-    setExpanded((prev) => ({ ...prev, [id]: !prev[id] }));
-  }
+  useEffect(() => {
+    setChatHistoryOpen(isCopilot);
+  }, [isCopilot]);
+
+  useEffect(() => {
+    function readBrandName() {
+      const stored = window.localStorage.getItem(BRAND_NAME_STORAGE_KEY)?.trim();
+      setBrandName(stored || "Osman Skincare");
+    }
+
+    readBrandName();
+    window.addEventListener("storage", readBrandName);
+    window.addEventListener("converza:brand-name-updated", readBrandName);
+
+    return () => {
+      window.removeEventListener("storage", readBrandName);
+      window.removeEventListener("converza:brand-name-updated", readBrandName);
+    };
+  }, []);
 
   function isActive(href: string) {
     if (href === "/") return pathname === "/";
     return pathname.startsWith(href);
   }
 
-  function handleLinkClick() {
-    onClose();
-  }
-
-  // ── Render a single nav item ──
-  function renderItem(item: NavItem) {
+  function NavLink({ item, index }: { item: NavItem; index: number }) {
     const active = isActive(item.href);
-    const hasChildren = item.children && item.children.length > 0;
-    const isOpen = expanded[item.id];
-
     return (
-      <div key={item.id}>
-        {/* Parent item */}
-        <div className="flex items-center">
-          <Link
-            href={item.href}
-            onClick={handleLinkClick}
-            className={clsx(
-              "group flex flex-1 items-center gap-3 rounded-lg px-3 py-2.5 md:py-2 text-[14px] md:text-[13.5px] font-medium transition-all duration-150",
-              active
-                ? "bg-accent-dim text-accent"
-                : "text-text-secondary hover:bg-bg-hover hover:text-text-primary"
-            )}
-          >
-            <item.icon
-              size={18}
-              strokeWidth={1.8}
-              className={clsx(
-                "shrink-0 transition-colors",
-                active ? "text-accent" : "text-text-muted group-hover:text-text-secondary"
-              )}
-            />
-            <span className="truncate">{item.label}</span>
-          </Link>
-
-          {hasChildren && (
-            <button
-              onClick={() => toggleExpand(item.id)}
-              className={clsx(
-                "mr-1 flex h-8 w-8 md:h-6 md:w-6 shrink-0 items-center justify-center rounded-md transition-colors",
-                "text-text-muted hover:bg-bg-hover hover:text-text-secondary"
-              )}
-              aria-label={`Toggle ${item.label} submenu`}
-            >
-              {isOpen ? (
-                <ChevronDown size={14} strokeWidth={2} />
-              ) : (
-                <ChevronRight size={14} strokeWidth={2} />
-              )}
-            </button>
+      <motion.div
+        initial={{ opacity: 0, x: -8 }}
+        animate={{ opacity: 1, x: 0 }}
+        transition={{ duration: 0.28, delay: 0.04 * index, ease: [0.16, 1, 0.3, 1] }}
+      >
+        <Link
+          href={item.href}
+          onClick={onClose}
+          className={clsx(
+            "group relative flex items-center gap-3 rounded-lg px-3 py-2 text-[13.5px] transition-colors duration-150",
+            active
+              ? "bg-bg-active text-text-primary font-medium"
+              : "text-text-secondary hover:bg-bg-hover hover:text-text-primary",
           )}
-        </div>
-
-        {/* Sub-items */}
-        {hasChildren && isOpen && (
-          <div className="ml-3 mt-0.5 space-y-0.5 border-l border-border pl-3">
-            {item.children!.map((sub) => {
-              const subActive = isActive(sub.href);
-              return (
-                <Link
-                  key={sub.href}
-                  href={sub.href}
-                  onClick={handleLinkClick}
-                  className={clsx(
-                    "group flex items-center gap-2.5 rounded-md px-2.5 py-2 md:py-[6px] text-[13px] md:text-[12.5px] font-medium transition-all duration-150",
-                    subActive
-                      ? "bg-accent-dim text-accent"
-                      : "text-text-muted hover:bg-bg-hover hover:text-text-secondary"
-                  )}
-                >
-                  <sub.icon
-                    size={14}
-                    strokeWidth={1.8}
-                    className={clsx(
-                      "shrink-0 transition-colors",
-                      subActive
-                        ? "text-accent"
-                        : "text-text-muted group-hover:text-text-secondary"
-                    )}
-                  />
-                  <span className="truncate">{sub.label}</span>
-                </Link>
-              );
-            })}
-          </div>
-        )}
-      </div>
+        >
+          {active && (
+            <motion.span
+              layoutId="active-rail"
+              className="absolute left-0 top-1/2 h-4 w-[3px] -translate-y-1/2 rounded-r-full bg-accent"
+              transition={{ type: "spring", stiffness: 380, damping: 30 }}
+            />
+          )}
+          <item.icon
+            size={16}
+            strokeWidth={active ? 2.2 : 1.8}
+            className={clsx(
+              "shrink-0 transition-colors",
+              active ? "text-text-primary" : "text-text-muted group-hover:text-text-secondary",
+            )}
+          />
+          <span className="flex-1 truncate">{item.label}</span>
+          {item.hint && (
+            <kbd className="hidden font-mono text-[9.5px] uppercase tracking-[0.14em] text-text-muted/70 group-hover:inline">
+              {item.hint}
+            </kbd>
+          )}
+        </Link>
+      </motion.div>
     );
   }
 
   const sidebarContent = (
     <>
-      {/* ── Brand ── */}
-      <div className="flex h-14 shrink-0 items-center justify-between border-b border-border px-5">
-        <div className="flex items-center gap-2.5">
-          <div className="flex h-7 w-7 items-center justify-center rounded-md bg-accent">
-            <Zap size={15} strokeWidth={2.5} className="text-text-on-accent" />
-          </div>
-          <span className="text-[15px] font-bold tracking-tight text-text-primary">
-            Converza
+      {/* ── Workspace switcher (Claude / Linear style) ── */}
+      <div className="flex h-16 shrink-0 items-center justify-between border-b border-border/60 px-4">
+        <div className="flex items-center gap-2.5 px-1 py-1">
+          <span className="relative flex h-8 w-8 items-center justify-center rounded-lg bg-text-primary text-bg-elevated">
+            <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+              <path
+                d="M7 1.5v11M1.5 7h11M3 3l8 8M11 3l-8 8"
+                stroke="currentColor"
+                strokeWidth="1.6"
+                strokeLinecap="round"
+              />
+            </svg>
+          </span>
+          <span className="flex flex-col items-start leading-tight">
+            <span className="text-[13.5px] font-semibold tracking-[-0.015em] text-text-primary">
+              Converza
+            </span>
+            <span className="max-w-[150px] truncate font-mono text-[9px] uppercase tracking-[0.16em] text-text-muted">
+              {brandName}
+            </span>
           </span>
         </div>
-        {/* Close button — mobile only */}
         <button
           onClick={onClose}
           className="flex h-8 w-8 items-center justify-center rounded-md text-text-muted hover:bg-bg-hover hover:text-text-primary md:hidden"
@@ -235,60 +161,119 @@ export default function Sidebar({ open, onClose }: SidebarProps) {
         </button>
       </div>
 
-      {/* ── Primary nav ── */}
-      <nav className="flex-1 space-y-1 overflow-y-auto px-3 py-4">
-        {primaryNav.map((item) => renderItem(item))}
+      {/* ── Single flat nav, focused on data input for the AI ── */}
+      <nav className="flex-1 space-y-0.5 overflow-y-auto px-3 pb-4 pt-4">
+        {navItems.map((item, i) => (
+          <NavLink key={item.id} item={item} index={i} />
+        ))}
+
+        {/* Quiet shortcut to the chat assistant — kept reachable but out of the primary IA */}
+        <div className="mt-6 border-t border-border/60 pt-3">
+          <Link
+            href="/copilot"
+            onClick={() => {
+              setChatHistoryOpen(true);
+              onClose();
+            }}
+            className={clsx(
+              "group flex items-center gap-3 rounded-lg px-3 py-2 text-[13px] transition-colors",
+              isCopilot
+                ? "bg-bg-active font-medium text-text-primary"
+                : "text-text-muted hover:bg-bg-hover hover:text-text-secondary",
+            )}
+          >
+            <MessageSquareText
+              size={14}
+              strokeWidth={isCopilot ? 2.1 : 1.8}
+              className={isCopilot ? "text-text-primary" : ""}
+            />
+            <span className="flex-1">Co-Pilot chat</span>
+            <ChevronDown
+              size={12}
+              strokeWidth={2}
+              className={clsx(
+                "text-text-muted transition-transform duration-200",
+                chatHistoryOpen && isCopilot ? "rotate-180" : "-rotate-90",
+              )}
+            />
+          </Link>
+
+          <AnimatePresence initial={false}>
+            {isCopilot && chatHistoryOpen && (
+              <motion.div
+                key="copilot-history"
+                initial={{ height: 0, opacity: 0 }}
+                animate={{ height: "auto", opacity: 1 }}
+                exit={{ height: 0, opacity: 0 }}
+                transition={{ duration: 0.24, ease: [0.16, 1, 0.3, 1] }}
+                className="overflow-hidden"
+              >
+                <div className="mt-1.5 space-y-1 pl-6">
+                  {chatHistoryItems.map((item) => (
+                    <Link
+                      key={item.id}
+                      href="/copilot"
+                      onClick={onClose}
+                      className="group flex items-center justify-between rounded-lg px-3 py-1.5 text-[12px] text-text-muted transition-colors hover:bg-bg-hover hover:text-text-primary"
+                    >
+                      <span className="truncate">{item.title}</span>
+                      <span className="ml-2 shrink-0 font-mono text-[9px] uppercase tracking-[0.16em] text-text-muted/70">
+                        {item.meta}
+                      </span>
+                    </Link>
+                  ))}
+                </div>
+              </motion.div>
+            )}
+          </AnimatePresence>
+        </div>
       </nav>
 
-      {/* ── Divider ── */}
-      <div className="mx-4 border-t border-border" />
-
-      {/* ── Settings (bottom anchor) ── */}
-      <nav className="shrink-0 space-y-1 px-3 py-3">
-        {renderItem(settingsNav)}
-      </nav>
-
-      {/* ── Status bar ── */}
-      <div className="flex items-center gap-2 border-t border-border px-4 py-2.5">
-        <span className="relative flex h-2 w-2">
-          <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-success opacity-75" />
-          <span className="relative inline-flex h-2 w-2 rounded-full bg-success" />
-        </span>
-        <span className="text-[11px] font-medium text-text-muted">
-          All systems operational
-        </span>
+      {/* ── User chip ── */}
+      <div className="mx-3 mb-3">
+        <Link
+          href="/settings"
+          onClick={onClose}
+          className="group flex items-center gap-2.5 rounded-lg px-2 py-2 transition-colors hover:bg-bg-hover"
+        >
+          <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-[#2D6FE5] to-[#0070F3] text-[11px] font-medium text-white">
+            NE
+          </span>
+          <span className="flex-1 truncate text-[13px] font-medium text-text-primary">
+            Nodir
+          </span>
+          <span className="font-mono text-[9.5px] uppercase tracking-[0.18em] text-text-muted">
+            Free
+          </span>
+        </Link>
       </div>
     </>
   );
 
   return (
     <>
-      {/* ── Mobile overlay ── */}
       {open && (
         <div
-          className="fixed inset-0 z-40 bg-black/60 backdrop-blur-sm md:hidden"
+          className="fixed inset-0 z-40 bg-black/30 backdrop-blur-sm md:hidden"
           onClick={onClose}
         />
       )}
 
-      {/* ── Desktop sidebar (always visible) ── */}
       <aside
         className={clsx(
-          "fixed inset-y-0 left-0 z-50 flex w-[var(--sidebar-width)] flex-col",
-          "border-r border-border bg-bg-secondary",
-          "hidden md:flex"
+          "fixed inset-y-0 left-0 z-50 hidden w-[var(--sidebar-width)] flex-col",
+          "border-r border-border bg-bg-secondary md:flex",
         )}
       >
         {sidebarContent}
       </aside>
 
-      {/* ── Mobile drawer (slide-in) ── */}
       <aside
         className={clsx(
           "fixed inset-y-0 left-0 z-50 flex w-[280px] flex-col",
           "border-r border-border bg-bg-secondary",
           "transition-transform duration-300 ease-in-out md:hidden",
-          open ? "translate-x-0" : "-translate-x-full"
+          open ? "translate-x-0" : "-translate-x-full",
         )}
       >
         {sidebarContent}

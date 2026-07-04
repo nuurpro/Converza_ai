@@ -1,0 +1,1570 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Converza — Replace Your $5,000 Agency. Launch 60 Ads in 24 Hours.</title>
+  <meta name="description" content="Converza is an autonomous AI marketing team for e-commerce brands. 60 ads, native English copy, zero freelancers. Pilot from $500." />
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@600;700;800&family=DM+Sans:wght@300;400;500&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet" />
+
+  <style>
+    /* ---------- RESET ---------- */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+
+    /* ---------- TOKENS ---------- */
+    :root {
+      --bg:            #080808;
+      --surface:       #141414;
+      --surface-2:     #1a1a1a;
+      --gold:          #D4AF37;
+      --gold-soft:     rgba(212,175,55,0.06);
+      --gold-mid:      rgba(212,175,55,0.14);
+      --gold-line:     rgba(212,175,55,0.22);
+      --ink:           #f5f5f0;
+      --ink-muted:     #c8c8c0;
+      --ink-dim:       #8a8a82;
+      --line:          rgba(255,255,255,0.07);
+      --line-strong:   rgba(255,255,255,0.12);
+      --red:           #e05656;
+      --green:         #5ac47d;
+      --shadow-heavy:  0 40px 80px rgba(0,0,0,0.6);
+      --max:           1240px;
+    }
+
+    /* ---------- BASE ---------- */
+    body {
+      background: var(--bg);
+      color: var(--ink);
+      font-family: 'DM Sans', sans-serif;
+      font-weight: 300;
+      line-height: 1.65;
+      font-size: 17px;
+      -webkit-font-smoothing: antialiased;
+      position: relative;
+      overflow-x: hidden;
+    }
+
+    /* Noise texture overlay */
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      z-index: 1;
+      opacity: 0.04;
+      background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='220' height='220'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 0 0 0 1 0'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>");
+    }
+
+    h1, h2, h3, h4 {
+      font-family: 'Syne', sans-serif;
+      font-weight: 800;
+      letter-spacing: -0.03em;
+      line-height: 1.05;
+      color: var(--ink);
+    }
+
+    p { color: var(--ink-muted); }
+
+    a { color: inherit; text-decoration: none; }
+
+    .wrap { max-width: var(--max); margin: 0 auto; padding: 0 32px; position: relative; z-index: 2; }
+
+    .mono {
+      font-family: 'DM Mono', monospace;
+      text-transform: uppercase;
+      letter-spacing: 0.14em;
+      font-size: 11px;
+      color: var(--ink-dim);
+    }
+
+    .gold { color: var(--gold); }
+
+    /* ---------- BUTTONS ---------- */
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      padding: 16px 28px;
+      border-radius: 100px;
+      font-family: 'DM Sans', sans-serif;
+      font-weight: 500;
+      font-size: 15px;
+      letter-spacing: -0.005em;
+      border: 1px solid transparent;
+      cursor: pointer;
+      transition: transform 0.2s ease, background 0.2s ease, border-color 0.2s ease;
+      white-space: nowrap;
+    }
+    .btn-gold {
+      background: var(--gold);
+      color: #101010;
+    }
+    .btn-gold:hover { transform: translateY(-1px); background: #e3c04a; }
+    .btn-ghost {
+      background: transparent;
+      color: var(--ink);
+      border-color: var(--line-strong);
+    }
+    .btn-ghost:hover { border-color: var(--gold-line); color: var(--gold); }
+
+    /* ---------- NAV ---------- */
+    .nav {
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      z-index: 100;
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      background: rgba(8,8,8,0.72);
+      border-bottom: 1px solid var(--line);
+    }
+    .nav-inner {
+      max-width: var(--max);
+      margin: 0 auto;
+      padding: 18px 32px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .logo {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-family: 'Syne', sans-serif;
+      font-weight: 700;
+      font-size: 18px;
+      letter-spacing: -0.02em;
+    }
+    .logo-mark {
+      width: 26px; height: 26px;
+      border-radius: 8px;
+      background: linear-gradient(135deg, var(--gold) 0%, #8f7420 100%);
+      position: relative;
+    }
+    .logo-mark::after {
+      content: '';
+      position: absolute;
+      inset: 6px;
+      border-radius: 3px;
+      background: var(--bg);
+    }
+    .nav-links {
+      display: flex;
+      gap: 34px;
+    }
+    .nav-links a {
+      font-size: 14px;
+      color: var(--ink-muted);
+      transition: color 0.2s ease;
+    }
+    .nav-links a:hover { color: var(--ink); }
+    .nav-cta { padding: 10px 18px; font-size: 13px; }
+
+    /* ---------- SECTION 1: HERO ---------- */
+    .hero {
+      padding: 180px 0 140px;
+      position: relative;
+    }
+    .hero::before {
+      content: '';
+      position: absolute;
+      top: 120px; left: 5%;
+      width: 900px; height: 900px;
+      background: radial-gradient(circle, var(--gold-soft) 0%, transparent 55%);
+      pointer-events: none;
+      z-index: 0;
+    }
+    .hero-grid {
+      display: grid;
+      grid-template-columns: 1.05fr 1fr;
+      gap: 80px;
+      align-items: center;
+    }
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      padding: 8px 16px;
+      border-radius: 100px;
+      border: 1px solid var(--gold-line);
+      background: rgba(212,175,55,0.04);
+      font-family: 'DM Mono', monospace;
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 0.14em;
+      color: var(--ink-muted);
+      margin-bottom: 36px;
+    }
+    .pulse {
+      width: 7px; height: 7px; border-radius: 50%;
+      background: var(--gold);
+      box-shadow: 0 0 0 0 var(--gold);
+      animation: pulse 2s infinite;
+    }
+    @keyframes pulse {
+      0%   { box-shadow: 0 0 0 0 rgba(212,175,55,0.6); }
+      70%  { box-shadow: 0 0 0 10px rgba(212,175,55,0); }
+      100% { box-shadow: 0 0 0 0 rgba(212,175,55,0); }
+    }
+
+    .h1 {
+      font-size: clamp(44px, 5.6vw, 76px);
+      margin-bottom: 28px;
+    }
+    .h1 em {
+      font-style: normal;
+      color: var(--gold);
+    }
+    .sub {
+      font-size: 20px;
+      color: var(--ink-muted);
+      max-width: 540px;
+      margin-bottom: 40px;
+      line-height: 1.55;
+    }
+    .cta-row {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      margin-bottom: 32px;
+    }
+    .risk-list {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      margin-top: 8px;
+    }
+    .risk {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      font-size: 14px;
+      color: var(--ink-muted);
+    }
+    .check {
+      width: 20px; height: 20px;
+      border-radius: 50%;
+      background: var(--gold-mid);
+      border: 1px solid var(--gold-line);
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+    .check svg { width: 11px; height: 11px; stroke: var(--gold); }
+
+    /* ---------- HERO MOCKUP ---------- */
+    .mockup {
+      background: var(--surface);
+      border: 1px solid var(--line);
+      border-radius: 16px;
+      overflow: hidden;
+      box-shadow: var(--shadow-heavy);
+      position: relative;
+    }
+    .mockup-titlebar {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 14px 16px;
+      border-bottom: 1px solid var(--line);
+      background: #101010;
+    }
+    .dot { width: 11px; height: 11px; border-radius: 50%; }
+    .dot.r { background: #ff5f57; }
+    .dot.y { background: #febc2e; }
+    .dot.g { background: #28c840; }
+    .mockup-title {
+      margin-left: 12px;
+      font-family: 'DM Mono', monospace;
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 0.14em;
+      color: var(--ink-dim);
+    }
+    .mockup-body { padding: 22px; }
+    .section-label {
+      font-family: 'DM Mono', monospace;
+      font-size: 10px;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: var(--ink-dim);
+      margin-bottom: 14px;
+    }
+    .agent-rows {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      margin-bottom: 22px;
+    }
+    .agent-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 12px 14px;
+      border-radius: 10px;
+      background: #0e0e0e;
+      border: 1px solid var(--line);
+      font-size: 13px;
+    }
+    .agent-row .name {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      color: var(--ink);
+    }
+    .agent-icon {
+      width: 22px; height: 22px;
+      border-radius: 6px;
+      background: var(--gold-mid);
+      border: 1px solid var(--gold-line);
+    }
+    .status-pill {
+      padding: 4px 10px;
+      border-radius: 100px;
+      font-family: 'DM Mono', monospace;
+      font-size: 9px;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+    }
+    .status-pill.running {
+      background: rgba(212,175,55,0.12);
+      color: var(--gold);
+      border: 1px solid var(--gold-line);
+    }
+    .status-pill.done {
+      background: rgba(90,196,125,0.08);
+      color: var(--green);
+      border: 1px solid rgba(90,196,125,0.2);
+    }
+    .status-pill.queue {
+      background: rgba(255,255,255,0.04);
+      color: var(--ink-dim);
+      border: 1px solid var(--line);
+    }
+
+    .hitl-card {
+      padding: 18px;
+      border-radius: 12px;
+      background: #0e0e0e;
+      border: 1px solid var(--gold-line);
+      margin-bottom: 18px;
+    }
+    .hitl-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 14px;
+    }
+    .hitl-title {
+      font-family: 'DM Mono', monospace;
+      font-size: 10px;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: var(--gold);
+    }
+    .hitl-meta {
+      font-family: 'DM Mono', monospace;
+      font-size: 10px;
+      color: var(--ink-dim);
+    }
+    .hitl-copy {
+      font-size: 14px;
+      color: var(--ink);
+      line-height: 1.55;
+      margin-bottom: 14px;
+    }
+    .hitl-copy span { color: var(--gold); }
+    .hitl-actions { display: flex; gap: 8px; }
+    .hitl-btn {
+      padding: 8px 14px;
+      border-radius: 100px;
+      font-family: 'DM Sans', sans-serif;
+      font-size: 12px;
+      font-weight: 500;
+      border: 1px solid var(--line);
+      background: transparent;
+      color: var(--ink-muted);
+      cursor: pointer;
+    }
+    .hitl-btn.approve {
+      background: var(--gold);
+      color: #101010;
+      border-color: var(--gold);
+    }
+
+    .thumbs {
+      display: flex;
+      gap: 8px;
+    }
+    .thumb {
+      flex: 1;
+      aspect-ratio: 9/16;
+      border-radius: 8px;
+      background: #0c0c0c;
+      border: 1px solid var(--line);
+      position: relative;
+      overflow: hidden;
+    }
+    .thumb::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(160deg, #1c1c1c 0%, #0c0c0c 70%);
+    }
+    .thumb::after {
+      content: '';
+      position: absolute;
+      left: 50%; top: 50%;
+      transform: translate(-50%, -50%);
+      width: 22px; height: 22px;
+      border-radius: 50%;
+      background: rgba(212,175,55,0.18);
+      border: 1px solid var(--gold-line);
+    }
+    .thumb.active { border-color: var(--gold-line); }
+    .thumb.active::before { background: linear-gradient(160deg, #2a220f 0%, #120e05 70%); }
+
+    /* ---------- SECTION 2: TRUST ---------- */
+    section { padding: 120px 0; border-top: 1px solid var(--line); }
+    .eyebrow {
+      font-family: 'DM Mono', monospace;
+      font-size: 11px;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: var(--gold);
+      margin-bottom: 24px;
+    }
+    .h2 { font-size: clamp(34px, 3.8vw, 52px); margin-bottom: 20px; }
+
+    .stat-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 1px;
+      background: var(--line);
+      border: 1px solid var(--line);
+      border-radius: 18px;
+      overflow: hidden;
+      margin-top: 60px;
+      margin-bottom: 80px;
+    }
+    .stat {
+      padding: 40px 36px;
+      background: var(--surface);
+    }
+    .stat-num {
+      font-family: 'Syne', sans-serif;
+      font-weight: 800;
+      font-size: 44px;
+      letter-spacing: -0.03em;
+      color: var(--gold);
+      line-height: 1;
+      margin-bottom: 12px;
+    }
+    .stat-label {
+      font-size: 15px;
+      color: var(--ink-muted);
+    }
+
+    /* Invoice comparison */
+    .compare {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 32px;
+      align-items: stretch;
+    }
+    .invoice {
+      padding: 32px;
+      border-radius: 16px;
+      border: 1px solid var(--line);
+      background: var(--surface);
+      position: relative;
+      overflow: hidden;
+    }
+    .invoice.agency {
+      opacity: 0.85;
+    }
+    .invoice.agency::after {
+      content: '';
+      position: absolute;
+      top: 50%; left: -10%;
+      width: 120%; height: 2px;
+      background: var(--red);
+      transform: rotate(-8deg);
+      opacity: 0.85;
+      box-shadow: 0 0 14px rgba(224,86,86,0.35);
+    }
+    .invoice.ours {
+      border-color: var(--gold-line);
+      background: linear-gradient(180deg, var(--surface) 0%, rgba(20,20,20,0.95) 100%);
+    }
+    .inv-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 24px;
+      padding-bottom: 20px;
+      border-bottom: 1px solid var(--line);
+    }
+    .inv-title {
+      font-family: 'Syne', sans-serif;
+      font-weight: 700;
+      font-size: 18px;
+    }
+    .inv-tag {
+      font-family: 'DM Mono', monospace;
+      font-size: 10px;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+      color: var(--ink-dim);
+    }
+    .inv-rows {
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+      margin-bottom: 24px;
+    }
+    .inv-row {
+      display: flex;
+      justify-content: space-between;
+      font-size: 14px;
+      color: var(--ink-muted);
+    }
+    .inv-row strong { color: var(--ink); font-weight: 500; }
+    .inv-total {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      padding-top: 20px;
+      border-top: 1px solid var(--line);
+    }
+    .inv-total-label {
+      font-family: 'DM Mono', monospace;
+      font-size: 11px;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: var(--ink-dim);
+    }
+    .inv-total-num {
+      font-family: 'Syne', sans-serif;
+      font-weight: 800;
+      font-size: 32px;
+      letter-spacing: -0.02em;
+    }
+    .invoice.ours .inv-total-num { color: var(--gold); }
+
+    /* ---------- SECTION 3: HOW IT WORKS ---------- */
+    .how-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 24px;
+      margin-top: 60px;
+    }
+    .step {
+      position: relative;
+      padding: 40px 32px;
+      border: 1px solid var(--line);
+      border-radius: 18px;
+      background: var(--surface);
+      overflow: hidden;
+      transition: transform 0.3s ease, border-color 0.3s ease;
+    }
+    .step:hover {
+      transform: translateY(-4px);
+      border-color: var(--gold-line);
+    }
+    .step-num {
+      position: absolute;
+      top: 10px; right: 24px;
+      font-family: 'Syne', sans-serif;
+      font-weight: 800;
+      font-size: 180px;
+      line-height: 1;
+      color: var(--ink);
+      opacity: 0.06;
+      letter-spacing: -0.05em;
+      pointer-events: none;
+    }
+    .step-icon {
+      width: 52px; height: 52px;
+      border-radius: 14px;
+      background: var(--gold-mid);
+      border: 1px solid var(--gold-line);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 28px;
+    }
+    .step-icon svg { width: 22px; height: 22px; stroke: var(--gold); }
+    .step-title {
+      font-family: 'Syne', sans-serif;
+      font-weight: 700;
+      font-size: 22px;
+      letter-spacing: -0.02em;
+      margin-bottom: 14px;
+      position: relative;
+    }
+    .step-desc {
+      font-size: 15px;
+      color: var(--ink-muted);
+      position: relative;
+    }
+
+    /* ---------- SECTION 4: BENTO ---------- */
+    .bento {
+      display: grid;
+      grid-template-columns: repeat(12, 1fr);
+      gap: 24px;
+      margin-top: 60px;
+    }
+    .cell {
+      padding: 36px;
+      border: 1px solid var(--gold-line);
+      border-radius: 18px;
+      background: linear-gradient(180deg, rgba(20,20,20,0.85) 0%, rgba(14,14,14,0.85) 100%);
+      backdrop-filter: blur(6px);
+      -webkit-backdrop-filter: blur(6px);
+      position: relative;
+      overflow: hidden;
+      transition: transform 0.3s ease, border-color 0.3s ease;
+    }
+    .cell:hover { transform: translateY(-3px); }
+    .cell-title {
+      font-family: 'Syne', sans-serif;
+      font-weight: 700;
+      font-size: 22px;
+      letter-spacing: -0.02em;
+      margin-bottom: 14px;
+      line-height: 1.2;
+    }
+    .cell-title em { font-style: normal; color: var(--gold); }
+    .cell-desc {
+      font-size: 15px;
+      color: var(--ink-muted);
+      margin-bottom: 26px;
+      max-width: 420px;
+    }
+    .span-8 { grid-column: span 8; }
+    .span-7 { grid-column: span 7; }
+    .span-6 { grid-column: span 6; }
+    .span-5 { grid-column: span 5; }
+    .span-4 { grid-column: span 4; }
+
+    /* Pipeline viz */
+    .pipeline {
+      display: flex;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 10px;
+    }
+    .pipe-node {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 10px 16px;
+      border-radius: 100px;
+      border: 1px solid var(--line);
+      background: #0e0e0e;
+      font-family: 'DM Mono', monospace;
+      font-size: 11px;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--ink-muted);
+    }
+    .pipe-node.active {
+      border-color: var(--gold-line);
+      background: rgba(212,175,55,0.08);
+      color: var(--gold);
+    }
+    .pipe-node .bullet {
+      width: 6px; height: 6px; border-radius: 50%;
+      background: var(--ink-dim);
+    }
+    .pipe-node.active .bullet {
+      background: var(--gold);
+      box-shadow: 0 0 8px var(--gold);
+    }
+    .pipe-arrow {
+      color: var(--ink-dim);
+      font-family: 'DM Mono', monospace;
+      font-size: 12px;
+    }
+
+    /* Calendar viz */
+    .cal {
+      display: grid;
+      grid-template-columns: repeat(7, 1fr);
+      gap: 6px;
+      margin-top: 12px;
+    }
+    .cal-day {
+      aspect-ratio: 1;
+      border-radius: 8px;
+      border: 1px solid var(--line);
+      background: #0e0e0e;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: 'DM Mono', monospace;
+      font-size: 11px;
+      color: var(--ink-dim);
+    }
+    .cal-day.post {
+      border-color: var(--gold-line);
+      background: rgba(212,175,55,0.1);
+      color: var(--gold);
+    }
+    .cal-day.today {
+      background: var(--gold);
+      color: #101010;
+      border-color: var(--gold);
+    }
+
+    /* Cost meters */
+    .meters { display: flex; flex-direction: column; gap: 18px; margin-top: 4px; }
+    .meter-row {
+      display: grid;
+      grid-template-columns: 130px 1fr 70px;
+      align-items: center;
+      gap: 14px;
+    }
+    .meter-label {
+      font-family: 'DM Mono', monospace;
+      font-size: 11px;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--ink-muted);
+    }
+    .meter-bar {
+      height: 6px;
+      border-radius: 100px;
+      background: rgba(255,255,255,0.05);
+      overflow: hidden;
+    }
+    .meter-fill {
+      height: 100%;
+      background: linear-gradient(90deg, #a8861f 0%, var(--gold) 100%);
+      border-radius: 100px;
+    }
+    .meter-val {
+      font-family: 'DM Mono', monospace;
+      font-size: 12px;
+      color: var(--gold);
+      text-align: right;
+    }
+
+    /* Brand passport card */
+    .passport {
+      margin-top: 10px;
+      padding: 20px;
+      border-radius: 12px;
+      border: 1px solid var(--line);
+      background: #0e0e0e;
+    }
+    .passport-row {
+      display: flex;
+      justify-content: space-between;
+      padding: 10px 0;
+      font-size: 13px;
+      border-bottom: 1px dashed var(--line);
+    }
+    .passport-row:last-child { border-bottom: none; }
+    .passport-row .k {
+      font-family: 'DM Mono', monospace;
+      font-size: 10px;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+      color: var(--ink-dim);
+    }
+    .passport-row .v { color: var(--ink); }
+
+    /* HITL mini */
+    .hitl-mini {
+      margin-top: 10px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+    .hitl-line {
+      padding: 12px 14px;
+      border-radius: 10px;
+      background: #0e0e0e;
+      border: 1px solid var(--line);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      font-size: 13px;
+    }
+    .hitl-line .copy {
+      color: var(--ink);
+      flex: 1;
+      overflow: hidden;
+      white-space: nowrap;
+      text-overflow: ellipsis;
+      margin-right: 12px;
+    }
+    .hitl-line .dots { display: flex; gap: 6px; }
+    .hitl-line .dots span {
+      width: 8px; height: 8px; border-radius: 50%;
+      border: 1px solid var(--line);
+    }
+    .hitl-line .dots .ok { background: var(--gold); border-color: var(--gold); }
+    .hitl-line .dots .no { background: transparent; }
+
+    /* Market flags */
+    .markets {
+      display: flex;
+      gap: 12px;
+      margin-top: 10px;
+      flex-wrap: wrap;
+    }
+    .market {
+      flex: 1;
+      min-width: 140px;
+      padding: 16px 18px;
+      border-radius: 12px;
+      border: 1px solid var(--line);
+      background: #0e0e0e;
+    }
+    .market .flag {
+      font-family: 'DM Mono', monospace;
+      font-size: 10px;
+      letter-spacing: 0.2em;
+      color: var(--gold);
+      margin-bottom: 8px;
+    }
+    .market .line {
+      font-size: 14px;
+      color: var(--ink);
+      line-height: 1.4;
+    }
+
+    /* ---------- SECTION 5: PRICING ---------- */
+    .price-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 24px;
+      margin-top: 60px;
+      align-items: stretch;
+    }
+    .plan {
+      position: relative;
+      padding: 40px 34px;
+      border: 1px solid var(--line);
+      border-radius: 20px;
+      background: var(--surface);
+      display: flex;
+      flex-direction: column;
+    }
+    .plan.featured {
+      border-color: var(--gold-line);
+      background: linear-gradient(180deg, rgba(212,175,55,0.06) 0%, rgba(20,20,20,0.95) 55%);
+    }
+    .popular-tab {
+      position: absolute;
+      top: -12px; left: 34px;
+      padding: 6px 14px;
+      border-radius: 100px;
+      background: var(--gold);
+      color: #101010;
+      font-family: 'DM Mono', monospace;
+      font-size: 10px;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+      font-weight: 500;
+    }
+    .plan-name {
+      font-family: 'DM Mono', monospace;
+      font-size: 11px;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: var(--ink-dim);
+      margin-bottom: 22px;
+    }
+    .plan-price {
+      font-family: 'Syne', sans-serif;
+      font-weight: 800;
+      font-size: 52px;
+      letter-spacing: -0.03em;
+      line-height: 1;
+      margin-bottom: 8px;
+    }
+    .plan-price small {
+      font-family: 'DM Sans', sans-serif;
+      font-weight: 300;
+      font-size: 15px;
+      color: var(--ink-dim);
+      letter-spacing: 0;
+      margin-left: 6px;
+    }
+    .plan-hint {
+      font-size: 14px;
+      color: var(--ink-muted);
+      margin-bottom: 28px;
+    }
+    .plan-divider {
+      height: 1px;
+      background: var(--line);
+      margin-bottom: 28px;
+    }
+    .plan-features {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+      margin-bottom: 34px;
+      flex: 1;
+    }
+    .plan-features li {
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+      font-size: 14px;
+      color: var(--ink-muted);
+    }
+    .tick {
+      width: 18px; height: 18px;
+      border-radius: 50%;
+      background: var(--gold-mid);
+      border: 1px solid var(--gold-line);
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      margin-top: 2px;
+    }
+    .tick svg { width: 10px; height: 10px; stroke: var(--gold); }
+
+    /* ---------- SECTION 6: FINAL CTA ---------- */
+    .final {
+      padding: 160px 0;
+      position: relative;
+      text-align: center;
+      border-top: 1px solid var(--line);
+    }
+    .final::before {
+      content: '';
+      position: absolute;
+      top: 50%; left: 50%;
+      transform: translate(-50%, -50%);
+      width: 1200px; height: 800px;
+      background: radial-gradient(ellipse, var(--gold-soft) 0%, transparent 60%);
+      pointer-events: none;
+      z-index: 0;
+    }
+    .final .inner { position: relative; z-index: 2; }
+    .scarcity {
+      display: inline-flex;
+      align-items: center;
+      gap: 14px;
+      padding: 12px 22px;
+      border-radius: 100px;
+      border: 1px solid var(--gold-line);
+      background: rgba(212,175,55,0.04);
+      margin-bottom: 44px;
+    }
+    .scarcity-dots { display: flex; gap: 8px; }
+    .scarcity-dot {
+      width: 9px; height: 9px; border-radius: 50%;
+      border: 1px solid var(--gold-line);
+    }
+    .scarcity-dot.taken { background: var(--gold); border-color: var(--gold); }
+    .scarcity-label {
+      font-family: 'DM Mono', monospace;
+      font-size: 11px;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+      color: var(--gold);
+    }
+    .final-h {
+      font-size: clamp(40px, 5vw, 68px);
+      max-width: 880px;
+      margin: 0 auto 44px;
+      line-height: 1.08;
+    }
+    .final .btn {
+      padding: 22px 38px;
+      font-size: 17px;
+    }
+
+    /* ---------- FOOTER ---------- */
+    footer {
+      padding: 32px 0;
+      border-top: 1px solid var(--line);
+    }
+    .foot {
+      max-width: var(--max);
+      margin: 0 auto;
+      padding: 0 32px;
+      display: grid;
+      grid-template-columns: 1fr auto 1fr;
+      align-items: center;
+      gap: 24px;
+    }
+    .foot-links {
+      display: flex;
+      gap: 26px;
+      justify-content: center;
+    }
+    .foot-links a {
+      font-family: 'DM Mono', monospace;
+      font-size: 11px;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+      color: var(--ink-dim);
+      transition: color 0.2s ease;
+    }
+    .foot-links a:hover { color: var(--ink); }
+    .foot-copy {
+      text-align: right;
+      font-family: 'DM Mono', monospace;
+      font-size: 11px;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: var(--ink-dim);
+    }
+
+    /* ---------- SCROLL REVEAL ---------- */
+    .reveal {
+      opacity: 0;
+      transform: translateY(24px);
+      transition: opacity 0.8s ease, transform 0.8s ease;
+    }
+    .reveal.in {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    /* ---------- RESPONSIVE (down to 900px) ---------- */
+    @media (max-width: 1100px) {
+      .hero-grid { grid-template-columns: 1fr; gap: 60px; }
+      .hero { padding: 140px 0 100px; }
+      .compare { grid-template-columns: 1fr; }
+      .how-grid { grid-template-columns: 1fr; }
+      .price-grid { grid-template-columns: 1fr; }
+      .stat-grid { grid-template-columns: repeat(2, 1fr); }
+      .span-8, .span-7, .span-6, .span-5, .span-4 { grid-column: span 12; }
+      .nav-links { display: none; }
+      .foot { grid-template-columns: 1fr; text-align: center; }
+      .foot-copy, .foot-links { justify-content: center; text-align: center; }
+    }
+    @media (max-width: 600px) {
+      .wrap { padding: 0 20px; }
+      .stat-grid { grid-template-columns: 1fr; }
+      .cta-row { flex-direction: column; align-items: stretch; }
+      .btn { justify-content: center; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ========== NAV ========== -->
+  <nav class="nav">
+    <div class="nav-inner">
+      <a href="#" class="logo"><span class="logo-mark"></span> Converza</a>
+      <div class="nav-links">
+        <a href="#how">How it works</a>
+        <a href="#features">Features</a>
+        <a href="#pricing">Pricing</a>
+        <a href="#cta">Pilot</a>
+      </div>
+      <a href="#cta" class="btn btn-gold nav-cta">Book Pilot →</a>
+    </div>
+  </nav>
+
+  <!-- ========== SECTION 1: HERO ========== -->
+  <section class="hero">
+    <div class="wrap">
+      <div class="hero-grid">
+
+        <div class="hero-left reveal">
+          <div class="badge">
+            <span class="pulse"></span>
+            <span>Now in closed beta · 5 pilot spots</span>
+          </div>
+
+          <h1 class="h1">
+            Replace Your <em>$5,000 Agency.</em><br/>
+            Launch <em>60 Ads in 24 Hours.</em>
+          </h1>
+
+          <p class="sub">
+            Without hiring freelancers, briefing editors, or writing a single script.
+            Your brand. Your voice. Posted on schedule.
+          </p>
+
+          <div class="cta-row">
+            <a href="#cta" class="btn btn-gold">Book Your $500 Pilot →</a>
+            <a href="#how" class="btn btn-ghost">See how it works</a>
+          </div>
+
+          <div class="risk-list">
+            <div class="risk">
+              <span class="check"><svg viewBox="0 0 24 24" fill="none" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span>
+              Cancel before Day 14 — full refund, no questions.
+            </div>
+            <div class="risk">
+              <span class="check"><svg viewBox="0 0 24 24" fill="none" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span>
+              Keep every ad and asset we generate, even if you walk away.
+            </div>
+            <div class="risk">
+              <span class="check"><svg viewBox="0 0 24 24" fill="none" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span>
+              Native US &amp; Dubai-market copy. Not Google Translate.
+            </div>
+          </div>
+        </div>
+
+        <!-- Product mockup -->
+        <div class="hero-right reveal">
+          <div class="mockup">
+            <div class="mockup-titlebar">
+              <span class="dot r"></span><span class="dot y"></span><span class="dot g"></span>
+              <span class="mockup-title">Converza · Command Center</span>
+            </div>
+            <div class="mockup-body">
+
+              <div class="section-label">Campaign / Fall Launch · Market US</div>
+
+              <div class="agent-rows">
+                <div class="agent-row">
+                  <div class="name"><span class="agent-icon"></span> Orchestrator</div>
+                  <span class="status-pill done">Done</span>
+                </div>
+                <div class="agent-row">
+                  <div class="name"><span class="agent-icon"></span> Copywriter · 60 variants</div>
+                  <span class="status-pill running">Running</span>
+                </div>
+                <div class="agent-row">
+                  <div class="name"><span class="agent-icon"></span> Video Editor · Cuts 18/60</div>
+                  <span class="status-pill running">Running</span>
+                </div>
+                <div class="agent-row">
+                  <div class="name"><span class="agent-icon"></span> Scheduler</div>
+                  <span class="status-pill queue">Queued</span>
+                </div>
+              </div>
+
+              <div class="hitl-card">
+                <div class="hitl-head">
+                  <span class="hitl-title">Approval Needed · Ad #12</span>
+                  <span class="hitl-meta">0:14s · Reels</span>
+                </div>
+                <div class="hitl-copy">
+                  "Your skin routine is working against you. <span>Swap 3 products for 1.</span> Free shipping to the US until Friday."
+                </div>
+                <div class="hitl-actions">
+                  <button class="hitl-btn approve">✓ Approve &amp; schedule</button>
+                  <button class="hitl-btn">Request changes</button>
+                </div>
+              </div>
+
+              <div class="thumbs">
+                <div class="thumb active"></div>
+                <div class="thumb"></div>
+                <div class="thumb"></div>
+                <div class="thumb"></div>
+                <div class="thumb"></div>
+              </div>
+
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- ========== SECTION 2: WALL OF TRUST ========== -->
+  <section id="trust">
+    <div class="wrap">
+      <div class="reveal">
+        <div class="eyebrow">The math</div>
+        <h2 class="h2">One subscription. The work of five people.</h2>
+        <p style="max-width: 620px; margin-top: 12px;">
+          We ran the numbers against what CIS brands pay Western agencies. Here is what the average Converza run looks like after 30 days.
+        </p>
+      </div>
+
+      <!-- Stat grid -->
+      <div class="stat-grid reveal">
+        <div class="stat">
+          <div class="stat-num">$3,800</div>
+          <div class="stat-label">Average monthly savings vs. a Western marketing agency.</div>
+        </div>
+        <div class="stat">
+          <div class="stat-num">60</div>
+          <div class="stat-label">Ad variants produced per run — across hooks, formats, and markets.</div>
+        </div>
+        <div class="stat">
+          <div class="stat-num">19</div>
+          <div class="stat-label">Specialist AI workers in the Converza swarm, running in parallel.</div>
+        </div>
+        <div class="stat">
+          <div class="stat-num">0</div>
+          <div class="stat-label">Weekly status meetings. No Zoom. No Slack pings at 2am.</div>
+        </div>
+        <div class="stat">
+          <div class="stat-num">24h</div>
+          <div class="stat-label">From brief to a full month of ads sitting in your approval inbox.</div>
+        </div>
+        <div class="stat">
+          <div class="stat-num">14d</div>
+          <div class="stat-label">Cancel window. Refund in full. Keep every asset.</div>
+        </div>
+      </div>
+
+      <!-- Invoice compare -->
+      <div class="compare reveal">
+        <div class="invoice agency">
+          <div class="inv-head">
+            <div class="inv-title">Western Agency · Monthly</div>
+            <div class="inv-tag">Invoice #A-0421</div>
+          </div>
+          <div class="inv-rows">
+            <div class="inv-row"><span>Account manager retainer</span><strong>$1,400</strong></div>
+            <div class="inv-row"><span>Copywriter · 2 revision rounds</span><strong>$900</strong></div>
+            <div class="inv-row"><span>Video editor · 60 cuts</span><strong>$1,800</strong></div>
+            <div class="inv-row"><span>Scheduling &amp; QA</span><strong>$600</strong></div>
+            <div class="inv-row"><span>Project management fee</span><strong>$500</strong></div>
+          </div>
+          <div class="inv-total">
+            <span class="inv-total-label">Total</span>
+            <span class="inv-total-num">$5,200<small style="font-size:14px;color:var(--ink-dim);font-family:'DM Sans';font-weight:300;letter-spacing:0;">/mo</small></span>
+          </div>
+        </div>
+
+        <div class="invoice ours">
+          <div class="inv-head">
+            <div class="inv-title">Converza · Pilot Run</div>
+            <div class="inv-tag">Invoice #C-0001</div>
+          </div>
+          <div class="inv-rows">
+            <div class="inv-row"><span>60 native-English ad variants</span><strong>Included</strong></div>
+            <div class="inv-row"><span>Video cuts &amp; thumbnails</span><strong>Included</strong></div>
+            <div class="inv-row"><span>Auto-scheduling &amp; posting</span><strong>Included</strong></div>
+            <div class="inv-row"><span>HITL approval dashboard</span><strong>Included</strong></div>
+            <div class="inv-row"><span>Meetings required</span><strong>Zero</strong></div>
+          </div>
+          <div class="inv-total">
+            <span class="inv-total-label">First month</span>
+            <span class="inv-total-num">$500</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ========== SECTION 3: HOW IT WORKS ========== -->
+  <section id="how">
+    <div class="wrap">
+      <div class="reveal">
+        <div class="eyebrow">How it works</div>
+        <h2 class="h2">Three steps. Most of it is us.</h2>
+        <p style="max-width: 600px; margin-top: 12px;">
+          You write your brand voice once. We do the rest. You approve with one click.
+        </p>
+      </div>
+
+      <div class="how-grid">
+        <div class="step reveal">
+          <div class="step-num">01</div>
+          <div class="step-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <rect x="3" y="5" width="18" height="14" rx="2"/>
+              <path d="M3 10h18"/>
+              <path d="M7 15h4"/>
+            </svg>
+          </div>
+          <div class="step-title">Define your brand passport.</div>
+          <div class="step-desc">
+            Fifteen minutes. You tell us what you sell, who buys it, and the voice. We save it once — forever.
+          </div>
+        </div>
+
+        <div class="step reveal">
+          <div class="step-num">02</div>
+          <div class="step-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M9 11l3 3L22 4"/>
+              <path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/>
+            </svg>
+          </div>
+          <div class="step-title">Review what lands in your inbox.</div>
+          <div class="step-desc">
+            Every ad, caption, and hook lands in one approval feed. Tap approve, tap reject, or ask for a tweak.
+          </div>
+        </div>
+
+        <div class="step reveal">
+          <div class="step-num">03</div>
+          <div class="step-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M5 12l4 4L19 6"/>
+              <path d="M12 2v4"/>
+              <path d="M12 20v2"/>
+            </svg>
+          </div>
+          <div class="step-title">Click publish. Watch it run.</div>
+          <div class="step-desc">
+            Approved assets post to your channels on the schedule you set. You watch the dashboard, not the clock.
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ========== SECTION 4: BENTO FEATURES ========== -->
+  <section id="features">
+    <div class="wrap">
+      <div class="reveal">
+        <div class="eyebrow">What's inside</div>
+        <h2 class="h2">Everything a five-person team would do. Without the five people.</h2>
+      </div>
+
+      <div class="bento">
+
+        <!-- Pipeline -->
+        <div class="cell span-8 reveal">
+          <div class="cell-title">Nineteen specialist agents <em>SO THAT</em> your campaign ships in a day, not a month.</div>
+          <p class="cell-desc">
+            Copywriting, video cuts, hook testing, scheduling — each task has its own agent. They work in parallel, not in line.
+          </p>
+          <div class="pipeline">
+            <span class="pipe-node"><span class="bullet"></span>Orchestrator</span>
+            <span class="pipe-arrow">→</span>
+            <span class="pipe-node active"><span class="bullet"></span>Copywriter</span>
+            <span class="pipe-arrow">→</span>
+            <span class="pipe-node active"><span class="bullet"></span>Video editor</span>
+            <span class="pipe-arrow">→</span>
+            <span class="pipe-node"><span class="bullet"></span>Scheduler</span>
+            <span class="pipe-arrow">→</span>
+            <span class="pipe-node"><span class="bullet"></span>Analytics</span>
+          </div>
+        </div>
+
+        <!-- Calendar -->
+        <div class="cell span-4 reveal">
+          <div class="cell-title">Posting calendar <em>SO THAT</em> you stop setting alarms for 9am Tuesday.</div>
+          <p class="cell-desc">
+            We post when your audience is awake. You see the week ahead before it starts.
+          </p>
+          <div class="cal">
+            <div class="cal-day">M</div>
+            <div class="cal-day post">T</div>
+            <div class="cal-day today">W</div>
+            <div class="cal-day post">T</div>
+            <div class="cal-day">F</div>
+            <div class="cal-day post">S</div>
+            <div class="cal-day">S</div>
+          </div>
+        </div>
+
+        <!-- Cost meters -->
+        <div class="cell span-7 reveal">
+          <div class="cell-title">Per-campaign cost meters <em>SO THAT</em> you know the dollar spend before you commit.</div>
+          <p class="cell-desc">
+            Every run shows the exact cost by campaign type. No surprise invoices at month end.
+          </p>
+          <div class="meters">
+            <div class="meter-row">
+              <span class="meter-label">TikTok · US</span>
+              <div class="meter-bar"><div class="meter-fill" style="width: 64%"></div></div>
+              <span class="meter-val">$128</span>
+            </div>
+            <div class="meter-row">
+              <span class="meter-label">Instagram · UAE</span>
+              <div class="meter-bar"><div class="meter-fill" style="width: 42%"></div></div>
+              <span class="meter-val">$84</span>
+            </div>
+            <div class="meter-row">
+              <span class="meter-label">Meta · Retargeting</span>
+              <div class="meter-bar"><div class="meter-fill" style="width: 28%"></div></div>
+              <span class="meter-val">$56</span>
+            </div>
+            <div class="meter-row">
+              <span class="meter-label">YouTube Shorts</span>
+              <div class="meter-bar"><div class="meter-fill" style="width: 18%"></div></div>
+              <span class="meter-val">$36</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Brand passport -->
+        <div class="cell span-5 reveal">
+          <div class="cell-title">One brand passport forever <em>SO THAT</em> you never re-brief a freelancer again.</div>
+          <p class="cell-desc">
+            Tone, promise, pricing, audience. Saved once. Re-used on every run.
+          </p>
+          <div class="passport">
+            <div class="passport-row"><span class="k">Brand</span><span class="v">Osman Skincare</span></div>
+            <div class="passport-row"><span class="k">Voice</span><span class="v">Direct · confident · warm</span></div>
+            <div class="passport-row"><span class="k">Markets</span><span class="v">US · UAE</span></div>
+            <div class="passport-row"><span class="k">Promise</span><span class="v">3 products in 1 bottle</span></div>
+          </div>
+        </div>
+
+        <!-- HITL -->
+        <div class="cell span-6 reveal">
+          <div class="cell-title">Human-in-the-loop approval <em>SO THAT</em> nothing ships without your eyes on it.</div>
+          <p class="cell-desc">
+            Approve, reject, or ask for a revision with one tap. Your call, every time.
+          </p>
+          <div class="hitl-mini">
+            <div class="hitl-line">
+              <span class="copy">"Swap 3 products for 1. Free shipping until Friday."</span>
+              <span class="dots"><span class="ok"></span><span class="no"></span></span>
+            </div>
+            <div class="hitl-line">
+              <span class="copy">"Your skin routine is lying to you."</span>
+              <span class="dots"><span class="ok"></span><span class="no"></span></span>
+            </div>
+            <div class="hitl-line">
+              <span class="copy">"Built in Tashkent. Trusted from Dubai to NYC."</span>
+              <span class="dots"><span class="ok"></span><span class="no"></span></span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Markets -->
+        <div class="cell span-6 reveal">
+          <div class="cell-title">Native US &amp; Dubai copy <em>SO THAT</em> your ads don't read like a translation.</div>
+          <p class="cell-desc">
+            Each market gets its own voice. Same product, different culture, different words.
+          </p>
+          <div class="markets">
+            <div class="market">
+              <div class="flag">US · English</div>
+              <div class="line">"One bottle. Three products. Zero clutter on the bathroom shelf."</div>
+            </div>
+            <div class="market">
+              <div class="flag">UAE · English</div>
+              <div class="line">"The one product your routine has been waiting for. Delivered to Dubai in 48h."</div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- ========== SECTION 5: PRICING ========== -->
+  <section id="pricing">
+    <div class="wrap">
+      <div class="reveal">
+        <div class="eyebrow">Pricing</div>
+        <h2 class="h2">Start with $500. Cancel on Day 13 if we don't earn the keep.</h2>
+      </div>
+
+      <div class="price-grid">
+
+        <!-- Pilot -->
+        <div class="plan reveal">
+          <div class="plan-name">Pilot</div>
+          <div class="plan-price">$500<small>first month</small></div>
+          <div class="plan-hint">For founders testing if AI can replace an agency on one brand.</div>
+          <div class="plan-divider"></div>
+          <ul class="plan-features">
+            <li><span class="tick"><svg viewBox="0 0 24 24" fill="none" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span> 1 brand · 1 market</li>
+            <li><span class="tick"><svg viewBox="0 0 24 24" fill="none" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span> Up to 60 ad variants</li>
+            <li><span class="tick"><svg viewBox="0 0 24 24" fill="none" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span> HITL approval dashboard</li>
+            <li><span class="tick"><svg viewBox="0 0 24 24" fill="none" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span> Email support · 24h reply</li>
+            <li><span class="tick"><svg viewBox="0 0 24 24" fill="none" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span> 14-day money-back</li>
+          </ul>
+          <a href="#cta" class="btn btn-ghost">Start the pilot</a>
+        </div>
+
+        <!-- Growth -->
+        <div class="plan featured reveal">
+          <div class="popular-tab">Most popular</div>
+          <div class="plan-name">Growth</div>
+          <div class="plan-price">$1,500<small>/ month</small></div>
+          <div class="plan-hint">For brands running real campaigns across two or three markets.</div>
+          <div class="plan-divider"></div>
+          <ul class="plan-features">
+            <li><span class="tick"><svg viewBox="0 0 24 24" fill="none" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span> Up to 3 brands · unlimited markets</li>
+            <li><span class="tick"><svg viewBox="0 0 24 24" fill="none" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span> Up to 250 ad variants per month</li>
+            <li><span class="tick"><svg viewBox="0 0 24 24" fill="none" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span> Priority Slack channel</li>
+            <li><span class="tick"><svg viewBox="0 0 24 24" fill="none" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span> Dedicated success manager</li>
+            <li><span class="tick"><svg viewBox="0 0 24 24" fill="none" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span> Weekly performance report</li>
+          </ul>
+          <a href="#cta" class="btn btn-gold">Start the pilot</a>
+        </div>
+
+        <!-- Enterprise -->
+        <div class="plan reveal">
+          <div class="plan-name">Enterprise</div>
+          <div class="plan-price">Custom</div>
+          <div class="plan-hint">For teams running many brands or a full in-house marketing stack.</div>
+          <div class="plan-divider"></div>
+          <ul class="plan-features">
+            <li><span class="tick"><svg viewBox="0 0 24 24" fill="none" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span> Unlimited brands &amp; markets</li>
+            <li><span class="tick"><svg viewBox="0 0 24 24" fill="none" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span> On-prem or VPC deployment</li>
+            <li><span class="tick"><svg viewBox="0 0 24 24" fill="none" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span> SLA &amp; legal review</li>
+            <li><span class="tick"><svg viewBox="0 0 24 24" fill="none" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span> Custom agent integrations</li>
+            <li><span class="tick"><svg viewBox="0 0 24 24" fill="none" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span> Quarterly strategy session</li>
+          </ul>
+          <a href="#cta" class="btn btn-ghost">Book a call</a>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- ========== SECTION 6: FINAL CTA ========== -->
+  <section id="cta" class="final">
+    <div class="wrap inner">
+
+      <div class="scarcity reveal">
+        <div class="scarcity-dots">
+          <span class="scarcity-dot taken"></span>
+          <span class="scarcity-dot taken"></span>
+          <span class="scarcity-dot"></span>
+          <span class="scarcity-dot"></span>
+          <span class="scarcity-dot"></span>
+        </div>
+        <span class="scarcity-label">3 of 5 pilot spots remaining</span>
+      </div>
+
+      <h2 class="final-h reveal">
+        Your competitors are already running more ads than you.
+      </h2>
+
+      <a href="mailto:pilot@converza.ai" class="btn btn-gold reveal">Secure One of Our 5 Pilot Spots →</a>
+
+    </div>
+  </section>
+
+  <!-- ========== FOOTER ========== -->
+  <footer>
+    <div class="foot">
+      <div class="logo"><span class="logo-mark"></span> Converza</div>
+      <div class="foot-links">
+        <a href="#how">How it works</a>
+        <a href="#features">Features</a>
+        <a href="#pricing">Pricing</a>
+        <a href="mailto:hello@converza.ai">Contact</a>
+      </div>
+      <div class="foot-copy">© 2026 Converza · Tashkent</div>
+    </div>
+  </footer>
+
+  <!-- ========== SCROLL REVEAL ========== -->
+  <script>
+    const io = new IntersectionObserver((entries) => {
+      entries.forEach((e) => {
+        if (e.isIntersecting) {
+          e.target.classList.add('in');
+          io.unobserve(e.target);
+        }
+      });
+    }, { threshold: 0.12, rootMargin: '0px 0px -40px 0px' });
+
+    document.querySelectorAll('.reveal').forEach((el) => io.observe(el));
+  </script>
+
+</body>
+</html>

@@ -14,8 +14,8 @@ const MODE_CONFIG: Record<
     label: "Ask",
     description: "Pause before executing high-cost actions",
     icon: Shield,
-    color: "text-amber-400",
-    bgColor: "bg-amber-400/10",
+    color: "text-accent",
+    bgColor: "bg-accent-dim",
   },
   auto: {
     label: "Auto",
@@ -72,12 +72,14 @@ export default function PermissionPill({
         disabled={disabled}
         onClick={() => setOpen((prev) => !prev)}
         className={clsx(
-          "flex items-center gap-1.5 rounded-lg px-2.5 py-1.5 text-[12px] font-semibold transition-colors",
-          "bg-bg-tertiary ring-1 ring-border hover:ring-border-hover",
+          "flex h-9 items-center gap-2 rounded-full border border-border bg-bg-secondary/60 px-3 text-[12.5px] font-medium tracking-[-0.01em] text-text-primary transition-all duration-150",
+          "hover:border-border-hover hover:bg-bg-secondary active:scale-[0.97]",
           disabled && "opacity-50 cursor-not-allowed"
         )}
       >
-        <Icon size={13} strokeWidth={2.5} className={current.color} />
+        <span className={clsx("flex h-5 w-5 items-center justify-center rounded-full", current.bgColor)}>
+          <Icon size={12} strokeWidth={2.2} className={current.color} />
+        </span>
         <span className="hidden text-text-primary sm:inline">{current.label}</span>
         <ChevronDown
           size={11}
@@ -90,10 +92,10 @@ export default function PermissionPill({
       </button>
 
       {open && (
-        <div className="absolute right-0 top-full z-50 mt-1.5 w-64 overflow-hidden rounded-xl bg-bg-elevated shadow-2xl ring-1 ring-border">
+        <div className="absolute bottom-full right-0 z-50 mb-2 w-64 overflow-hidden rounded-2xl border border-border bg-bg-elevated shadow-[0_12px_32px_rgba(0,0,0,0.08)]">
           <div className="px-3 py-2 border-b border-border">
-            <p className="text-[11px] font-semibold uppercase tracking-wider text-text-muted">
-              Permission Mode
+            <p className="font-mono text-[10px] font-medium uppercase tracking-[0.18em] text-text-muted">
+              Permission mode
             </p>
           </div>
           {(Object.keys(MODE_CONFIG) as PermissionMode[]).map((key) => {
@@ -117,7 +119,7 @@ export default function PermissionPill({
               >
                 <div
                   className={clsx(
-                    "mt-0.5 flex h-7 w-7 shrink-0 items-center justify-center rounded-lg",
+                    "mt-0.5 flex h-7 w-7 shrink-0 items-center justify-center rounded-full",
                     isActive ? cfg.bgColor : "bg-bg-tertiary"
                   )}
                 >
@@ -130,7 +132,7 @@ export default function PermissionPill({
                 <div className="flex-1 min-w-0">
                   <p
                     className={clsx(
-                      "text-[13px] font-semibold",
+                      "text-[13px] font-medium tracking-[-0.01em]",
                       isActive ? "text-text-primary" : "text-text-secondary"
                     )}
                   >

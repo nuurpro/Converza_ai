@@ -195,7 +195,7 @@ function OutputPreview({ output, agentType }: { output: Record<string, unknown>;
     return (
       <div className="mt-2 flex flex-col gap-2">
         {anchorUrl && (
-          <div className="flex items-center gap-2 rounded-lg bg-bg-primary/60 px-3 py-2 ring-1 ring-border">
+          <div className="flex items-center gap-2 rounded-lg bg-bg-elevated/80 px-3 py-2 ring-1 ring-border">
             <Image size={12} className="shrink-0 text-amber-400" />
             <span className="truncate font-mono text-[11px] text-text-muted">
               Anchor frame ready
@@ -208,7 +208,7 @@ function OutputPreview({ output, agentType }: { output: Record<string, unknown>;
           </div>
         )}
         {videoUrl && (
-          <div className="flex items-center gap-2 rounded-lg bg-bg-primary/60 px-3 py-2 ring-1 ring-border">
+          <div className="flex items-center gap-2 rounded-lg bg-bg-elevated/80 px-3 py-2 ring-1 ring-border">
             <Video size={12} className="shrink-0 text-emerald-400" />
             <span className="truncate font-mono text-[11px] text-text-muted">
               {provider === "veo" ? "Veo 3.1" : "Kling 2.1"} video rendered
@@ -227,7 +227,7 @@ function OutputPreview({ output, agentType }: { output: Record<string, unknown>;
       : JSON.stringify(preview, null, 0);
 
   return (
-    <div className="mt-2 rounded-lg bg-bg-primary/60 px-3 py-2 ring-1 ring-border">
+    <div className="mt-2 rounded-lg bg-bg-elevated/80 px-3 py-2 ring-1 ring-border">
       <p className="line-clamp-2 font-mono text-[11px] leading-relaxed text-text-muted">
         {previewStr.slice(0, 200)}
         {previewStr.length > 200 ? "…" : ""}
