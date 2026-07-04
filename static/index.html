@@ -1,728 +1,2430 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="uz">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Converza Co-Pilot</title>
+  <title>Converza</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Google+Sans+Flex:opsz,wght@6..144,400..700&family=Roboto:wght@400;500;700&display=swap" rel="stylesheet" />
   <style>
-    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-
+    *, *::before, *::after { box-sizing: border-box; }
     :root {
-      --bg-primary:    #0d0d0f;
-      --bg-secondary:  #16161a;
-      --bg-tertiary:   #1e1e24;
-      --accent:        #facc15;
-      --accent-hover:  #eab308;
-      --accent-dim:    rgba(250, 204, 21, 0.12);
-      --text-primary:  #f0f0f5;
-      --text-secondary:#8888aa;
-      --text-on-accent:#0d0d0f;
-      --border:        #2a2a35;
-      --border-hover:  #3a3a48;
-      --radius-sm:     8px;
-      --radius-md:     14px;
-      --radius-lg:     20px;
+      --bg: #f8f9fa;
+      --surface: #ffffff;
+      --surface-2: #f1f3f4;
+      --surface-3: #e8eaed;
+      --ink: #202124;
+      --muted: #5f6368;
+      --line: #dadce0;
+      --blue: #1a73e8;
+      --blue-soft: #e8f0fe;
+      --green: #188038;
+      --green-soft: #e6f4ea;
+      --amber: #f9ab00;
+      --red: #d93025;
+      --radius: 12px;
+      --radius-lg: 16px;
+      --shadow: 0 1px 2px rgba(60,64,67,.15), 0 1px 3px rgba(60,64,67,.1);
+      --shadow-lg: 0 4px 16px rgba(60,64,67,.12);
+      --sidebar-w: 248px;
     }
 
     html, body {
-      height: 100%;
-      font-family: 'Inter', system-ui, sans-serif;
-      background: var(--bg-primary);
-      color: var(--text-primary);
-      overflow: hidden;
+      min-height: 100%;
+      margin: 0;
+      font-family: "Google Sans Flex", Roboto, system-ui, sans-serif;
+      background: var(--bg);
+      color: var(--ink);
     }
 
-    /* ------------------------------------------------------------------ */
-    /* ONBOARDING                                                           */
-    /* ------------------------------------------------------------------ */
+    body { overflow-x: hidden; }
+    button, input, textarea, select { font: inherit; }
 
-    #onboarding {
-      position: fixed;
-      inset: 0;
-      background: var(--bg-primary);
+    .app {
+      min-height: 100vh;
+      display: grid;
+      grid-template-columns: var(--sidebar-w) 1fr;
+    }
+
+    .sidebar {
+      background: var(--surface);
+      border-right: 1px solid var(--line);
       display: flex;
       flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      gap: 48px;
-      z-index: 100;
-      transition: opacity 0.4s ease, visibility 0.4s ease;
-    }
-
-    #onboarding.hidden {
-      opacity: 0;
-      visibility: hidden;
-      pointer-events: none;
-    }
-
-    .onboarding-logo {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 12px;
-    }
-
-    .logo-mark {
-      width: 56px;
-      height: 56px;
-      background: var(--accent);
-      border-radius: 14px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
-
-    .logo-mark svg { width: 30px; height: 30px; }
-
-    .onboarding-logo h1 {
-      font-size: 28px;
-      font-weight: 700;
-      letter-spacing: -0.5px;
-    }
-
-    .onboarding-logo p {
-      font-size: 15px;
-      color: var(--text-secondary);
-      text-align: center;
-    }
-
-    .onboarding-question {
-      font-size: 18px;
-      font-weight: 600;
-      color: var(--text-primary);
-    }
-
-    .role-cards {
-      display: flex;
-      gap: 16px;
-    }
-
-    .role-card {
-      width: 220px;
-      padding: 28px 24px;
-      background: var(--bg-secondary);
-      border: 1.5px solid var(--border);
-      border-radius: var(--radius-lg);
-      cursor: pointer;
-      transition: border-color 0.2s, background 0.2s, transform 0.15s;
-      text-align: left;
-    }
-
-    .role-card:hover {
-      border-color: var(--accent);
-      background: var(--accent-dim);
-      transform: translateY(-2px);
-    }
-
-    .role-card-icon {
-      width: 40px;
-      height: 40px;
-      background: var(--accent-dim);
-      border-radius: var(--radius-sm);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      margin-bottom: 16px;
-      font-size: 20px;
-    }
-
-    .role-card h3 {
-      font-size: 16px;
-      font-weight: 600;
-      margin-bottom: 6px;
-    }
-
-    .role-card p {
-      font-size: 13px;
-      color: var(--text-secondary);
-      line-height: 1.5;
-    }
-
-    /* ------------------------------------------------------------------ */
-    /* CHAT LAYOUT                                                          */
-    /* ------------------------------------------------------------------ */
-
-    #chat-app {
-      display: flex;
-      flex-direction: column;
+      padding: 20px 14px;
+      position: sticky;
+      top: 0;
       height: 100vh;
-      opacity: 0;
-      transition: opacity 0.4s ease;
+      z-index: 20;
     }
 
-    #chat-app.visible { opacity: 1; }
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-weight: 700;
+      font-size: 17px;
+      color: var(--ink);
+      padding: 4px 8px 20px;
+    }
 
-    /* Header */
-    .chat-header {
-      flex-shrink: 0;
-      height: 60px;
-      background: var(--bg-secondary);
-      border-bottom: 1px solid var(--border);
+    .mark {
+      width: 32px;
+      height: 32px;
+      display: grid;
+      place-items: center;
+      border-radius: 8px;
+      background: linear-gradient(135deg, #1a73e8, #4285f4);
+      color: #fff;
+      font-weight: 700;
+      font-size: 14px;
+    }
+
+    .nav {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      flex: 1;
+    }
+
+    .nav-btn {
+      border: 0;
+      background: transparent;
+      color: var(--muted);
+      text-align: left;
+      padding: 10px 12px;
+      border-radius: 999px;
+      cursor: pointer;
+      font-weight: 500;
+      font-size: 14px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .nav-btn:hover { background: var(--surface-2); color: var(--ink); }
+    .nav-btn.active { background: var(--blue-soft); color: var(--blue); font-weight: 600; }
+    .nav-btn:disabled { opacity: 0.45; cursor: not-allowed; }
+
+    .nav-icon {
+      width: 20px;
+      height: 20px;
+      border-radius: 6px;
+      background: var(--surface-3);
+      display: grid;
+      place-items: center;
+      font-size: 11px;
+      font-weight: 700;
+    }
+
+    .nav-btn.active .nav-icon { background: #d2e3fc; color: var(--blue); }
+
+    .sidebar-foot {
+      border-top: 1px solid var(--line);
+      padding-top: 14px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .main {
+      min-width: 0;
+      display: flex;
+      flex-direction: column;
+      min-height: 100vh;
+    }
+
+    .main > .view.active {
+      flex: 1;
+    }
+
+    .topbar {
+      min-height: 56px;
       display: flex;
       align-items: center;
       justify-content: space-between;
-      padding: 0 20px;
+      padding: 0 24px;
+      background: var(--surface);
+      border-bottom: 1px solid var(--line);
+      gap: 16px;
     }
 
-    .header-brand {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-    }
-
-    .header-logo {
-      width: 32px;
-      height: 32px;
-      background: var(--accent);
-      border-radius: 8px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
-
-    .header-logo svg { width: 18px; height: 18px; }
-
-    .header-brand span {
-      font-size: 16px;
-      font-weight: 700;
-      letter-spacing: -0.3px;
-    }
-
-    .role-badge {
-      font-size: 12px;
-      font-weight: 600;
-      padding: 4px 10px;
-      background: var(--accent-dim);
-      color: var(--accent);
-      border-radius: 20px;
-      border: 1px solid rgba(250, 204, 21, 0.25);
-    }
-
-    /* Messages */
-    #messages {
-      flex: 1;
-      overflow-y: auto;
-      padding: 24px 0;
-      display: flex;
-      flex-direction: column;
-      gap: 6px;
-      scroll-behavior: smooth;
-    }
-
-    #messages::-webkit-scrollbar { width: 4px; }
-    #messages::-webkit-scrollbar-track { background: transparent; }
-    #messages::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
-
-    .msg-row {
-      display: flex;
-      padding: 0 20px;
-    }
-
-    .msg-row.user { justify-content: flex-end; }
-    .msg-row.assistant { justify-content: flex-start; }
-
-    .bubble {
-      max-width: min(680px, 80%);
-      padding: 12px 16px;
-      font-size: 14.5px;
-      line-height: 1.65;
-      white-space: pre-wrap;
-      word-break: break-word;
-    }
-
-    .bubble.user {
-      background: var(--accent);
-      color: var(--text-on-accent);
-      border-radius: 18px 18px 4px 18px;
+    .topbar-title {
+      font-size: 15px;
       font-weight: 500;
+      color: var(--muted);
     }
 
-    .bubble.assistant {
-      background: var(--bg-tertiary);
-      color: var(--text-primary);
-      border-radius: 18px 18px 18px 4px;
-      border: 1px solid var(--border);
-    }
-
-    /* Typing indicator */
-    #typing-indicator {
-      display: none;
-      padding: 0 20px;
-    }
-
-    #typing-indicator.visible { display: flex; }
-
-    .typing-bubble {
-      background: var(--bg-tertiary);
-      border: 1px solid var(--border);
-      border-radius: 18px 18px 18px 4px;
-      padding: 14px 18px;
+    .topbar-end {
       display: flex;
-      gap: 5px;
       align-items: center;
+      gap: 12px;
+      margin-left: auto;
+    }
+
+    .tabs { display: none; }
+
+    .tab {
+      border: 0;
+      border-radius: 6px;
+      background: transparent;
+      color: var(--muted);
+      padding: 8px 12px;
+      cursor: pointer;
+      font-weight: 600;
+    }
+
+    .tab.active { background: var(--surface); color: var(--ink); box-shadow: 0 1px 3px rgba(16,24,40,0.08); }
+    .tab:disabled { opacity: 0.48; cursor: not-allowed; }
+
+    .status-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      padding: 8px 12px;
+      color: var(--muted);
+      font-size: 13px;
+      white-space: nowrap;
     }
 
     .dot {
-      width: 7px;
-      height: 7px;
-      background: var(--text-secondary);
-      border-radius: 50%;
-      animation: bounce 1.2s infinite ease-in-out;
+      width: 8px;
+      height: 8px;
+      border-radius: 999px;
+      background: var(--blue);
     }
 
-    .dot:nth-child(1) { animation-delay: 0s; }
-    .dot:nth-child(2) { animation-delay: 0.2s; }
-    .dot:nth-child(3) { animation-delay: 0.4s; }
-
-    @keyframes bounce {
-      0%, 60%, 100% { transform: translateY(0); opacity: 0.4; }
-      30% { transform: translateY(-5px); opacity: 1; }
+    .tg-icon {
+      width: 16px;
+      height: 16px;
+      vertical-align: middle;
+      flex: 0 0 auto;
     }
 
-    /* Input area */
-    .input-area {
-      flex-shrink: 0;
-      padding: 16px 20px;
-      background: var(--bg-secondary);
-      border-top: 1px solid var(--border);
+    .content {
+      width: min(1120px, 100%);
+      margin: 0 auto;
+      padding: 30px 28px 42px;
     }
 
-    .input-wrapper {
-      display: flex;
-      align-items: flex-end;
-      gap: 10px;
-      background: var(--bg-tertiary);
-      border: 1.5px solid var(--border);
-      border-radius: var(--radius-md);
-      padding: 10px 12px;
-      transition: border-color 0.2s;
+    .view { display: none; }
+    .view.active { display: block; }
+
+    .headline {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) 320px;
+      gap: 22px;
+      align-items: stretch;
+      margin-bottom: 22px;
     }
 
-    .input-wrapper:focus-within {
-      border-color: var(--accent);
+    .hero {
+      background: var(--surface);
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      padding: 24px;
     }
 
-    #message-input {
-      flex: 1;
-      background: transparent;
-      border: none;
-      outline: none;
-      color: var(--text-primary);
-      font-family: inherit;
-      font-size: 14.5px;
+    .hero h2 {
+      margin: 0 0 8px;
+      font-size: 24px;
+      line-height: 1.2;
+      letter-spacing: -0.02em;
+    }
+
+    .hero p {
+      margin: 0;
+      color: var(--muted);
       line-height: 1.5;
-      resize: none;
-      max-height: 120px;
-      overflow-y: auto;
+      max-width: 520px;
+      font-size: 14px;
     }
 
-    #message-input::placeholder { color: var(--text-secondary); }
+    .proof {
+      background: #0f8f68;
+      color: #fff;
+      border-radius: var(--radius);
+      padding: 22px;
+      box-shadow: var(--shadow);
+    }
 
-    #message-input::-webkit-scrollbar { width: 3px; }
-    #message-input::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
+    .proof strong {
+      display: block;
+      font-size: 28px;
+      margin-bottom: 8px;
+    }
 
-    #send-btn {
-      flex-shrink: 0;
-      width: 36px;
-      height: 36px;
-      background: var(--accent);
-      border: none;
+    .proof span {
+      color: rgba(255,255,255,0.86);
+      line-height: 1.5;
+      display: block;
+    }
+
+    .panel {
+      background: var(--surface);
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      overflow: hidden;
+    }
+
+    .panel-head {
+      display: flex;
+      justify-content: space-between;
+      gap: 16px;
+      padding: 18px 20px;
+      border-bottom: 1px solid var(--line);
+      align-items: center;
+    }
+
+    .panel-head h3 { margin: 0; font-size: 18px; }
+    .panel-head p { margin: 4px 0 0; color: var(--muted); font-size: 13px; }
+
+    .form {
+      padding: 20px;
+      display: grid;
+      gap: 18px;
+    }
+
+    .grid-2 {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 16px;
+    }
+
+    label {
+      display: grid;
+      gap: 7px;
+      color: #344054;
+      font-weight: 600;
+      font-size: 13px;
+    }
+
+    input, textarea, select {
+      width: 100%;
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      background: #fff;
+      color: var(--ink);
+      padding: 11px 12px;
+      outline: none;
+    }
+
+    textarea {
+      min-height: 96px;
+      resize: vertical;
+      line-height: 1.5;
+    }
+
+    input:focus, textarea:focus, select:focus {
+      border-color: var(--blue);
+      box-shadow: 0 0 0 3px rgba(39,84,197,0.12);
+    }
+
+    .repeat-list {
+      display: grid;
+      gap: 10px;
+    }
+
+    .repeat-row {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) 40px;
+      gap: 10px;
+      align-items: start;
+    }
+
+    .repeat-row.pricing {
+      grid-template-columns: minmax(0, 1fr) 140px minmax(0, 1fr) 40px;
+    }
+
+    .icon-btn, .secondary, .primary {
+      border: 0;
+      border-radius: var(--radius);
+      cursor: pointer;
+      font-weight: 700;
+    }
+
+    .icon-btn {
+      height: 42px;
+      width: 40px;
+      background: var(--surface-2);
+      color: var(--muted);
+    }
+
+    .secondary {
+      background: var(--surface-2);
+      color: var(--ink);
+      padding: 10px 13px;
+    }
+
+    .primary {
+      background: var(--blue);
+      color: #fff;
+      padding: 11px 16px;
+    }
+
+    .primary:disabled { opacity: 0.55; cursor: not-allowed; }
+    .actions {
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      border-top: 1px solid var(--line);
+      padding: 16px 20px;
+      background: #fbfcfe;
+    }
+
+    .preview {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 12px;
+    }
+
+    .metric {
+      background: var(--surface);
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      padding: 14px;
+    }
+
+    .metric strong { display: block; font-size: 20px; margin-bottom: 4px; }
+    .metric span { color: var(--muted); font-size: 12px; line-height: 1.45; }
+
+    .notice {
+      margin-top: 14px;
+      border-radius: var(--radius);
+      border: 1px solid var(--line);
+      padding: 12px 14px;
+      color: var(--muted);
+      background: #fff;
+      line-height: 1.5;
+    }
+
+    .notice.success { border-color: rgba(15,143,104,0.28); color: #096246; background: #eefaf5; }
+    .notice.error { border-color: rgba(194,59,59,0.28); color: #9e2525; background: #fff1f1; }
+
+    .auth-hub {
+      display: flex;
+      justify-content: center;
+      padding: 8px 0 12px;
+    }
+
+    .auth-card {
+      width: min(540px, 100%);
+      padding: 28px 28px 24px;
+      background: var(--surface);
+      border: 1px solid var(--line);
+      border-radius: calc(var(--radius) + 2px);
+      box-shadow: var(--shadow);
+    }
+
+    .auth-card-head {
+      text-align: center;
+      margin-bottom: 18px;
+    }
+
+    .auth-card-head h2 {
+      margin: 0 0 8px;
+      font-size: 22px;
+      line-height: 1.25;
+      letter-spacing: -0.02em;
+    }
+
+    .auth-card-head p {
+      margin: 0;
+      color: var(--muted);
+      font-size: 14px;
+      line-height: 1.55;
+    }
+
+    .auth-card > p {
+      margin: 0 0 14px;
+      color: var(--muted);
+      font-size: 14px;
+      line-height: 1.55;
+      text-align: center;
+    }
+
+    .auth-card.highlight-pulse {
+      box-shadow: 0 0 0 2px var(--blue), 0 0 0 8px rgba(0, 85, 255, 0.12), var(--shadow);
+      transition: box-shadow 0.25s ease;
+    }
+
+    .auth-tabs {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 18px;
+      padding: 4px;
+      background: var(--bg);
+      border-radius: 10px;
+      border: 1px solid var(--line);
+    }
+
+    .auth-tab {
+      flex: 1;
+      border: 0;
+      background: transparent;
+      color: var(--muted);
+      font-size: 13px;
+      font-weight: 600;
+      padding: 10px 12px;
       border-radius: 8px;
       cursor: pointer;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      transition: background 0.15s, transform 0.1s, opacity 0.15s;
+      transition: background 0.15s ease, color 0.15s ease;
     }
 
-    #send-btn:hover:not(:disabled) {
-      background: var(--accent-hover);
-      transform: scale(1.05);
+    .auth-tab.active {
+      background: var(--surface);
+      color: var(--ink);
+      box-shadow: 0 1px 3px rgba(15, 23, 42, 0.08);
     }
 
-    #send-btn:disabled {
-      opacity: 0.35;
-      cursor: not-allowed;
-      transform: none;
-    }
-
-    #send-btn svg { width: 16px; height: 16px; }
-
-    .input-hint {
-      font-size: 11px;
-      color: var(--text-secondary);
-      margin-top: 8px;
+    .auth-switch-link {
+      margin: 14px 0 0;
       text-align: center;
+      font-size: 13px;
+      color: var(--muted);
     }
 
-    /* Welcome message */
-    .welcome-msg {
+    .auth-switch-link button {
+      border: 0;
+      background: transparent;
+      color: var(--blue);
+      font-weight: 600;
+      cursor: pointer;
+      text-decoration: underline;
+      padding: 0;
+      font-size: inherit;
+    }
+
+    .auth-user {
+      display: none;
+      align-items: center;
+      gap: 10px;
+      padding: 8px 12px;
+      border-radius: 999px;
+      background: rgba(15, 143, 104, 0.1);
+      border: 1px solid rgba(15, 143, 104, 0.24);
+      color: #096246;
+      font-size: 13px;
+      font-weight: 600;
+    }
+
+    .auth-user.visible { display: inline-flex; }
+
+    .auth-user button {
+      border: 0;
+      background: transparent;
+      color: var(--muted);
+      cursor: pointer;
+      font-size: 12px;
+      text-decoration: underline;
+      padding: 0;
+    }
+
+    .access-form {
       display: flex;
       flex-direction: column;
+      gap: 8px;
+    }
+
+    .access-form input,
+    .access-form textarea {
+      width: 100%;
+      padding: 10px 12px;
+      border-radius: 8px;
+      border: 1px solid var(--line);
+      background: var(--surface);
+      color: var(--ink);
+    }
+
+    .access-form input:focus,
+    .access-form textarea:focus {
+      outline: none;
+      border-color: var(--blue);
+      box-shadow: 0 0 0 3px rgba(0, 85, 255, 0.12);
+    }
+
+    .access-form textarea { min-height: 88px; resize: vertical; }
+
+    .access-form label {
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--ink);
+      margin-top: 4px;
+    }
+
+    .access-form button.primary {
+      margin-top: 8px;
+      width: 100%;
+      background: var(--blue);
+      color: #fff;
+      border: 0;
+      border-radius: 8px;
+      padding: 12px 14px;
+      font-weight: 700;
+      cursor: pointer;
+    }
+
+    .access-status {
+      padding: 16px;
+      border-radius: var(--radius);
+      background: var(--surface-2);
+      border: 1px solid var(--line);
+      font-size: 14px;
+      line-height: 1.55;
+      color: var(--ink);
+      text-align: center;
+    }
+
+    .access-status strong {
+      display: block;
+      margin-bottom: 8px;
+      font-size: 16px;
+    }
+
+    .access-status button {
+      margin-top: 12px;
+      border: 0;
+      background: transparent;
+      color: var(--blue);
+      cursor: pointer;
+      text-decoration: underline;
+      font-size: 13px;
+      font-weight: 600;
+      padding: 0;
+    }
+
+    #telegram-login-section {
+      text-align: center;
+    }
+
+    #telegram-login {
+      display: flex;
+      justify-content: center;
+      min-height: 44px;
+    }
+
+    .auth-hint {
+      margin: 10px 0 0;
+      color: var(--muted);
+      font-size: 12px;
+      line-height: 1.5;
+      text-align: center;
+    }
+
+    #setup-view.intro-active {
+      background-color: var(--bg);
+      background-image:
+        linear-gradient(rgba(228, 228, 231, 0.45) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(228, 228, 231, 0.45) 1px, transparent 1px);
+      background-size: 48px 48px;
+    }
+
+    #setup-blocked {
+      width: min(1080px, 100%);
+      margin: 0 auto;
+      padding: 0 0 24px;
+    }
+
+    .intro-funnel {
+      display: flex;
+      flex-direction: column;
+      gap: 32px;
+    }
+
+    .funnel-track {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
       align-items: center;
       justify-content: center;
-      flex: 1;
-      gap: 12px;
-      color: var(--text-secondary);
-      text-align: center;
-      padding: 40px 20px;
-      pointer-events: none;
+      padding: 14px 16px;
+      background: var(--surface);
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
     }
 
-    .welcome-msg .welcome-icon {
-      font-size: 40px;
-      opacity: 0.5;
-    }
-
-    .welcome-msg h2 {
-      font-size: 18px;
+    .funnel-step {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 6px 10px;
+      border-radius: 999px;
+      font-size: 12px;
       font-weight: 600;
-      color: var(--text-primary);
+      color: var(--muted);
+      background: var(--surface-2);
+      border: 1px solid transparent;
     }
 
-    .welcome-msg p {
+    .funnel-step .num {
+      width: 22px;
+      height: 22px;
+      display: grid;
+      place-items: center;
+      border-radius: 999px;
+      font-size: 11px;
+      background: #fff;
+      border: 1px solid var(--line);
+      color: var(--muted);
+    }
+
+    .funnel-step.done { color: var(--ink); }
+    .funnel-step.done .num { background: var(--green); border-color: var(--green); color: #fff; }
+    .funnel-step.active { color: var(--blue); background: rgba(0, 85, 255, 0.08); border-color: rgba(0, 85, 255, 0.22); }
+    .funnel-step.active .num { background: var(--blue); border-color: var(--blue); color: #fff; }
+
+    .funnel-cta-bar {
+      margin-left: auto;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      align-items: center;
+    }
+
+    .funnel-cta-bar p {
+      margin: 0;
+      font-size: 13px;
+      color: var(--muted);
+      max-width: 280px;
+      line-height: 1.45;
+    }
+
+    .funnel-cta {
+      border: 0;
+      border-radius: 8px;
+      padding: 10px 16px;
+      font-weight: 700;
+      font-size: 13px;
+      cursor: pointer;
+      background: var(--blue);
+      color: #fff;
+      white-space: nowrap;
+    }
+
+    .funnel-cta.secondary {
+      background: var(--surface);
+      color: var(--ink);
+      border: 1px solid var(--line);
+    }
+
+    .intro-hero { text-align: center; padding-top: 4px; }
+
+    .system-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 6px 12px;
+      border-radius: 999px;
+      border: 1px solid var(--line);
+      background: var(--surface);
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      color: var(--blue);
+      margin-bottom: 18px;
+    }
+
+    .system-pill .pulse {
+      width: 7px;
+      height: 7px;
+      border-radius: 999px;
+      background: var(--blue);
+      box-shadow: 0 0 0 4px rgba(0, 85, 255, 0.18);
+    }
+
+    .intro-title {
+      margin: 0;
+      font-size: clamp(36px, 6vw, 52px);
+      font-weight: 800;
+      letter-spacing: -0.03em;
+      line-height: 1.05;
+      color: var(--ink);
+    }
+
+    .intro-sub {
+      margin: 10px 0 0;
+      font-size: 17px;
+      line-height: 1.45;
+      color: var(--muted);
+      font-weight: 500;
+      max-width: 420px;
+      margin-inline: auto;
+    }
+
+    .intro-points {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 12px;
+      max-width: 720px;
+      margin: 0 auto;
+    }
+
+    .intro-points article {
+      text-align: center;
+      padding: 16px 12px;
+      background: var(--surface);
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+    }
+
+    .intro-points strong {
+      display: block;
+      font-size: 15px;
+      margin-bottom: 4px;
+      color: var(--ink);
+    }
+
+    .intro-points span {
+      font-size: 13px;
+      color: var(--muted);
+      line-height: 1.4;
+    }
+
+    @media (max-width: 700px) {
+      .intro-points { grid-template-columns: 1fr; }
+    }
+
+    .intro-section-head {
+      text-align: center;
+      margin-bottom: 22px;
+    }
+
+    .intro-section-head h2 {
+      margin: 0;
+      font-size: clamp(24px, 4vw, 34px);
+      line-height: 1.2;
+      letter-spacing: -0.02em;
+    }
+
+    .intro-section-head h2 em {
+      font-style: italic;
+      color: var(--blue);
+    }
+
+    .intro-section-head p {
+      margin: 10px 0 0;
+      color: var(--muted);
+      font-size: 15px;
+      line-height: 1.55;
+    }
+
+    .err-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 14px;
+    }
+
+    .err-card {
+      background: var(--surface);
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      padding: 18px;
+      box-shadow: var(--shadow);
+    }
+
+    .err-tag {
+      display: inline-block;
+      margin-bottom: 12px;
+      font-size: 10px;
+      font-weight: 800;
+      letter-spacing: 0.04em;
+      color: var(--red);
+      font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+    }
+
+    .err-card h3 {
+      margin: 0 0 8px;
+      font-size: 17px;
+      line-height: 1.25;
+    }
+
+    .err-card p {
+      margin: 0;
       font-size: 14px;
-      max-width: 400px;
-      line-height: 1.6;
+      line-height: 1.55;
+      color: var(--muted);
     }
 
-    /* Error bubble */
+    .pillar-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 14px;
+    }
+
+    .pillar-card {
+      background: var(--surface);
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      padding: 20px;
+      box-shadow: var(--shadow);
+    }
+
+    .pillar-card .label {
+      font-size: 11px;
+      font-weight: 800;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--blue);
+      margin-bottom: 8px;
+    }
+
+    .pillar-card h3 {
+      margin: 0 0 8px;
+      font-size: 18px;
+    }
+
+    .pillar-card p {
+      margin: 0;
+      font-size: 14px;
+      line-height: 1.55;
+      color: var(--muted);
+    }
+
+    .phase-lane {
+      position: relative;
+      padding: 28px 0 8px;
+    }
+
+    .phase-line {
+      position: absolute;
+      left: 8%;
+      right: 8%;
+      top: 50%;
+      height: 2px;
+      background: linear-gradient(90deg, var(--line), var(--blue), var(--line));
+      z-index: 0;
+    }
+
+    .phase-grid {
+      position: relative;
+      z-index: 1;
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 14px;
+      align-items: stretch;
+    }
+
+    .phase-card {
+      background: var(--surface);
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      padding: 18px;
+      box-shadow: var(--shadow);
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .phase-card.highlight {
+      border-color: var(--blue);
+      box-shadow: 0 0 0 1px rgba(0, 85, 255, 0.15), var(--shadow);
+    }
+
+    .phase-card .phase-num {
+      font-size: 11px;
+      font-weight: 800;
+      letter-spacing: 0.06em;
+      color: var(--blue);
+      text-transform: uppercase;
+    }
+
+    .phase-card h3 {
+      margin: 0;
+      font-size: 17px;
+      line-height: 1.25;
+    }
+
+    .phase-card.highlight h3 { color: var(--blue); }
+
+    .phase-card p {
+      margin: 0;
+      font-size: 13px;
+      line-height: 1.55;
+      color: var(--muted);
+    }
+
+    .phase-badge {
+      display: inline-flex;
+      align-self: flex-start;
+      margin-top: 4px;
+      padding: 4px 8px;
+      border-radius: 999px;
+      font-size: 11px;
+      font-weight: 700;
+      background: rgba(0, 85, 255, 0.1);
+      color: var(--blue);
+    }
+
+    .agent-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 14px;
+    }
+
+    .agent-card {
+      background: var(--surface);
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      padding: 18px;
+      box-shadow: var(--shadow);
+    }
+
+    .agent-card.featured {
+      border-color: var(--blue);
+      grid-column: 1 / -1;
+    }
+
+    .agent-card .agent-name {
+      font-size: 11px;
+      font-weight: 800;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      color: var(--blue);
+      margin-bottom: 6px;
+    }
+
+    .agent-card h3 {
+      margin: 0 0 8px;
+      font-size: 18px;
+    }
+
+    .agent-card p {
+      margin: 0;
+      font-size: 14px;
+      line-height: 1.55;
+      color: var(--muted);
+    }
+
+    @media (max-width: 900px) {
+      .err-grid, .pillar-grid, .phase-grid, .agent-grid { grid-template-columns: 1fr; }
+      .phase-line { display: none; }
+      .funnel-cta-bar { margin-left: 0; width: 100%; }
+      .funnel-track { flex-direction: column; align-items: stretch; }
+    }
+
+    .connection-panel {
+      margin-bottom: 18px;
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      padding: 16px 18px;
+      background: #f8fafc;
+    }
+
+    .connection-panel h3 { margin: 0 0 8px; font-size: 16px; }
+    .connection-panel p { margin: 0 0 10px; color: var(--muted); font-size: 14px; line-height: 1.5; }
+    .connection-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 6px 12px;
+      border-radius: 999px;
+      font-size: 13px;
+      font-weight: 600;
+    }
+    .connection-pill.on { background: #e8f8f1; color: var(--green); }
+    .connection-pill.off { background: #fff4e5; color: #b45309; }
+
+    #pdf-panel { margin-bottom: 18px; }
+
+    .pdf-drop {
+      border: 2px dashed var(--line);
+      border-radius: var(--radius);
+      padding: 22px;
+      text-align: center;
+      color: var(--muted);
+      cursor: pointer;
+      transition: border-color 0.15s ease, background 0.15s ease;
+    }
+
+    .pdf-drop.dragover { border-color: var(--blue); background: #eef2fc; }
+    .pdf-drop p { margin: 0; }
+    .pdf-browse { color: var(--blue); font-weight: 600; text-decoration: underline; }
+
+    .pdf-list {
+      list-style: none;
+      margin: 14px 0 0;
+      padding: 0;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      text-align: left;
+    }
+
+    .pdf-list li {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 8px 12px;
+      background: var(--surface-2);
+      border-radius: 6px;
+      font-size: 13px;
+      color: var(--ink);
+    }
+
+    .pdf-list li button {
+      margin-left: auto;
+      border: 0;
+      background: transparent;
+      color: var(--muted);
+      cursor: pointer;
+      font-size: 14px;
+    }
+
+    .chat-shell {
+      display: flex;
+      flex-direction: column;
+      flex: 1;
+      min-height: calc(100vh - 120px);
+      background: var(--surface);
+      border: 1px solid var(--line);
+      border-radius: var(--radius-lg);
+      box-shadow: var(--shadow);
+      overflow: hidden;
+    }
+
+    #messages {
+      flex: 1;
+      overflow-y: auto;
+      padding: 24px;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+      background: linear-gradient(180deg, #fafbfc 0%, #fff 120px);
+    }
+
+    .bubble {
+      max-width: min(720px, 88%);
+      padding: 12px 16px;
+      border-radius: 18px;
+      line-height: 1.55;
+      font-size: 14px;
+      white-space: pre-wrap;
+    }
+
+    .bubble.user {
+      align-self: flex-end;
+      background: var(--blue);
+      color: #fff;
+      border-bottom-right-radius: 4px;
+    }
+
+    .bubble.assistant {
+      align-self: flex-start;
+      background: var(--surface-2);
+      color: var(--ink);
+      border-bottom-left-radius: 4px;
+    }
+
     .bubble.error {
-      background: rgba(239, 68, 68, 0.1);
-      color: #f87171;
-      border: 1px solid rgba(239, 68, 68, 0.25);
-      border-radius: 18px 18px 18px 4px;
+      align-self: flex-start;
+      background: #fce8e6;
+      color: var(--red);
+      border: 1px solid #f5c6c2;
     }
 
-    @media (max-width: 600px) {
-      .role-cards { flex-direction: column; }
-      .role-card { width: 100%; min-width: 280px; }
+    .composer {
+      display: flex;
+      gap: 10px;
+      padding: 16px 20px;
+      border-top: 1px solid var(--line);
+      background: var(--surface);
+      align-items: flex-end;
+    }
+
+    .composer textarea {
+      flex: 1;
+      min-height: 48px;
+      max-height: 160px;
+      resize: vertical;
+      border: 1px solid var(--line);
+      border-radius: 24px;
+      padding: 12px 18px;
+      background: var(--surface-2);
+    }
+
+    .composer textarea:focus {
+      outline: 2px solid var(--blue-soft);
+      border-color: var(--blue);
+      background: #fff;
+    }
+
+    .panel {
+      background: var(--surface);
+      border: 1px solid var(--line);
+      border-radius: var(--radius-lg);
+      box-shadow: var(--shadow);
+    }
+
+    #copilot-view.active {
+      display: flex;
+      flex-direction: column;
+      flex: 1;
+      width: 100%;
+      max-width: none;
+      padding-bottom: 16px;
+    }
+
+    #copilot-view .headline {
+      width: min(1120px, 100%);
+      margin-left: auto;
+      margin-right: auto;
+    }
+
+    #copilot-view .chat-shell {
+      flex: 1;
+      width: min(1120px, 100%);
+      margin: 0 auto;
+      min-height: calc(100vh - 220px);
+    }
+
+    #message-input { min-height: 46px; max-height: 120px; }
+
+    @media (max-width: 900px) {
+      .app { grid-template-columns: 1fr; }
+      .sidebar {
+        position: relative;
+        height: auto;
+        flex-direction: row;
+        flex-wrap: wrap;
+        padding: 12px;
+        border-right: 0;
+        border-bottom: 1px solid var(--line);
+      }
+      .nav { flex-direction: row; flex-wrap: wrap; }
+      .sidebar-foot { display: none; }
+      .headline, .grid-2, .preview { grid-template-columns: 1fr; }
+      .repeat-row, .repeat-row.pricing { grid-template-columns: 1fr; }
+      .topbar { align-items: flex-start; flex-wrap: wrap; padding: 14px; }
+      .topbar-end { margin-left: 0; width: 100%; justify-content: space-between; }
+      .content { padding: 18px 14px 30px; }
+      .auth-card { padding: 22px 18px; }
     }
   </style>
 </head>
 <body>
-
-  <!-- ================================================================ -->
-  <!-- ONBOARDING                                                        -->
-  <!-- ================================================================ -->
-  <div id="onboarding">
-    <div class="onboarding-logo">
-      <div class="logo-mark">
-        <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-          <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"
-                stroke="#0d0d0f" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
-        </svg>
+  <div class="app">
+    <aside class="sidebar">
+      <div class="brand"><div class="mark">C</div><span>Converza</span></div>
+      <nav class="nav">
+        <button type="button" class="nav-btn active" data-view="setup"><span class="nav-icon">DM</span> DM Closer</button>
+        <button type="button" class="nav-btn" data-view="copilot" id="copilot-tab" disabled><span class="nav-icon">AI</span> Co-Pilot</button>
+      </nav>
+      <div class="sidebar-foot">
+        <div class="status-pill"><svg class="tg-icon" viewBox="0 0 24 24" fill="#229ED9" aria-hidden="true" focusable="false" width="16" height="16"><path d="M21.94 4.49 18.9 19.16c-.23 1.02-.84 1.27-1.7.79l-4.7-3.47-2.27 2.18c-.25.25-.46.46-.95.46l.34-4.82 8.77-7.93c.38-.34-.08-.53-.6-.19l-10.84 6.83-4.67-1.46c-1.02-.32-1.04-1.02.21-1.5l18.26-7.04c.85-.31 1.59.2 1.31 1.47Z"/></svg><span class="dot" id="status-dot"></span><span id="status-text">Telegram orqali kiring</span></div>
       </div>
-      <h1>Converza Co-Pilot</h1>
-      <p>Your autonomous AI marketing strategist</p>
-    </div>
-
-    <p class="onboarding-question">Who are you?</p>
-
-    <div class="role-cards">
-      <div class="role-card" data-role="Owner">
-        <div class="role-card-icon">&#x1F3AF;</div>
-        <h3>I'm the Owner</h3>
-        <p>Focus on growth, revenue, ROI & competitive strategy</p>
-      </div>
-      <div class="role-card" data-role="Marketer">
-        <div class="role-card-icon">&#x1F4CA;</div>
-        <h3>I'm a Marketer</h3>
-        <p>Focus on execution, metrics, content & workflows</p>
-      </div>
-    </div>
-  </div>
-
-  <!-- ================================================================ -->
-  <!-- CHAT APP                                                          -->
-  <!-- ================================================================ -->
-  <div id="chat-app">
-    <header class="chat-header">
-      <div class="header-brand">
-        <div class="header-logo">
-          <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"
-                  stroke="#0d0d0f" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
-          </svg>
+    </aside>
+    <main class="main">
+      <div class="topbar">
+        <div class="topbar-title" id="topbar-title">DM Closer</div>
+        <div class="topbar-end">
+          <div class="auth-user" id="auth-user">
+            <span id="auth-label">Kirgansiz</span>
+            <button type="button" id="logout-btn">Chiqish</button>
+          </div>
         </div>
-        <span>Converza</span>
       </div>
-      <div class="role-badge" id="role-badge">—</div>
-    </header>
+      <div class="tabs" hidden aria-hidden="true">
+        <button class="tab active" data-view="setup">DM Closer</button>
+        <button class="tab" data-view="copilot" id="copilot-tab-legacy" disabled>Co-Pilot</button>
+      </div>
 
-    <div id="messages">
-      <div class="welcome-msg" id="welcome-msg">
-        <div class="welcome-icon">&#x26A1;</div>
-        <h2>Ready when you are.</h2>
-        <p>Ask me anything about your marketing strategy, campaigns, copy, or competitive positioning.</p>
-      </div>
-    </div>
+      <section class="content view active intro-active" id="setup-view">
+        <div id="setup-blocked">
+          <div class="intro-funnel">
+            <div class="funnel-track" id="funnel-track">
+              <div class="funnel-step done" data-step="1"><span class="num">1</span> Kirish</div>
+              <div class="funnel-step" data-step="2"><span class="num">2</span> Ariza</div>
+              <div class="funnel-step" data-step="3"><span class="num">3</span> Tasdiq</div>
+              <div class="funnel-step" data-step="4"><span class="num">4</span> Telegram</div>
+              <div class="funnel-step" data-step="5"><span class="num">5</span> Pasport</div>
+            </div>
 
-    <div id="typing-indicator">
-      <div class="typing-bubble">
-        <span class="dot"></span>
-        <span class="dot"></span>
-        <span class="dot"></span>
-      </div>
-    </div>
+            <section class="intro-hero">
+              <div class="system-pill"><span class="pulse"></span> Faol</div>
+              <h1 class="intro-title">Converza</h1>
+              <p class="intro-sub">Telegram'da sotuv va marketing uchun AI tizim.</p>
+            </section>
 
-    <div class="input-area">
-      <div class="input-wrapper">
-        <textarea
-          id="message-input"
-          rows="1"
-          placeholder="Ask your Co-Pilot anything..."
-          autocomplete="off"
-          spellcheck="true"
-        ></textarea>
-        <button id="send-btn" disabled title="Send message">
-          <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <path d="M22 2L11 13M22 2L15 22l-4-9-9-4 20-7z"
-                  stroke="#0d0d0f" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
-          </svg>
-        </button>
-      </div>
-      <p class="input-hint">Enter to send &nbsp;&middot;&nbsp; Shift+Enter for new line</p>
-    </div>
+            <section class="auth-hub" id="auth-hub">
+              <div class="auth-card" id="auth-card">
+                <div class="auth-card-head" id="auth-card-head">
+                  <h2 id="auth-card-title">Kirish</h2>
+                  <p id="auth-card-subtitle">Yangi foydalanuvchi — ariza. Tasdiqlangan — @ConverzaApp_bot orqali kirish.</p>
+                </div>
+                <div class="auth-tabs" id="auth-tabs" hidden>
+                  <button type="button" class="auth-tab active" data-auth-tab="request">Yangi ariza</button>
+                  <button type="button" class="auth-tab" data-auth-tab="returning">Telegram kirish</button>
+                </div>
+                <div id="access-request-panel">
+                  <form class="access-form" id="access-request-form">
+                    <label for="req-name">To'liq ismingiz *</label>
+                    <input id="req-name" name="full_name" required minlength="2" placeholder="Ali Valiyev" />
+                    <label for="req-business">Biznes nomi *</label>
+                    <input id="req-business" name="business_name" required minlength="2" placeholder="Go'zallik saloni Nafis" />
+                    <label for="req-message">Asosiy muammo *</label>
+                    <textarea id="req-message" name="message" required minlength="30" maxlength="500" placeholder="Kechqurun xabarlarga javob bera olmayman, mijozlar ketadi..."></textarea>
+                    <label for="req-contact">Telefon raqami *</label>
+                    <input id="req-contact" name="contact" type="tel" required placeholder="+998901234567" />
+                    <label for="req-telegram">Telegram @username *</label>
+                    <input id="req-telegram" name="telegram_username" required placeholder="@username" />
+                    <button type="submit" class="primary">Arizani yuborish</button>
+                  </form>
+                  <p class="auth-hint" id="access-form-hint">@username login bilan bir xil bo'lsin.</p>
+                  <p class="auth-switch-link" id="access-to-login-link">
+                    Tasdiqlanganmisiz?
+                    <button type="button" id="goto-returning-login">Telegram kirish</button>
+                  </p>
+                </div>
+                <div class="access-status" id="access-pending-panel" hidden>
+                  <strong>Kutilmoqda</strong>
+                  <p>Admin tasdiqlagach Telegram ochiladi.</p>
+                  <button type="button" id="refresh-access-btn">Yangilash</button>
+                </div>
+                <div class="access-status" id="access-rejected-panel" hidden>
+                  <strong>Rad etildi</strong>
+                  <p id="access-rejected-note">Qayta urinishingiz mumkin.</p>
+                  <button type="button" id="retry-access-btn">Yangi ariza</button>
+                </div>
+                <div id="telegram-login-section" hidden>
+                  <p id="telegram-login-copy">Telegram orqali kiring.</p>
+                  <div id="telegram-login"></div>
+                  <p class="auth-hint">Tugma ko'rinmasa — BotFather'da domen tekshiring.</p>
+                  <p class="auth-switch-link" id="login-to-request-link" hidden>
+                    Hali yo'qsiz?
+                    <button type="button" id="goto-access-request">Ariza yuborish</button>
+                  </p>
+                </div>
+              </div>
+            </section>
+
+            <section class="intro-points" aria-label="Asosiy imkoniyatlar">
+              <article><strong>24/7 DM</strong><span>Mijoz xabarlariga javob</span></article>
+              <article><strong>Click</strong><span>Hisob-faktura va to'lov</span></article>
+              <article><strong>Brend pasporti</strong><span>Bitta manba — barcha agentlar</span></article>
+            </section>
+
+            <section class="funnel-track" id="funnel-footer">
+              <div class="funnel-cta-bar" style="margin-left:0;width:100%;justify-content:space-between;">
+                <p id="funnel-footer-text">Boshlash uchun ariza yoki Telegram kirish.</p>
+                <button type="button" class="funnel-cta" id="funnel-footer-btn">Boshlash</button>
+              </div>
+            </section>
+          </div>
+        </div>
+
+        <div id="passport-workspace" hidden>
+        <div class="headline">
+          <div class="hero">
+            <h2>Brend pasporti</h2>
+            <p>DM Closer ishlashi uchun to'ldiring.</p>
+          </div>
+          <div class="proof">
+            <strong>1-hafta</strong>
+            <span>Kechki xabarlarga javob, to'lovga olib kelish.</span>
+          </div>
+        </div>
+
+        <div class="preview">
+          <div class="metric"><strong id="metric-brand">0</strong><span>Brend maydonlari</span></div>
+          <div class="metric"><strong id="metric-pricing">0</strong><span>Narxlar</span></div>
+          <div class="metric"><strong id="metric-faq">0</strong><span>FAQ</span></div>
+          <div class="metric"><strong id="metric-objections">0</strong><span>E'tirozlar</span></div>
+        </div>
+
+        <div class="connection-panel" id="connection-panel" hidden>
+          <h3>Telegram Business</h3>
+          <p>DM Closer <strong>biznes hisobingiz</strong> orqali javob beradi.</p>
+          <div class="connection-pill off" id="connection-pill">
+            <span id="connection-status-text">Tekshirilmoqda...</span>
+          </div>
+          <div class="connection-pill off" id="subscription-pill" style="margin-top:8px;">
+            <span id="subscription-status-text">Obuna: tekshirilmoqda...</span>
+          </div>
+          <div class="connection-pill off" id="payments-pill" style="margin-top:8px;">
+            <span id="payments-status-text">Mijozlar Click: tekshirilmoqda...</span>
+          </div>
+          <p style="margin-top:12px;font-size:13px;color:var(--muted);">
+            Sales bot: Sozlamalar → Business → Chatbots → <strong id="bot-username-hint" data-sales-bot>@ConverzaSales_bot</strong>
+          </p>
+          <p style="margin-top:8px;font-size:13px;color:var(--muted);">
+            Converza obunasi: <strong>@ConverzaApp_bot</strong> da /subscribe
+          </p>
+        </div>
+
+        <div class="panel" id="pdf-panel">
+          <div class="panel-head">
+            <div>
+              <h3>PDF dan to'ldirish</h3>
+              <p>Hujjat yuklang — pasport avtomatik yaratiladi.</p>
+            </div>
+          </div>
+          <div class="pdf-drop" id="pdf-drop">
+            <input type="file" id="pdf-input" accept="application/pdf,.pdf" multiple hidden />
+            <p id="pdf-drop-text">PDF fayllarni shu yerga tashlang yoki <span class="pdf-browse">tanlang</span></p>
+            <ul class="pdf-list" id="pdf-list"></ul>
+          </div>
+          <div class="actions">
+            <button type="button" class="secondary" id="pdf-clear">Tozalash</button>
+            <button type="button" class="primary" id="pdf-generate" disabled>PDF'dan yaratish</button>
+          </div>
+          <div id="pdf-result" class="notice" hidden></div>
+        </div>
+
+        <form class="panel" id="passport-form">
+          <div class="panel-head">
+            <div>
+              <h3>Brend ma'lumotlari</h3>
+            </div>
+          </div>
+
+          <div class="form">
+            <div class="grid-2">
+              <label>Biznes nomi
+                <input name="brand_name" required placeholder="Converza" />
+              </label>
+              <label>Soha
+                <input name="industry" placeholder="Telegram sotuv avtomatlashtirish" />
+              </label>
+            </div>
+            <div class="grid-2">
+              <label>Joylashuv
+                <input name="target_location" value="O'zbekiston" />
+              </label>
+              <label>Muloqot ohangi
+                <select name="tone">
+                  <option>Samimiy, ishonchli va lo'nda</option>
+                  <option>Professional va to'g'ridan-to'g'ri</option>
+                  <option>Iliq va maslahatchi</option>
+                </select>
+              </label>
+            </div>
+
+            <label>Asosiy taklif
+              <textarea name="core_offer" required placeholder="Biz bizneslarga kechki mijozlarni yo'qotmaslik uchun oddiy DM Closer sotamiz."></textarea>
+            </label>
+            <label>Maqsadli auditoriya
+              <textarea name="target_audience" required placeholder="Telegram orqali sotadigan va ish vaqtidan keyin mijozlarni yo'qotadigan o'zbek kichik bizneslari."></textarea>
+            </label>
+            <label>Closer eslatmalari
+              <textarea name="raw_notes" placeholder="Qaytarish, yetkazish, taqiqlangan mavzular."></textarea>
+            </label>
+
+            <div>
+              <label>Narxlar (Click uchun)</label>
+              <div class="repeat-list" id="pricing-list"></div>
+              <button type="button" class="secondary" id="add-pricing">Narx qo'shish</button>
+            </div>
+            <div>
+              <label>FAQ</label>
+              <div class="repeat-list" id="faq-list"></div>
+              <button type="button" class="secondary" id="add-faq">Savol-javob qo'shish</button>
+            </div>
+            <div>
+              <label>Keng tarqalgan e'tirozlar</label>
+              <div class="repeat-list" id="objection-list"></div>
+              <button type="button" class="secondary" id="add-objection">E'tiroz qo'shish</button>
+            </div>
+
+            <div class="notice">
+              Org: <strong id="org-id-label">kirilmagan</strong>. DM Closer va Co-Pilot shu pasportdan foydalanadi.
+            </div>
+            <div class="grid-2">
+              <label>Sotuv boti (Business DM)
+                <input value="@ConverzaSales_bot" readonly data-sales-bot />
+              </label>
+              <label>Click token (ixtiyoriy)
+                <input name="click_token" type="password" autocomplete="off" placeholder="BotFather → Payments → Click" />
+              </label>
+            </div>
+            <p style="font-size:13px;color:var(--muted);margin:0;">
+              O'z Click provider tokeningizni qo'shsangiz, mijozlarga to'lov havolasi yuboriladi.
+              Token bermasangiz, DM Closer faqat matnli javob beradi.
+            </p>
+          </div>
+
+          <div id="save-result" class="notice" hidden></div>
+
+          <div class="actions">
+            <button type="submit" class="primary" id="save-btn">Saqlash</button>
+          </div>
+        </form>
+        </div>
+      </section>
+
+      <section class="content view" id="copilot-view">
+        <div class="headline">
+          <div class="hero">
+            <h2>Co-Pilot</h2>
+            <p>Strategiya va matnlar — brend pasportingiz asosida.</p>
+          </div>
+          <div class="proof"><strong id="saved-brand">Tayyor</strong><span>Saqlangan pasport yuklangan.</span></div>
+        </div>
+        <div class="chat-shell">
+          <div id="messages">
+            <div class="bubble assistant">Savol bering: skript, e'tiroz, kontent rejasi.</div>
+          </div>
+          <div class="composer">
+            <textarea id="message-input" placeholder="Co-Pilot'ga yozing..." spellcheck="true"></textarea>
+            <button class="primary" id="send-btn" type="button">Yuborish</button>
+          </div>
+        </div>
+      </section>
+    </main>
   </div>
 
-  <!-- ================================================================ -->
-  <!-- SCRIPT                                                            -->
-  <!-- ================================================================ -->
   <script>
-    // ----------------------------------------------------------------
-    // State
-    // ----------------------------------------------------------------
+    const AUTH_STORAGE_KEY = "converza_auth";
+    const ACCESS_REQUEST_KEY = "converza_access_request_id";
     const state = {
-      userRole: null,
+      saved: false,
+      orgId: null,
+      token: null,
+      user: null,
+      brandId: null,
+      accessMode: "form",
+      copilotMode: "chat",
+      conversationId: null,
       conversationHistory: [],
-      currentConversationId: null,
-      isStreaming: false,
       clientContext: {
         brand_name: "",
         industry: "",
-        target_location: "",
+        target_location: "O'zbekiston",
         hex_colors: [],
         target_audience: "",
         core_offer: ""
       }
     };
 
-    // ----------------------------------------------------------------
-    // DOM refs
-    // ----------------------------------------------------------------
-    const onboardingEl     = document.getElementById("onboarding");
-    const chatAppEl        = document.getElementById("chat-app");
-    const messagesEl       = document.getElementById("messages");
-    const welcomeMsgEl     = document.getElementById("welcome-msg");
-    const typingIndicator  = document.getElementById("typing-indicator");
-    const messageInput     = document.getElementById("message-input");
-    const sendBtn          = document.getElementById("send-btn");
-    const roleBadge        = document.getElementById("role-badge");
+    const form = document.getElementById("passport-form");
+    const saveBtn = document.getElementById("save-btn");
+    const saveResult = document.getElementById("save-result");
+    const statusText = document.getElementById("status-text");
+    const statusDot = document.getElementById("status-dot");
+    const copilotTab = document.getElementById("copilot-tab");
 
-    // ----------------------------------------------------------------
-    // Onboarding
-    // ----------------------------------------------------------------
-    document.querySelectorAll(".role-card").forEach(card => {
-      card.addEventListener("click", () => {
-        state.userRole = card.dataset.role;
-        roleBadge.textContent = state.userRole;
-
-        onboardingEl.classList.add("hidden");
-        chatAppEl.classList.add("visible");
-
-        setTimeout(() => messageInput.focus(), 420);
-      });
-    });
-
-    // ----------------------------------------------------------------
-    // Input auto-resize
-    // ----------------------------------------------------------------
-    messageInput.addEventListener("input", () => {
-      messageInput.style.height = "auto";
-      messageInput.style.height = Math.min(messageInput.scrollHeight, 120) + "px";
-      sendBtn.disabled = messageInput.value.trim() === "" || state.isStreaming;
-    });
-
-    // ----------------------------------------------------------------
-    // Send on Enter (Shift+Enter = newline)
-    // ----------------------------------------------------------------
-    messageInput.addEventListener("keydown", e => {
-      if (e.key === "Enter" && !e.shiftKey) {
-        e.preventDefault();
-        if (!sendBtn.disabled) handleSend();
-      }
-    });
-
-    sendBtn.addEventListener("click", handleSend);
-
-    // ----------------------------------------------------------------
-    // Core send logic
-    // ----------------------------------------------------------------
-    function handleSend() {
-      const text = messageInput.value.trim();
-      if (!text || state.isStreaming) return;
-
-      messageInput.value = "";
-      messageInput.style.height = "auto";
-      sendBtn.disabled = true;
-
-      sendMessage(text);
+    function apiHeaders(extra = {}) {
+      const headers = { ...extra };
+      if (state.token) headers.Authorization = `Bearer ${state.token}`;
+      return headers;
     }
 
-    async function sendMessage(userText) {
-      state.isStreaming = true;
+    function addPricing(tier = "", price = "", features = "") {
+      const row = document.createElement("div");
+      row.className = "repeat-row pricing";
+      row.innerHTML = `
+        <input data-field="tier" placeholder="Telegram Pro" value="${escapeAttr(tier)}" />
+        <input data-field="price" placeholder="$30 yoki 375000 so'm" value="${escapeAttr(price)}" />
+        <input data-field="features" placeholder="kelgan xabarlarga javob berish, hisob-faktura yuborish" value="${escapeAttr(features)}" />
+        <button type="button" class="icon-btn" title="O'chirish">x</button>
+      `;
+      row.querySelector("button").addEventListener("click", () => { row.remove(); updateMetrics(); });
+      document.getElementById("pricing-list").appendChild(row);
+      row.querySelectorAll("input").forEach(input => input.addEventListener("input", updateMetrics));
+      updateMetrics();
+    }
 
-      // Remove welcome message on first send
-      if (welcomeMsgEl) welcomeMsgEl.remove();
+    function addFaq(question = "", answer = "") {
+      const row = document.createElement("div");
+      row.className = "repeat-row";
+      row.innerHTML = `
+        <input data-field="question" placeholder="Kechasi ham ishlaydimi?" value="${escapeAttr(question)}" />
+        <input data-field="answer" placeholder="Ha, closer 24/7 javob bera oladi." value="${escapeAttr(answer)}" />
+        <button type="button" class="icon-btn" title="O'chirish">x</button>
+      `;
+      row.querySelector("button").addEventListener("click", () => { row.remove(); updateMetrics(); });
+      document.getElementById("faq-list").appendChild(row);
+      row.querySelectorAll("input").forEach(input => input.addEventListener("input", updateMetrics));
+      updateMetrics();
+    }
 
-      // Render user bubble
-      appendBubble("user", userText);
+    function addObjection(objection = "", response = "") {
+      const row = document.createElement("div");
+      row.className = "repeat-row";
+      row.innerHTML = `
+        <input data-field="objection" placeholder="Juda qimmat" value="${escapeAttr(objection)}" />
+        <input data-field="response" placeholder="Bitta qaytarilgan savdo rejaning narxini qoplaydi." value="${escapeAttr(response)}" />
+        <button type="button" class="icon-btn" title="O'chirish">x</button>
+      `;
+      row.querySelector("button").addEventListener("click", () => { row.remove(); updateMetrics(); });
+      document.getElementById("objection-list").appendChild(row);
+      row.querySelectorAll("input").forEach(input => input.addEventListener("input", updateMetrics));
+      updateMetrics();
+    }
 
-      // Add to history
-      const historySnapshot = [...state.conversationHistory];
-      state.conversationHistory.push({ role: "user", content: userText });
+    function escapeAttr(value) {
+      return String(value).replaceAll("&", "&amp;").replaceAll('"', "&quot;").replaceAll("<", "&lt;");
+    }
 
-      // Show typing indicator
-      showTyping();
+    function collectRows(listId) {
+      return [...document.querySelectorAll(`#${listId} .repeat-row`)].map(row => {
+        const item = {};
+        row.querySelectorAll("[data-field]").forEach(input => item[input.dataset.field] = input.value.trim());
+        return item;
+      }).filter(item => Object.values(item).some(Boolean));
+    }
 
-      let assistantBubble = null;
-      let fullResponse = "";
-      let firstToken = true;
+    function showAccessPanel(mode) {
+      state.accessMode = mode;
+      const showTabs = mode === "form" || mode === "returning";
+      const showForm = mode === "form";
+      const showLogin = mode === "login" || mode === "approved" || mode === "returning";
 
+      document.getElementById("auth-tabs").hidden = !showTabs;
+      document.getElementById("access-request-panel").hidden = !showForm;
+      document.getElementById("access-pending-panel").hidden = mode !== "pending";
+      document.getElementById("access-rejected-panel").hidden = mode !== "rejected";
+      document.getElementById("telegram-login-section").hidden = !showLogin;
+
+      const headWrap = document.getElementById("auth-card-head");
+      if (headWrap) headWrap.hidden = mode === "pending" || mode === "rejected";
+
+      const loginCopy = document.getElementById("telegram-login-copy");
+      const backToRequest = document.getElementById("login-to-request-link");
+      if (loginCopy) {
+        loginCopy.textContent = mode === "returning"
+          ? "Tasdiqlangan hisob — Telegram orqali kiring."
+          : "Telegram orqali kiring.";
+      }
+      if (backToRequest) backToRequest.hidden = mode !== "returning";
+
+      document.querySelectorAll(".auth-tab").forEach(tab => {
+        const active = mode === "returning"
+          ? tab.dataset.authTab === "returning"
+          : tab.dataset.authTab === "request";
+        tab.classList.toggle("active", active);
+      });
+
+      if (showLogin) {
+        mountTelegramWidget();
+      } else {
+        document.getElementById("telegram-login").innerHTML = "";
+      }
+
+      updateSetupVisibility();
+      updateFunnelState();
+    }
+
+    function showReturningLogin() {
+      showAccessPanel("returning");
+      statusText.textContent = "Telegram kirish";
+      statusDot.style.background = "var(--blue)";
+    }
+
+    function showAccessRequestForm() {
+      showAccessPanel("form");
+      statusText.textContent = "Kirish";
+      statusDot.style.background = "var(--amber)";
+    }
+
+    function highlightAuthCard() {
+      const card = document.getElementById("auth-card");
+      card.classList.add("highlight-pulse");
+      window.setTimeout(() => card.classList.remove("highlight-pulse"), 2200);
+    }
+
+    function scrollToAuth(focusId) {
+      const hub = document.getElementById("auth-hub");
+      hub.scrollIntoView({ behavior: "smooth", block: "center" });
+      highlightAuthCard();
+      if (focusId) {
+        const el = document.getElementById(focusId);
+        if (el) window.setTimeout(() => el.focus(), 400);
+      }
+    }
+
+    function funnelStepForMode(mode) {
+      if (mode === "pending") return 3;
+      if (mode === "rejected") return 2;
+      if (mode === "returning" || mode === "login" || mode === "approved") return 4;
+      return 2;
+    }
+
+    function updateFunnelState() {
+      const activeStep = funnelStepForMode(state.accessMode);
+      document.querySelectorAll(".funnel-step").forEach(step => {
+        const n = Number(step.dataset.step);
+        step.classList.toggle("done", n < activeStep);
+        step.classList.toggle("active", n === activeStep);
+      });
+
+      const headCopy = {
+        form: {
+          title: "Kirish",
+          subtitle: "Yangi — ariza. Tasdiqlangan — Telegram."
+        },
+        returning: {
+          title: "Telegram kirish",
+          subtitle: "Tasdiqlangan hisobingiz bilan kiring."
+        },
+        pending: {
+          title: "Kutilmoqda",
+          subtitle: "Admin tasdiqlaguncha kuting."
+        },
+        rejected: {
+          title: "Rad etildi",
+          subtitle: "Yangi ariza yuborishingiz mumkin."
+        },
+        approved: {
+          title: "Tasdiqlandi",
+          subtitle: "Telegram orqali kiring."
+        },
+        login: {
+          title: "Tasdiqlandi",
+          subtitle: "Telegram orqali kiring."
+        }
+      };
+
+      const footerCopy = {
+        form: { footer: "Ariza yoki Telegram kirish.", btn: "Forma", action: "request" },
+        returning: { footer: "Telegram orqali davom eting.", btn: "Telegram", action: "returning" },
+        pending: { footer: "Tasdiq kutilmoqda.", btn: "Yangilash", action: "refresh" },
+        rejected: { footer: "Yangi ariza yuboring.", btn: "Ariza", action: "retry" },
+        approved: { footer: "Telegram orqali kiring.", btn: "Telegram", action: "login" },
+        login: { footer: "Telegram orqali kiring.", btn: "Telegram", action: "login" }
+      };
+
+      const mode = state.accessMode === "approved" ? "approved" : state.accessMode;
+      const head = headCopy[mode] || headCopy.form;
+      const foot = footerCopy[mode] || footerCopy.form;
+
+      const titleEl = document.getElementById("auth-card-title");
+      const subtitleEl = document.getElementById("auth-card-subtitle");
+      if (titleEl) titleEl.textContent = head.title;
+      if (subtitleEl) subtitleEl.textContent = head.subtitle;
+
+      const headWrap = document.getElementById("auth-card-head");
+      if (headWrap) headWrap.hidden = mode === "pending" || mode === "rejected";
+
+      const footerText = document.getElementById("funnel-footer-text");
+      const footerBtn = document.getElementById("funnel-footer-btn");
+      if (footerText) footerText.textContent = foot.footer;
+      if (footerBtn) {
+        footerBtn.textContent = foot.btn;
+        footerBtn.dataset.action = foot.action;
+      }
+    }
+
+    function handleFunnelAction(action) {
+      if (action === "refresh") {
+        refreshAccessStatus();
+        scrollToAuth();
+        return;
+      }
+      if (action === "retry") {
+        showAccessPanel("form");
+        updateFunnelState();
+        scrollToAuth("req-name");
+        return;
+      }
+      if (action === "login" || action === "returning") {
+        showReturningLogin();
+        scrollToAuth();
+        return;
+      }
+      scrollToAuth("req-name");
+    }
+
+    function updateSetupVisibility() {
+      const workspace = document.getElementById("passport-workspace");
+      const blocked = document.getElementById("setup-blocked");
+      const setupView = document.getElementById("setup-view");
+      if (state.orgId) {
+        workspace.hidden = false;
+        blocked.hidden = true;
+        setupView.classList.remove("intro-active");
+        return;
+      }
+      workspace.hidden = true;
+      blocked.hidden = false;
+      setupView.classList.add("intro-active");
+      updateFunnelState();
+    }
+
+    async function refreshAccessStatus() {
+      const requestId = localStorage.getItem(ACCESS_REQUEST_KEY);
+      if (!requestId) {
+        showAccessRequestForm();
+        return;
+      }
       try {
-        const response = await fetch("/chat", {
+        const response = await fetch(`/api/access-request/${requestId}`);
+        if (!response.ok) {
+          localStorage.removeItem(ACCESS_REQUEST_KEY);
+          showAccessRequestForm();
+          return;
+        }
+        const data = await response.json();
+        if (data.status === "approved") {
+          state.accessMode = "approved";
+          showAccessPanel("login");
+          await mountTelegramWidget();
+          statusText.textContent = "Tasdiqlandi — Telegram";
+          statusDot.style.background = "var(--green)";
+          updateSetupVisibility();
+          return;
+        }
+        if (data.status === "rejected") {
+          showAccessPanel("rejected");
+          const note = document.getElementById("access-rejected-note");
+          note.textContent = data.review_note
+            ? `Sabab: ${data.review_note}`
+            : "Qayta urinib ko'rishingiz mumkin.";
+          statusText.textContent = "Rad etildi";
+          statusDot.style.background = "var(--red)";
+          return;
+        }
+        showAccessPanel("pending");
+        statusText.textContent = "Kutilmoqda";
+        statusDot.style.background = "var(--amber)";
+      } catch (_) {
+        showAccessPanel("pending");
+      }
+    }
+
+    function validateAccessForm(fd) {
+      const message = String(fd.get("message") || "").trim();
+      const phone = String(fd.get("contact") || "").replace(/\D/g, "");
+      const username = String(fd.get("telegram_username") || "").trim().replace(/^@/, "");
+      if (message.length < 30) {
+        return "Muammoingizni kamida 30 belgi bilan yozing.";
+      }
+      if (phone.length < 9) {
+        return "To'g'ri telefon raqamini kiriting.";
+      }
+      if (username.length < 3) {
+        return "Telegram @username kiriting.";
+      }
+      return null;
+    }
+
+    async function submitAccessRequest(event) {
+      event.preventDefault();
+      const fd = new FormData(event.target);
+      const hint = document.getElementById("access-form-hint");
+      const clientError = validateAccessForm(fd);
+      if (clientError) {
+        hint.textContent = clientError;
+        return;
+      }
+      hint.textContent = "Yuborilmoqda...";
+      try {
+        const response = await fetch("/api/access-request", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
-            message: userText,
-            client_context: state.clientContext,
-            user_role: state.userRole,
-            conversation_history: historySnapshot
+            full_name: String(fd.get("full_name")).trim(),
+            business_name: String(fd.get("business_name")).trim(),
+            telegram_username: String(fd.get("telegram_username")).trim(),
+            contact: String(fd.get("contact")).trim(),
+            message: String(fd.get("message")).trim()
           })
         });
+        const result = await response.json();
+        if (!response.ok) throw new Error(parseApiError(result, response.statusText));
+        localStorage.setItem(ACCESS_REQUEST_KEY, result.request_id);
+        event.target.reset();
+        hint.textContent = "";
+        await refreshAccessStatus();
+      } catch (error) {
+        hint.textContent = error.message;
+      }
+    }
 
+    function setAuthenticated(user, orgId, token) {
+      state.user = user;
+      state.orgId = orgId;
+      state.token = token || null;
+      localStorage.setItem(AUTH_STORAGE_KEY, JSON.stringify({ user, orgId, token: state.token }));
+      showAccessPanel("login");
+      document.getElementById("telegram-login-section").hidden = true;
+      document.getElementById("access-request-panel").hidden = true;
+      document.getElementById("access-pending-panel").hidden = true;
+      document.getElementById("access-rejected-panel").hidden = true;
+      const authUser = document.getElementById("auth-user");
+      authUser.classList.add("visible");
+      const label = user.username ? `@${user.username}` : user.first_name;
+      document.getElementById("auth-label").textContent = `${label} sifatida kirdingiz`;
+      document.getElementById("org-id-label").textContent = orgId;
+      statusText.textContent = state.saved ? "Saqlangan" : "Kirildi";
+      statusDot.style.background = state.saved ? "var(--green)" : "var(--amber)";
+      document.getElementById("connection-panel").hidden = false;
+      updateSetupVisibility();
+      loadConnectionStatus();
+    }
+
+    function clearAuth() {
+      state.user = null;
+      state.orgId = null;
+      state.token = null;
+      state.saved = false;
+      state.brandId = null;
+      localStorage.removeItem(AUTH_STORAGE_KEY);
+      document.getElementById("auth-user").classList.remove("visible");
+      document.getElementById("org-id-label").textContent = "kirilmagan";
+      copilotTab.disabled = true;
+      document.getElementById("connection-panel").hidden = true;
+      showReturningLogin();
+      updateSetupVisibility();
+    }
+
+    async function restoreSession() {
+      const cached = localStorage.getItem(AUTH_STORAGE_KEY);
+      if (!cached) return false;
+      try {
+        const { user, orgId, token } = JSON.parse(cached);
+        if (!user || !orgId || !token) {
+          localStorage.removeItem(AUTH_STORAGE_KEY);
+          return false;
+        }
+        const response = await fetch("/api/auth/me", {
+          headers: { Authorization: `Bearer ${token}` }
+        });
         if (!response.ok) {
-          hideTyping();
-          appendBubble("error", `Server error: ${response.status} ${response.statusText}`);
-          rollbackLastUserMessage();
-          finishStreaming();
-          return;
+          localStorage.removeItem(AUTH_STORAGE_KEY);
+          return false;
         }
+        const me = await response.json();
+        setAuthenticated(user, me.org_id || orgId, token);
+        await loadExistingPassport();
+        return true;
+      } catch (_) {
+        localStorage.removeItem(AUTH_STORAGE_KEY);
+        return false;
+      }
+    }
 
-        const reader = response.body.getReader();
-        const decoder = new TextDecoder();
-
-        while (true) {
-          const { done, value } = await reader.read();
-          if (done) break;
-
-          const chunk = decoder.decode(value, { stream: true });
-          const lines = chunk.split("\n");
-
-          for (const line of lines) {
-            if (!line.startsWith("data: ")) continue;
-            const jsonStr = line.slice(6).trim();
-            if (!jsonStr) continue;
-
-            let data;
-            try { data = JSON.parse(jsonStr); } catch { continue; }
-
-            if (data.error) {
-              hideTyping();
-              appendBubble("error", data.error);
-              rollbackLastUserMessage();
-              finishStreaming();
-              return;
-            }
-
-            if (data.token) {
-              if (firstToken) {
-                hideTyping();
-                assistantBubble = createAssistantBubble();
-                firstToken = false;
-              }
-              fullResponse += data.token;
-              assistantBubble.textContent = fullResponse;
-              scrollToBottom();
-            }
-
-            if (data.done) {
-              state.currentConversationId = data.conversation_id;
-            }
-          }
+    async function loadConnectionStatus() {
+      if (!state.token) return;
+      const pill = document.getElementById("connection-pill");
+      const label = document.getElementById("connection-status-text");
+      const subPill = document.getElementById("subscription-pill");
+      const subLabel = document.getElementById("subscription-status-text");
+      const paymentsPill = document.getElementById("payments-pill");
+      const paymentsLabel = document.getElementById("payments-status-text");
+      try {
+        const response = await fetch("/api/org/connection-status", {
+          headers: apiHeaders()
+        });
+        if (!response.ok) return;
+        const data = await response.json();
+        if (data.connected) {
+          pill.className = "connection-pill on";
+          label.textContent = "Biznes ulanishi faol";
+        } else {
+          pill.className = "connection-pill off";
+          label.textContent = "Biznes ulanishi yo'q";
         }
-
-        // Save assistant turn to history
-        if (fullResponse) {
-          state.conversationHistory.push({ role: "assistant", content: fullResponse });
+        if (data.subscription_active) {
+          subPill.className = "connection-pill on";
+          subLabel.textContent = "Converza obunasi faol";
+        } else {
+          subPill.className = "connection-pill off";
+          subLabel.textContent = "Obuna yo'q — @ConverzaApp_bot /subscribe";
         }
+        if (data.payments_enabled) {
+          paymentsPill.className = "connection-pill on";
+          paymentsLabel.textContent = "Mijozlar Click to'lovi yoqilgan";
+        } else {
+          paymentsPill.className = "connection-pill off";
+          paymentsLabel.textContent = "Mijozlar Click yo'q (ixtiyoriy)";
+        }
+      } catch (_) {
+        pill.className = "connection-pill off";
+        label.textContent = "Holatni yuklab bo'lmadi";
+        subPill.className = "connection-pill off";
+        subLabel.textContent = "Obuna holati noma'lum";
+        paymentsPill.className = "connection-pill off";
+        paymentsLabel.textContent = "Click holati noma'lum";
+      }
+    }
 
-      } catch (err) {
-        hideTyping();
-        appendBubble("error", `Connection error: ${err.message}`);
-        rollbackLastUserMessage();
+    async function mountTelegramWidget() {
+      const container = document.getElementById("telegram-login");
+      container.innerHTML = "";
+      try {
+        const config = await fetch("/api/auth/config").then(r => r.json());
+        const hint = document.getElementById("bot-username-hint");
+        const salesBot = config.sales_bot_username || "ConverzaSales_bot";
+        if (hint) hint.textContent = `@${salesBot}`;
+        document.querySelectorAll("[data-sales-bot]").forEach(el => {
+          el.textContent = `@${salesBot}`;
+        });
+        const script = document.createElement("script");
+        script.async = true;
+        script.src = "https://telegram.org/js/telegram-widget.js?22";
+        script.setAttribute("data-telegram-login", config.bot_username || "ConverzaApp_bot");
+        script.setAttribute("data-size", "medium");
+        script.setAttribute("data-radius", "8");
+        script.setAttribute("data-onauth", "onTelegramAuth(user)");
+        script.setAttribute("data-request-access", "write");
+        container.appendChild(script);
+      } catch (error) {
+        container.textContent = "Telegram orqali kirishni yuklab bo'lmadi.";
+      }
+    }
+
+    window.onTelegramAuth = async function onTelegramAuth(user) {
+      try {
+        const response = await fetch("/api/auth/telegram", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(user)
+        });
+        const result = await response.json();
+        if (!response.ok) throw new Error(parseApiError(result, response.statusText));
+        setAuthenticated(
+          { first_name: result.first_name, username: result.username },
+          result.org_id,
+          result.token
+        );
+        await loadExistingPassport();
+        if (state.orgId && !state.saved && !document.getElementById("pricing-list").children.length) {
+          seedExamples();
+        }
+      } catch (error) {
+        const msg = String(error.message || "");
+        if (msg.includes("admin tasdig")) {
+          showAccessPanel("pending");
+          updateSetupVisibility();
+          statusText.textContent = "Kirish uchun admin tasdiqi kerak";
+        }
+        showSave(msg, "error");
+      }
+    };
+
+    function collectPassport() {
+      const data = new FormData(form);
+      return {
+        org_id: state.orgId,
+        brand_name: data.get("brand_name").trim(),
+        industry: data.get("industry").trim(),
+        target_location: data.get("target_location").trim() || "O'zbekiston",
+        target_audience: data.get("target_audience").trim(),
+        core_offer: data.get("core_offer").trim(),
+        tone: data.get("tone"),
+        raw_notes: data.get("raw_notes").trim(),
+        click_token: (data.get("click_token") || "").trim(),
+        pricing: collectRows("pricing-list").map(item => ({
+          tier: item.tier,
+          price: item.price,
+          features: item.features ? item.features.split(",").map(v => v.trim()).filter(Boolean) : []
+        })),
+        faq: collectRows("faq-list"),
+        objections: collectRows("objection-list")
+      };
+    }
+
+    function populateForm(passport) {
+      form.brand_name.value = passport.brand_name || "";
+      form.industry.value = passport.industry || "";
+      form.target_location.value = passport.target_location || "O'zbekiston";
+      form.target_audience.value = passport.target_audience || "";
+      form.core_offer.value = passport.core_offer || "";
+      form.raw_notes.value = passport.raw_notes || "";
+      if (passport.tone) {
+        const match = [...form.tone.options].some(o => o.value === passport.tone);
+        if (match) {
+          [...form.tone.options].forEach(option => {
+            option.selected = option.value === passport.tone;
+          });
+        }
       }
 
-      finishStreaming();
+      const pricingFeatures = item =>
+        Array.isArray(item.features) ? item.features.join(", ") : (item.features || "");
+
+      document.getElementById("pricing-list").innerHTML = "";
+      document.getElementById("faq-list").innerHTML = "";
+      document.getElementById("objection-list").innerHTML = "";
+
+      (passport.pricing || []).forEach(item => {
+        addPricing(item.tier || "", item.price || "", pricingFeatures(item));
+      });
+      (passport.faq || []).forEach(item => addFaq(item.question || "", item.answer || ""));
+      (passport.objections || []).forEach(item => addObjection(item.objection || "", item.response || ""));
+      updateMetrics();
     }
 
-    // ----------------------------------------------------------------
-    // Helpers
-    // ----------------------------------------------------------------
+    function applySavedPassport(passport) {
+      populateForm(passport);
+      if (form.click_token) form.click_token.value = "";
+
+      state.saved = true;
+      state.brandId = passport.id;
+      state.clientContext = {
+        brand_name: passport.brand_name || "",
+        industry: passport.industry || "",
+        target_location: passport.target_location || "O'zbekiston",
+        hex_colors: passport.hex_colors || [],
+        target_audience: passport.target_audience || "",
+        core_offer: passport.core_offer || ""
+      };
+      copilotTab.disabled = false;
+      statusText.textContent = "Yuklandi";
+      statusDot.style.background = "var(--green)";
+      document.getElementById("saved-brand").textContent = passport.brand_name || "Tayyor";
+      updateMetrics();
+    }
+
+    async function loadExistingPassport() {
+      if (!state.orgId) return;
+      try {
+        const response = await fetch(`/api/brand-passport/by-org/${state.orgId}`, {
+          headers: apiHeaders()
+        });
+        if (!response.ok) return;
+        const passport = await response.json();
+        applySavedPassport(passport);
+      } catch (_) {
+        // No saved passport yet — keep the empty form.
+      }
+    }
+
+    function updateMetrics() {
+      const p = collectPassport();
+      const basics = ["brand_name", "industry", "target_location", "target_audience", "core_offer"].filter(k => p[k]).length;
+      document.getElementById("metric-brand").textContent = basics;
+      document.getElementById("metric-pricing").textContent = p.pricing.length;
+      document.getElementById("metric-faq").textContent = p.faq.length;
+      document.getElementById("metric-objections").textContent = p.objections.length;
+    }
+
+    async function savePassport(event) {
+      event.preventDefault();
+      if (!state.orgId) {
+        showSave("Avval Telegram orqali kiring.", "error");
+        return;
+      }
+      const passport = collectPassport();
+      if (!passport.brand_name || !passport.target_audience || !passport.core_offer) {
+        showSave("Biznes nomi, auditoriya va taklif kerak.", "error");
+        return;
+      }
+      if (!passport.pricing.length) {
+        showSave("Kamida bitta narx qo'shing.", "error");
+        return;
+      }
+
+      saveBtn.disabled = true;
+      showSave("Saqlanmoqda...", "");
+      try {
+        const response = await fetch("/api/dm-closer/onboard", {
+          method: "POST",
+          headers: apiHeaders({ "Content-Type": "application/json" }),
+          body: JSON.stringify(passport)
+        });
+        const result = await response.json();
+        if (!response.ok) throw new Error(parseApiError(result, response.statusText));
+        state.saved = true;
+        state.brandId = result.brand_id;
+        state.clientContext = {
+          brand_name: passport.brand_name,
+          industry: passport.industry,
+          target_location: passport.target_location,
+          hex_colors: [],
+          target_audience: passport.target_audience,
+          core_offer: passport.core_offer
+        };
+        copilotTab.disabled = false;
+        statusText.textContent = "Saqlandi";
+        statusDot.style.background = "var(--green)";
+        document.getElementById("saved-brand").textContent = passport.brand_name;
+        showSave(`Saqlandi (${passport.pricing.length} narx).`, "success");
+        loadConnectionStatus();
+      } catch (error) {
+        showSave(error.message, "error");
+      } finally {
+        saveBtn.disabled = false;
+      }
+    }
+
+    function parseApiError(result, fallback) {
+      const detail = result?.detail;
+      if (!detail) return fallback || "So'rov bajarilmadi.";
+      if (typeof detail === "string") {
+        if (detail.includes("Could not find") && detail.includes("column")) {
+          return "Ma'lumotlar bazasi yangilanmagan. Administratorga xabar bering yoki keyinroq qayta urinib ko'ring.";
+        }
+        if (detail.startsWith("{") && detail.includes("message")) {
+          try {
+            const parsed = JSON.parse(detail.replace(/'/g, "\""));
+            if (parsed.message) return parseApiError({ detail: parsed.message }, fallback);
+          } catch (_) { /* use raw string */ }
+        }
+        return detail;
+      }
+      if (Array.isArray(detail)) {
+        return detail.map((item) => item.msg || item).join("; ");
+      }
+      return fallback || "So'rov bajarilmadi.";
+    }
+
+    function showSave(message, type) {
+      saveResult.hidden = false;
+      saveResult.textContent = message;
+      saveResult.className = `notice ${type || ""}`;
+      saveResult.scrollIntoView({ behavior: "smooth", block: "nearest" });
+    }
+
+    function switchView(view) {
+      document.querySelectorAll(".nav-btn, .tab").forEach(btn => {
+        btn.classList.toggle("active", btn.dataset.view === view);
+      });
+      document.querySelectorAll(".view").forEach(section => {
+        section.classList.toggle("active", section.id === `${view}-view`);
+      });
+      const titles = { setup: "DM Closer", copilot: "Co-Pilot" };
+      const titleEl = document.getElementById("topbar-title");
+      if (titleEl) titleEl.textContent = titles[view] || "Converza";
+    }
+
     function appendBubble(role, text) {
-      const row = document.createElement("div");
-      row.className = `msg-row ${role === "error" ? "assistant" : role}`;
-
       const bubble = document.createElement("div");
-      bubble.className = `bubble ${role === "error" ? "error" : role}`;
+      bubble.className = `bubble ${role}`;
       bubble.textContent = text;
-
-      row.appendChild(bubble);
-      messagesEl.appendChild(row);
-      scrollToBottom();
+      document.getElementById("messages").appendChild(bubble);
+      bubble.scrollIntoView({ block: "end" });
       return bubble;
     }
 
-    function createAssistantBubble() {
-      const row = document.createElement("div");
-      row.className = "msg-row assistant";
-
-      const bubble = document.createElement("div");
-      bubble.className = "bubble assistant";
-
-      row.appendChild(bubble);
-      messagesEl.appendChild(row);
-      scrollToBottom();
-      return bubble;
+    async function streamSse(response, assistant, onEvent) {
+      if (!response.ok || !response.body) throw new Error(`${response.status} ${response.statusText}`);
+      const reader = response.body.getReader();
+      const decoder = new TextDecoder();
+      let buffer = "";
+      while (true) {
+        const { done, value } = await reader.read();
+        if (done) break;
+        buffer += decoder.decode(value, { stream: true });
+        const lines = buffer.split("\n");
+        buffer = lines.pop() || "";
+        for (const line of lines) {
+          if (!line.startsWith("data: ")) continue;
+          const raw = line.slice(6).trim();
+          if (!raw) continue;
+          const event = JSON.parse(raw);
+          onEvent(event, assistant);
+        }
+      }
     }
 
-    function showTyping() {
-      typingIndicator.classList.add("visible");
-      scrollToBottom();
+    async function sendCopilot() {
+      const input = document.getElementById("message-input");
+      const text = input.value.trim();
+      if (!text) return;
+      if (!state.orgId) {
+        appendBubble("error", "Avval Telegram orqali kiring.");
+        return;
+      }
+      if (!state.brandId) {
+        appendBubble("error", "Avval pasportni saqlang.");
+        return;
+      }
+      input.value = "";
+      appendBubble("user", text);
+      const history = [...state.conversationHistory];
+      state.conversationHistory.push({ role: "user", content: text });
+      const assistant = appendBubble("assistant", "");
+
+      try {
+        const endpoint = "/chat";
+        const payload = {
+          message: text,
+          brand_id: state.brandId,
+          client_context: state.clientContext,
+          user_role: "Owner",
+          conversation_history: history
+        };
+
+        const response = await fetch(endpoint, {
+          method: "POST",
+          headers: apiHeaders({ "Content-Type": "application/json" }),
+          body: JSON.stringify(payload)
+        });
+
+        let full = "";
+        await streamSse(response, assistant, (event) => {
+          if (event.error) throw new Error(event.error);
+          if (event.conversation_id) state.conversationId = event.conversation_id;
+          if (event.type === "dag_plan") {
+            full += `\n\n[Agent rejasi: ${event.plan?.campaign_name || "kampaniya"}]`;
+            assistant.textContent = full.trim();
+          }
+          if (event.type === "dag_result") {
+            full += `\n\n[Kampaniya tayyor: ${event.campaign_name || "bajarildi"}]`;
+            assistant.textContent = full.trim();
+          }
+          if (event.type === "dag_error") throw new Error(event.error);
+          const token = event.token;
+          if (token) {
+            full += token;
+            assistant.textContent = full;
+          }
+        });
+        if (full) state.conversationHistory.push({ role: "assistant", content: full });
+      } catch (error) {
+        assistant.className = "bubble error";
+        assistant.textContent = error.message;
+      }
     }
 
-    function hideTyping() {
-      typingIndicator.classList.remove("visible");
+    form.addEventListener("input", updateMetrics);
+    form.addEventListener("submit", savePassport);
+    document.getElementById("add-pricing").addEventListener("click", () => addPricing());
+    document.getElementById("add-faq").addEventListener("click", () => addFaq());
+    document.getElementById("add-objection").addEventListener("click", () => addObjection());
+    document.querySelectorAll(".nav-btn, .topbar .tab").forEach(btn => {
+      btn.addEventListener("click", () => {
+        if (btn.disabled) return;
+        switchView(btn.dataset.view);
+      });
+    });
+    document.getElementById("logout-btn").addEventListener("click", clearAuth);
+    document.getElementById("access-request-form").addEventListener("submit", submitAccessRequest);
+    document.getElementById("refresh-access-btn").addEventListener("click", refreshAccessStatus);
+    document.getElementById("retry-access-btn").addEventListener("click", () => {
+      localStorage.removeItem(ACCESS_REQUEST_KEY);
+      showAccessRequestForm();
+      scrollToAuth("req-name");
+    });
+    document.getElementById("goto-returning-login").addEventListener("click", () => {
+      showReturningLogin();
+      scrollToAuth();
+    });
+    document.getElementById("goto-access-request").addEventListener("click", () => {
+      showAccessRequestForm();
+      scrollToAuth("req-name");
+    });
+    document.querySelectorAll(".auth-tab").forEach(tab => {
+      tab.addEventListener("click", () => {
+        if (tab.dataset.authTab === "returning") {
+          showReturningLogin();
+        } else {
+          showAccessRequestForm();
+        }
+      });
+    });
+    document.getElementById("send-btn").addEventListener("click", sendCopilot);
+    document.getElementById("message-input").addEventListener("keydown", event => {
+      if (event.key === "Enter" && !event.shiftKey) {
+        event.preventDefault();
+        sendCopilot();
+      }
+    });
+
+    function seedExamples() {
+      addPricing("Telegram Pro", "$30", "kelgan xabarlarga javob berish, hisob-faktura yuborish, suhbatlarni boshqarish");
+      addFaq("Qaysi platformada ishlaydi?", "Hozircha Converza Telegram'da ishlaydi.");
+      addFaq("Kechasi ham javob beradimi?", "Ha, u 24/7 javob bera oladi va kechki mijozlarni qaytaradi.");
+      addObjection("Juda qimmat", "Bitta qaytarilgan savdo rejaning narxini qoplaydi.");
     }
 
-    function scrollToBottom() {
-      messagesEl.scrollTop = messagesEl.scrollHeight;
+    // ── PDF upload → auto-generate brand passport ──────────────────────────
+    const pdfState = { files: [] };
+    const pdfInput = document.getElementById("pdf-input");
+    const pdfDrop = document.getElementById("pdf-drop");
+    const pdfList = document.getElementById("pdf-list");
+    const pdfGenerate = document.getElementById("pdf-generate");
+    const pdfClear = document.getElementById("pdf-clear");
+    const pdfResult = document.getElementById("pdf-result");
+
+    function showPdfResult(message, type) {
+      pdfResult.hidden = false;
+      pdfResult.textContent = message;
+      pdfResult.className = `notice ${type || ""}`;
     }
 
-    function finishStreaming() {
-      state.isStreaming = false;
-      sendBtn.disabled = messageInput.value.trim() === "";
-      messageInput.focus();
+    function renderPdfList() {
+      pdfList.innerHTML = "";
+      pdfState.files.forEach((file, index) => {
+        const li = document.createElement("li");
+        const sizeKb = Math.max(1, Math.round(file.size / 1024));
+        li.innerHTML = `<span>📄</span><span>${escapeAttr(file.name)} — ${sizeKb} KB</span><button type="button" title="O'chirish">✕</button>`;
+        li.querySelector("button").addEventListener("click", (e) => {
+          e.stopPropagation();
+          pdfState.files.splice(index, 1);
+          renderPdfList();
+        });
+        pdfList.appendChild(li);
+      });
+      pdfGenerate.disabled = pdfState.files.length === 0;
     }
 
-    function rollbackLastUserMessage() {
-      // Remove the user message we just added so history stays consistent
-      const last = state.conversationHistory[state.conversationHistory.length - 1];
-      if (last && last.role === "user") state.conversationHistory.pop();
+    function addPdfFiles(fileList) {
+      for (const file of fileList) {
+        if (!file.name.toLowerCase().endsWith(".pdf")) continue;
+        const exists = pdfState.files.some(f => f.name === file.name && f.size === file.size);
+        if (!exists) pdfState.files.push(file);
+      }
+      renderPdfList();
     }
+
+    async function generateFromPdf() {
+      if (!state.orgId) {
+        showPdfResult("Avval Telegram orqali kiring.", "error");
+        return;
+      }
+      if (!pdfState.files.length) return;
+      pdfGenerate.disabled = true;
+      showPdfResult(`${pdfState.files.length} ta hujjat tahlil qilinmoqda... ⏳`, "");
+      try {
+        const fd = new FormData();
+        pdfState.files.forEach(file => fd.append("files", file, file.name));
+        const response = await fetch("/api/dm-closer/parse-pdf", {
+          method: "POST",
+          headers: apiHeaders(),
+          body: fd
+        });
+        const result = await response.json();
+        if (!response.ok) throw new Error(parseApiError(result, response.statusText));
+        populateForm(result.passport);
+        showPdfResult(
+          `${result.files_processed} ta PDF dan yaratildi. Tekshirib saqlang.`,
+          "success"
+        );
+      } catch (error) {
+        showPdfResult(`Xatolik: ${error.message}`, "error");
+      } finally {
+        pdfGenerate.disabled = pdfState.files.length === 0;
+      }
+    }
+
+    pdfList.addEventListener("click", e => e.stopPropagation());
+    pdfDrop.addEventListener("click", () => pdfInput.click());
+    pdfInput.addEventListener("change", () => { addPdfFiles(pdfInput.files); pdfInput.value = ""; });
+    pdfDrop.addEventListener("dragover", e => { e.preventDefault(); pdfDrop.classList.add("dragover"); });
+    pdfDrop.addEventListener("dragleave", () => pdfDrop.classList.remove("dragover"));
+    pdfDrop.addEventListener("drop", e => {
+      e.preventDefault();
+      pdfDrop.classList.remove("dragover");
+      if (e.dataTransfer?.files) addPdfFiles(e.dataTransfer.files);
+    });
+    pdfClear.addEventListener("click", () => { pdfState.files = []; renderPdfList(); pdfResult.hidden = true; });
+    pdfGenerate.addEventListener("click", generateFromPdf);
+
+    document.getElementById("funnel-footer-btn").addEventListener("click", e => {
+      handleFunnelAction(e.currentTarget.dataset.action || "request");
+    });
+
+    async function bootstrap() {
+      updateSetupVisibility();
+
+      const restored = await restoreSession();
+      if (!restored && !state.orgId) {
+        await refreshAccessStatus();
+      }
+
+      if (state.orgId && !state.saved && !document.getElementById("pricing-list").children.length) {
+        seedExamples();
+      }
+    }
+    bootstrap();
   </script>
 </body>
 </html>
