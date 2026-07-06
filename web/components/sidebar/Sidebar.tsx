@@ -4,26 +4,32 @@ import { useEffect, useState } from "react";
 import { usePathname } from "next/navigation";
 import Link from "next/link";
 import clsx from "clsx";
-import { AnimatePresence, motion } from "motion/react";
+import { motion } from "motion/react";
 import {
   LayoutDashboard,
-  Compass,
+  UsersRound,
+  MessagesSquare,
   Crosshair,
-  ChevronDown,
+  Building2,
   X,
-  MessageSquareText,
+  Settings,
 } from "lucide-react";
+import {
+  getWorkspaceNavItems,
+  type WorkspaceNavItem,
+} from "@/lib/data/workspace";
 
 // ─────────────────────────────────────────────────────────────────────
 // Types
 // ─────────────────────────────────────────────────────────────────────
 
 interface NavItem {
-  id: string;
+  id: WorkspaceNavItem["id"];
   label: string;
   href: string;
   icon: React.ElementType;
-  hint?: string;
+  badge?: string;
+  placement: WorkspaceNavItem["placement"];
 }
 
 interface SidebarProps {
@@ -32,20 +38,22 @@ interface SidebarProps {
 }
 
 // ─────────────────────────────────────────────────────────────────────
-// IA — single nav focused on data input for the AI
+// IA — approved Agent Workspace model
 // ─────────────────────────────────────────────────────────────────────
 
-const navItems: NavItem[] = [
-  { id: "dashboard", label: "Dashboard", href: "/", icon: LayoutDashboard },
-  { id: "strategy", label: "Strategy", href: "/strategy", icon: Compass },
-  { id: "competitors", label: "Competitors", href: "/competitors", icon: Crosshair },
-];
+const navIconMap: Record<WorkspaceNavItem["id"], React.ElementType> = {
+  dashboard: LayoutDashboard,
+  agents: UsersRound,
+  squad: MessagesSquare,
+  competitors: Crosshair,
+  office: Building2,
+  settings: Settings,
+};
 
-const chatHistoryItems = [
-  { id: "campaign-brief", title: "Campaign brief", meta: "Today" },
-  { id: "creative-hooks", title: "Creative hooks", meta: "Yesterday" },
-  { id: "competitor-review", title: "Competitor review", meta: "Mon" },
-];
+const navItems: NavItem[] = getWorkspaceNavItems().map((item) => ({
+  ...item,
+  icon: navIconMap[item.id],
+}));
 
 const BRAND_NAME_STORAGE_KEY = "converza.brandName";
 
@@ -55,13 +63,7 @@ const BRAND_NAME_STORAGE_KEY = "converza.brandName";
 
 export default function Sidebar({ open, onClose }: SidebarProps) {
   const pathname = usePathname();
-  const [chatHistoryOpen, setChatHistoryOpen] = useState(false);
   const [brandName, setBrandName] = useState("Osman Skincare");
-  const isCopilot = pathname.startsWith("/copilot");
-
-  useEffect(() => {
-    setChatHistoryOpen(isCopilot);
-  }, [isCopilot]);
 
   useEffect(() => {
     function readBrandName() {
@@ -96,16 +98,16 @@ export default function Sidebar({ open, onClose }: SidebarProps) {
           href={item.href}
           onClick={onClose}
           className={clsx(
-            "group relative flex items-center gap-3 rounded-lg px-3 py-2 text-[13.5px] transition-colors duration-150",
+            "group relative flex items-center gap-2.5 rounded-lg px-2.5 py-[9px] font-workspace-sans text-[13px] transition-colors duration-150",
             active
-              ? "bg-bg-active text-text-primary font-medium"
-              : "text-text-secondary hover:bg-bg-hover hover:text-text-primary",
+              ? "bg-[#f4f4f5] font-medium text-black"
+              : "text-[#666666] hover:bg-[#f4f4f5] hover:text-[#111111]",
           )}
         >
           {active && (
             <motion.span
               layoutId="active-rail"
-              className="absolute left-0 top-1/2 h-4 w-[3px] -translate-y-1/2 rounded-r-full bg-accent"
+              className="absolute left-0 top-1/2 h-4 w-[3px] -translate-y-1/2 rounded-r-full bg-converza-blue"
               transition={{ type: "spring", stiffness: 380, damping: 30 }}
             />
           )}
@@ -114,14 +116,14 @@ export default function Sidebar({ open, onClose }: SidebarProps) {
             strokeWidth={active ? 2.2 : 1.8}
             className={clsx(
               "shrink-0 transition-colors",
-              active ? "text-text-primary" : "text-text-muted group-hover:text-text-secondary",
+              active ? "text-black" : "text-[#999999] group-hover:text-[#666666]",
             )}
           />
           <span className="flex-1 truncate">{item.label}</span>
-          {item.hint && (
-            <kbd className="hidden font-mono text-[9.5px] uppercase tracking-[0.14em] text-text-muted/70 group-hover:inline">
-              {item.hint}
-            </kbd>
+          {item.badge && (
+            <span className="ml-auto rounded-full bg-[#ececec] px-2 py-0.5 font-workspace-mono text-[8px] uppercase tracking-[0.04em] text-[#999999]">
+              {item.badge}
+            </span>
           )}
         </Link>
       </motion.div>
@@ -130,24 +132,16 @@ export default function Sidebar({ open, onClose }: SidebarProps) {
 
   const sidebarContent = (
     <>
-      {/* ── Workspace switcher (Claude / Linear style) ── */}
-      <div className="flex h-16 shrink-0 items-center justify-between border-b border-border/60 px-4">
-        <div className="flex items-center gap-2.5 px-1 py-1">
-          <span className="relative flex h-8 w-8 items-center justify-center rounded-lg bg-text-primary text-bg-elevated">
-            <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
-              <path
-                d="M7 1.5v11M1.5 7h11M3 3l8 8M11 3l-8 8"
-                stroke="currentColor"
-                strokeWidth="1.6"
-                strokeLinecap="round"
-              />
-            </svg>
+      <div className="flex shrink-0 items-center justify-between px-2 pb-5">
+        <div className="flex items-center gap-2.5">
+          <span className="flex h-[30px] w-[30px] items-center justify-center rounded-lg bg-black font-workspace-display text-[15px] font-extrabold text-white">
+            C
           </span>
           <span className="flex flex-col items-start leading-tight">
-            <span className="text-[13.5px] font-semibold tracking-[-0.015em] text-text-primary">
+            <span className="font-workspace-display text-[14px] font-extrabold tracking-[-0.01em] text-black">
               Converza
             </span>
-            <span className="max-w-[150px] truncate font-mono text-[9px] uppercase tracking-[0.16em] text-text-muted">
+            <span className="max-w-[150px] truncate font-workspace-mono text-[10px] uppercase tracking-[0.03em] text-[#999999]">
               {brandName}
             </span>
           </span>
@@ -161,91 +155,27 @@ export default function Sidebar({ open, onClose }: SidebarProps) {
         </button>
       </div>
 
-      {/* ── Single flat nav, focused on data input for the AI ── */}
-      <nav className="flex-1 space-y-0.5 overflow-y-auto px-3 pb-4 pt-4">
-        {navItems.map((item, i) => (
+      <nav className="flex-1 space-y-1 overflow-y-auto">
+        {navItems.filter((item) => item.placement === "main").map((item, i) => (
           <NavLink key={item.id} item={item} index={i} />
         ))}
-
-        {/* Quiet shortcut to the chat assistant — kept reachable but out of the primary IA */}
-        <div className="mt-6 border-t border-border/60 pt-3">
-          <Link
-            href="/copilot"
-            onClick={() => {
-              setChatHistoryOpen(true);
-              onClose();
-            }}
-            className={clsx(
-              "group flex items-center gap-3 rounded-lg px-3 py-2 text-[13px] transition-colors",
-              isCopilot
-                ? "bg-bg-active font-medium text-text-primary"
-                : "text-text-muted hover:bg-bg-hover hover:text-text-secondary",
-            )}
-          >
-            <MessageSquareText
-              size={14}
-              strokeWidth={isCopilot ? 2.1 : 1.8}
-              className={isCopilot ? "text-text-primary" : ""}
-            />
-            <span className="flex-1">Co-Pilot chat</span>
-            <ChevronDown
-              size={12}
-              strokeWidth={2}
-              className={clsx(
-                "text-text-muted transition-transform duration-200",
-                chatHistoryOpen && isCopilot ? "rotate-180" : "-rotate-90",
-              )}
-            />
-          </Link>
-
-          <AnimatePresence initial={false}>
-            {isCopilot && chatHistoryOpen && (
-              <motion.div
-                key="copilot-history"
-                initial={{ height: 0, opacity: 0 }}
-                animate={{ height: "auto", opacity: 1 }}
-                exit={{ height: 0, opacity: 0 }}
-                transition={{ duration: 0.24, ease: [0.16, 1, 0.3, 1] }}
-                className="overflow-hidden"
-              >
-                <div className="mt-1.5 space-y-1 pl-6">
-                  {chatHistoryItems.map((item) => (
-                    <Link
-                      key={item.id}
-                      href="/copilot"
-                      onClick={onClose}
-                      className="group flex items-center justify-between rounded-lg px-3 py-1.5 text-[12px] text-text-muted transition-colors hover:bg-bg-hover hover:text-text-primary"
-                    >
-                      <span className="truncate">{item.title}</span>
-                      <span className="ml-2 shrink-0 font-mono text-[9px] uppercase tracking-[0.16em] text-text-muted/70">
-                        {item.meta}
-                      </span>
-                    </Link>
-                  ))}
-                </div>
-              </motion.div>
-            )}
-          </AnimatePresence>
-        </div>
       </nav>
 
-      {/* ── User chip ── */}
-      <div className="mx-3 mb-3">
-        <Link
-          href="/settings"
-          onClick={onClose}
-          className="group flex items-center gap-2.5 rounded-lg px-2 py-2 transition-colors hover:bg-bg-hover"
-        >
-          <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-[#2D6FE5] to-[#0070F3] text-[11px] font-medium text-white">
-            NE
+      <div className="mt-2 border-t border-[#e5e5e5] pt-3">
+        {navItems.filter((item) => item.placement === "footer").map((item, i) => (
+          <NavLink key={item.id} item={item} index={i} />
+        ))}
+        <div className="mt-2 flex items-center gap-2.5 rounded-lg px-2.5 py-1.5 font-workspace-sans">
+          <span className="flex h-[26px] w-[26px] shrink-0 items-center justify-center rounded-full bg-black text-[11px] font-medium text-white">
+            N
           </span>
-          <span className="flex-1 truncate text-[13px] font-medium text-text-primary">
+          <span className="text-[12px] text-[#111111]">
             Nodir
           </span>
-          <span className="font-mono text-[9.5px] uppercase tracking-[0.18em] text-text-muted">
+          <span className="ml-auto font-workspace-mono text-[9px] uppercase tracking-[0.06em] text-[#999999]">
             Free
           </span>
-        </Link>
+        </div>
       </div>
     </>
   );
@@ -262,7 +192,7 @@ export default function Sidebar({ open, onClose }: SidebarProps) {
       <aside
         className={clsx(
           "fixed inset-y-0 left-0 z-50 hidden w-[var(--sidebar-width)] flex-col",
-          "border-r border-border bg-bg-secondary md:flex",
+          "border-r border-[#e5e5e5] bg-white px-3.5 py-5 md:flex",
         )}
       >
         {sidebarContent}
@@ -270,8 +200,8 @@ export default function Sidebar({ open, onClose }: SidebarProps) {
 
       <aside
         className={clsx(
-          "fixed inset-y-0 left-0 z-50 flex w-[280px] flex-col",
-          "border-r border-border bg-bg-secondary",
+          "fixed inset-y-0 left-0 z-50 flex w-[250px] flex-col",
+          "border-r border-[#e5e5e5] bg-white px-3.5 py-5",
           "transition-transform duration-300 ease-in-out md:hidden",
           open ? "translate-x-0" : "-translate-x-full",
         )}

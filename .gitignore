@@ -48,3 +48,6 @@ next-env.d.ts
 
 # OpenClaw engine (cloned, not tracked)
 backend/
+
+# MoneyPrinterTurbo worker clone (run separately, not vendored)
+services/MoneyPrinterTurbo/

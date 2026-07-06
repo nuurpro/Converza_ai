@@ -5,6 +5,9 @@
   --font-sans:  var(--font-geist), ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
   --font-serif: var(--font-serif), "Instrument Serif", Georgia, "Times New Roman", serif;
   --font-mono:  var(--font-mono), "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
+  --font-workspace-display: var(--font-syne), ui-sans-serif, system-ui, sans-serif;
+  --font-workspace-sans: var(--font-dm-sans), ui-sans-serif, system-ui, sans-serif;
+  --font-workspace-mono: var(--font-dm-mono), ui-monospace, SFMono-Regular, Menlo, monospace;
 
   /* ── Background ── (Claude-style: warm cream canvas, true-white lifted surfaces) */
   --color-bg-primary:    #FAFAF7;        /* warm cream canvas — the "page" */
@@ -42,8 +45,18 @@
   --color-info:          var(--color-accent);
   --color-info-dim:      var(--color-accent-dim);
 
+  /* ── Agent workspace tokens from the v1 spec ── */
+  --color-converza-blue: #0070F3;
+  --color-converza-blue-dim: rgba(0,112,243,0.08);
+  --color-milo: #D97706;
+  --color-milo-dim: rgba(217,119,6,0.10);
+  --color-sleyz: #16A34A;
+  --color-sleyz-dim: rgba(22,163,74,0.10);
+  --color-vea: #7C3AED;
+  --color-vea-dim: rgba(124,58,237,0.10);
+
   /* ── Sidebar ── */
-  --sidebar-width:       272px;
+  --sidebar-width:       250px;
   --sidebar-collapsed:   64px;
 }
 

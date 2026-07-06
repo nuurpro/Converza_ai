@@ -1,22 +1,28 @@
 import os
 import uuid
 import json
+import asyncio
 from datetime import datetime, timezone
 from typing import AsyncGenerator
 
-from fastapi import FastAPI, HTTPException
+from fastapi import FastAPI, HTTPException, BackgroundTasks
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import StreamingResponse
 from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel
 from dotenv import load_dotenv
-import anthropic
 
-from agents.orchestrator import run_orchestrator
-from agents.manager import stream_manager
-from agents.dag_runner import execute_dag
 from db import get_supabase
 from llm import stream_gemini
+from lib.context_assembler import VALID_AGENTS
+from lib.mentions import extract_mentions
+from lib.repository import SupabaseRepository
+from lib.switchboard import (
+    handle_direct_agent_message,
+    handle_squad_owner_message,
+    resolve_hitl,
+    run_agent,
+)
 
 load_dotenv()
 
@@ -53,6 +59,20 @@ class PipelineRequest(BaseModel):
     user_role: str = "Owner"
     conversation_id: str | None = None  # existing conversation to append to
     conversation_history: list[dict] = []
+
+
+class AgentMessageRequest(BaseModel):
+    org_id: str
+    text: str
+
+
+class SquadMessageRequest(BaseModel):
+    org_id: str
+    text: str
+
+
+class HitlEditRequest(BaseModel):
+    final_content: str | None = None
 
 
 # ---------------------------------------------------------------------------
@@ -135,10 +155,6 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# Anthropic client — used by orchestrator/manager agents (not /chat which uses KIE.ai)
-anthropic_client = anthropic.AsyncAnthropic(api_key=os.getenv("ANTHROPIC_API_KEY"))
-
-
 # ---------------------------------------------------------------------------
 # Helpers
 # ---------------------------------------------------------------------------
@@ -160,6 +176,10 @@ def build_context_block(ctx: ClientContext, role: str) -> str:
         f"User Role: {role}\n"
         f"[END CLIENT CONTEXT]\n\n"
     )
+
+
+def get_switchboard_repo() -> SupabaseRepository:
+    return SupabaseRepository(get_supabase())
 
 
 async def stream_response(
@@ -239,17 +259,22 @@ async def orchestrate(request: OrchestrateRequest):
     ctx = request.client_context.model_dump()
 
     try:
+        from agents.orchestrator import run_orchestrator
+
         result = await run_orchestrator(
             user_message=request.user_message,
             client_context=ctx,
             conversation_history=request.conversation_history,
         )
-    except anthropic.AuthenticationError:
-        raise HTTPException(status_code=401, detail="Invalid ANTHROPIC_API_KEY.")
-    except anthropic.RateLimitError:
-        raise HTTPException(status_code=429, detail="Rate limit reached. Try again shortly.")
-    except anthropic.APIStatusError as e:
-        raise HTTPException(status_code=502, detail=f"Anthropic API error: {e.message}")
+    except Exception as e:
+        error_name = e.__class__.__name__
+        if error_name == "AuthenticationError":
+            raise HTTPException(status_code=401, detail="Invalid ANTHROPIC_API_KEY.")
+        if error_name == "RateLimitError":
+            raise HTTPException(status_code=429, detail="Rate limit reached. Try again shortly.")
+        if error_name == "APIStatusError":
+            raise HTTPException(status_code=502, detail=f"Anthropic API error: {getattr(e, 'message', str(e))}")
+        raise
 
     return result
 
@@ -347,6 +372,9 @@ async def stream_pipeline(request: PipelineRequest) -> AsyncGenerator[str, None]
     dag_plan_data: dict | None = None
 
     try:
+        from agents.manager import stream_manager
+        from agents.dag_runner import execute_dag
+
         # ── Resolve Brand Passport ──
         if request.brand_id:
             try:
@@ -459,13 +487,19 @@ async def stream_pipeline(request: PipelineRequest) -> AsyncGenerator[str, None]
         # ── Done ──
         yield f"data: {json.dumps({'type': 'done', 'conversation_id': conv_id, 'run_id': run_id})}\n\n"
 
-    except anthropic.AuthenticationError:
-        yield f"data: {json.dumps({'type': 'error', 'error': 'Invalid API key. Check your ANTHROPIC_API_KEY.'})}\n\n"
-    except anthropic.RateLimitError:
-        yield f"data: {json.dumps({'type': 'error', 'error': 'Rate limit reached. Please wait and try again.'})}\n\n"
-    except anthropic.APIStatusError as e:
-        yield f"data: {json.dumps({'type': 'error', 'error': f'API error ({e.status_code}): {e.message}'})}\n\n"
     except Exception as e:
+        error_name = e.__class__.__name__
+        if error_name == "AuthenticationError":
+            yield f"data: {json.dumps({'type': 'error', 'error': 'Invalid API key. Check your ANTHROPIC_API_KEY.'})}\n\n"
+            return
+        if error_name == "RateLimitError":
+            yield f"data: {json.dumps({'type': 'error', 'error': 'Rate limit reached. Please wait and try again.'})}\n\n"
+            return
+        if error_name == "APIStatusError":
+            status_code = getattr(e, "status_code", "unknown")
+            message = getattr(e, "message", str(e))
+            yield f"data: {json.dumps({'type': 'error', 'error': f'API error ({status_code}): {message}'})}\n\n"
+            return
         yield f"data: {json.dumps({'type': 'error', 'error': f'Pipeline error: {str(e)}'})}\n\n"
 
 
@@ -509,6 +543,143 @@ async def pipeline_status(run_id: str):
         }
     except Exception as e:
         raise HTTPException(status_code=404, detail=f"Run not found: {str(e)}")
+
+
+# ---------------------------------------------------------------------------
+# Agent Switchboard + Squad Chat
+# ---------------------------------------------------------------------------
+
+@app.post("/api/agent/{agent_slug}/message")
+async def agent_message(agent_slug: str, request: AgentMessageRequest):
+    if agent_slug not in VALID_AGENTS:
+        raise HTTPException(status_code=404, detail="Unknown agent")
+
+    try:
+        result = await handle_direct_agent_message(
+            org_id=request.org_id,
+            agent_slug=agent_slug,
+            text=request.text,
+            repo=get_switchboard_repo(),
+        )
+        return result
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@app.post("/api/squad/message")
+async def squad_message(request: SquadMessageRequest, background_tasks: BackgroundTasks):
+    repo = get_switchboard_repo()
+    mentions = extract_mentions(request.text)
+    owner_message = await repo.insert_squad_message(
+        org_id=request.org_id,
+        sender_slug="owner",
+        content=request.text,
+        mentions=mentions,
+    )
+
+    targets = mentions or ["milo"]
+    for target in targets:
+        background_tasks.add_task(
+            run_agent,
+            org_id=request.org_id,
+            agent_slug=target,
+            text=request.text,
+            triggered_by="owner",
+            repo=repo,
+        )
+
+    return {"message": owner_message, "routed_to": targets}
+
+
+@getattr(app, "get")("/api/squad/stream")
+async def squad_stream(org_id: str):
+    async def events() -> AsyncGenerator[str, None]:
+        seen_messages: set[str] = set()
+        seen_steps: set[str] = set()
+        while True:
+            try:
+                sb = get_supabase()
+                messages = (
+                    sb.table("squad_messages")
+                    .select("*")
+                    .eq("org_id", org_id)
+                    .order("created_at", desc=False)
+                    .limit(100)
+                    .execute()
+                )
+                for row in messages.data or []:
+                    if row["id"] in seen_messages:
+                        continue
+                    seen_messages.add(row["id"])
+                    yield f"data: {json.dumps({'type': 'squad_message', 'row': row}, default=str)}\n\n"
+
+                steps = (
+                    sb.table("agent_run_steps")
+                    .select("*")
+                    .eq("org_id", org_id)
+                    .order("created_at", desc=False)
+                    .limit(100)
+                    .execute()
+                )
+                for row in steps.data or []:
+                    if row["id"] in seen_steps:
+                        continue
+                    seen_steps.add(row["id"])
+                    yield f"data: {json.dumps({'type': 'agent_run_step', 'row': row}, default=str)}\n\n"
+            except Exception as e:
+                yield f"data: {json.dumps({'type': 'error', 'error': str(e)})}\n\n"
+            await asyncio.sleep(2)
+
+    return StreamingResponse(
+        events(),
+        media_type="text/event-stream",
+        headers={"Cache-Control": "no-cache", "X-Accel-Buffering": "no"},
+    )
+
+
+@app.post("/api/hitl/{draft_id}/approve")
+async def hitl_approve(draft_id: str):
+    try:
+        return await resolve_hitl(
+            draft_id=draft_id,
+            action="approve",
+            repo=get_switchboard_repo(),
+        )
+    except KeyError:
+        raise HTTPException(status_code=404, detail="Draft not found")
+
+
+@app.post("/api/hitl/{draft_id}/reject")
+async def hitl_reject(draft_id: str):
+    try:
+        return await resolve_hitl(
+            draft_id=draft_id,
+            action="reject",
+            repo=get_switchboard_repo(),
+        )
+    except KeyError:
+        raise HTTPException(status_code=404, detail="Draft not found")
+
+
+@app.post("/api/hitl/{draft_id}/edit")
+async def hitl_edit(draft_id: str, request: HitlEditRequest):
+    try:
+        return await resolve_hitl(
+            draft_id=draft_id,
+            action="edit",
+            repo=get_switchboard_repo(),
+            edited_content=request.final_content,
+        )
+    except KeyError:
+        raise HTTPException(status_code=404, detail="Draft not found")
+
+
+@app.get("/api/dashboard/{org_id}/stats")
+async def dashboard_stats(org_id: str):
+    try:
+        return {"stats": await get_switchboard_repo().get_dashboard_stats(org_id)}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
 
 
 # ---------------------------------------------------------------------------

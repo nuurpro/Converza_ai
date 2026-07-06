@@ -9,6 +9,7 @@ interface ConfigPageShellProps {
   lead: string;
   icon: React.ElementType;
   placeholder: string;
+  children?: React.ReactNode;
 }
 
 export default function ConfigPageShell({
@@ -17,6 +18,7 @@ export default function ConfigPageShell({
   lead,
   icon: Icon,
   placeholder,
+  children,
 }: ConfigPageShellProps) {
   const [value, setValue] = useState("");
   const [saved, setSaved] = useState(false);
@@ -80,6 +82,8 @@ export default function ConfigPageShell({
               {saved ? "Saved" : "Save"}
             </button>
           </div>
+
+          {children && <div className="mt-12">{children}</div>}
         </motion.div>
       </div>
     </div>

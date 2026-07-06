@@ -12,17 +12,42 @@ const roles = [
 ];
 
 const models = [
-  { id: "sonnet-4-7", label: "Claude Sonnet 4.7", tag: "Default", speed: "Fast", cost: "$3 / 1M" },
-  { id: "opus-4-7", label: "Claude Opus 4.7", tag: "Heavy reasoning", speed: "Slow", cost: "$15 / 1M" },
-  { id: "haiku-4-7", label: "Claude Haiku 4.7", tag: "Bulk runs", speed: "Instant", cost: "$0.50 / 1M" },
+  {
+    id: "openai/gpt-oss-20b",
+    label: "OpenAI GPT-OSS 20B",
+    tag: "Default",
+    speed: "~1000 t/s",
+    context: "131k ctx",
+  },
+  {
+    id: "openai/gpt-oss-120b",
+    label: "OpenAI GPT-OSS 120B",
+    tag: "Deep reasoning",
+    speed: "~500 t/s",
+    context: "131k ctx",
+  },
+  {
+    id: "llama-3.3-70b-versatile",
+    label: "Llama 3.3 70B Versatile",
+    tag: "General",
+    speed: "~280 t/s",
+    context: "131k ctx",
+  },
+  {
+    id: "llama-3.1-8b-instant",
+    label: "Llama 3.1 8B Instant",
+    tag: "Fast bulk",
+    speed: "~560 t/s",
+    context: "131k ctx",
+  },
 ];
 
 export default function ModelsPage() {
   const [picks, setPicks] = useState<Record<string, string>>({
-    strategist: "sonnet-4-7",
-    copywriter: "sonnet-4-7",
-    video: "haiku-4-7",
-    analyst: "opus-4-7",
+    strategist: "openai/gpt-oss-120b",
+    copywriter: "openai/gpt-oss-20b",
+    video: "openai/gpt-oss-20b",
+    analyst: "openai/gpt-oss-120b",
   });
 
   return (
@@ -32,7 +57,7 @@ export default function ModelsPage() {
           Models
         </h2>
         <p className="mt-2 max-w-md text-[15px] leading-relaxed text-text-secondary">
-          Default LLM per role. Pick the smallest model that still does the job — the swarm runs faster and cheaper.
+          Default Groq model per role. Pick the smallest model that still does the job, the swarm runs faster and cheaper.
         </p>
       </header>
 
@@ -71,7 +96,7 @@ export default function ModelsPage() {
                     {active && <Check size={11} strokeWidth={2.6} />}
                   </span>
                   <div className="flex-1">
-                    <div className="flex items-baseline gap-2">
+                    <div className="flex flex-wrap items-baseline gap-x-2 gap-y-1">
                       <span className="text-[14px] font-medium text-text-primary">
                         {model.label}
                       </span>
@@ -79,9 +104,12 @@ export default function ModelsPage() {
                         {model.tag}
                       </span>
                     </div>
+                    <div className="mt-1 font-mono text-[10.5px] text-text-muted">
+                      {model.id}
+                    </div>
                   </div>
-                  <span className="font-mono text-[10.5px] uppercase tracking-[0.18em] text-text-muted">
-                    {model.speed} · {model.cost}
+                  <span className="text-right font-mono text-[10.5px] uppercase tracking-[0.12em] text-text-muted">
+                    {model.speed} · {model.context}
                   </span>
                 </button>
               );

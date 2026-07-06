@@ -19,7 +19,7 @@ export default function MainLayout({ children }: MainLayoutProps) {
   }
 
   return (
-    <div className="flex h-screen overflow-hidden bg-bg-primary">
+    <div className="flex h-screen overflow-hidden bg-white">
       {/* Mobile hamburger */}
       <button
         onClick={() => setSidebarOpen(true)}
